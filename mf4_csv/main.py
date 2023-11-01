@@ -8,7 +8,8 @@ import glob
 
 output_dir = "./output_in_csv"
 
-def prepare_dir(mf4_file):
+
+def prepare_dir(mf4_file): #Directory preparation
     my_str = str(mf4_file)
     my_str = my_str.lower().strip(".mf4")
     my_str = my_str.replace(".MF4", ".csv")
@@ -17,7 +18,7 @@ def prepare_dir(mf4_file):
     return my_str
 
 
-def convertMF4toCSV(mf4_file):
+def convertMF4toCSV(mf4_file): 
     data = MDF(mf4_file)
     f_out = mf4_file.replace(".MF4", ".csv")
     data.export(fmt='csv', filename=f_out) #write to csv 
