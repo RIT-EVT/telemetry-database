@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8aa9e395-7b4f-4817-b0ed-0bdb71c894a5" name="Changes" comment="Adding DDL" />
+    <list default="true" id="8aa9e395-7b4f-4817-b0ed-0bdb71c894a5" name="Changes" comment="Adding DDL">
+      <change afterPath="$PROJECT_DIR$/DDL.sql" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -14,10 +16,13 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="ROOT_SYNC" value="DONT_SYNC" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 7
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
   <component name="ProjectId" id="2XpBqjxlJNsNEbaJb2oBYbimYeP" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -28,7 +33,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "tmb7852/ddl",
-    "last_opened_file_path": "C:/Users/trevo/telemetry-database"
+    "last_opened_file_path": "C:/Users/trevo/telemetry-database/DDL.sql"
   },
   "keyToStringList": {
     "DatabaseDriversLRU": [
