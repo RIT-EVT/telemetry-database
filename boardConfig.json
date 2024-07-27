@@ -1,0 +1,32 @@
+{
+    "Motor Controller": {
+        "dummydata": "dummy"
+    },
+    "TMU": {
+        "0x180": ["thermistorOneTemp", "thermistorTwoTemp", "thermistorThreeTemp", "thermistorFourTemp"]
+    },
+    "TMS": {
+        "0x180": ["sensorOne", "sensorTwo", "sensorThree", "sensorFour"],
+        "0x200": ["pumpSpeed", "fanSpeed", "fan2Speed"]
+    },
+    "IMU": {
+        "0x180": ["vectorXValueOne", "vectorXValueTwo", "vectorXValueThree", "vectorXValueFour"],
+        "0x200": ["vectorYValueOne", "vectorYValueTwo", "vectorYValueThree", "vectorYValueFour"],
+        "0x280": ["vectorZValueOne", "vectorZValueTwo", "vectorZValueThree", "vectorZValueFour"]
+    },
+    "PVC": {
+        "0x180": ["state"]
+    },
+    "BMS": {
+        "0x180": ["batteryVoltage", "minCellVoltage", "minCellID", "maxCellVoltage", "maxCellID"],
+        "0x200": ["current", "minPackTemp", "minPackTempId", "maxPackTemp", "maxPackTempId", "internalTemp", "state"],
+        "0x280": ["thermistorOneTemp", "thermistorTwoTemp", "thermistorThreeTemp", "thermistorFourTemp", "thermistorFiveTemp", "thermistorFiveTemp", "bqTempOne", "bqTempTwo"],
+        "0x300": ["errorRegister", "bqOneStatus", "bqTwoStatus", "bqThreeStatus", "bqFourStatus", "bqFiveStatus", "bqSixStatus", "bqSevenStatus"]
+    },
+    "BMSV": {
+        "0x180": ["cellOneVoltage", "cellTwoVoltage", "cellThreeVoltage", "cellFourVoltage"],
+        "0x200": ["cellFiveVoltage", "cellSixVoltage", "cellSevenVoltage", "cellEightVoltage"],
+        "0x280": ["cellNineVoltage", "cellTenVoltage", "cellElevenVoltage", "cellTwelveVoltage"]
+    }
+
+}
