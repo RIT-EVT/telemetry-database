@@ -1,256 +1,312 @@
-CREATE TABLE BikeInfo(
+CREATE TABLE BmsConfig(
     id                  SERIAL PRIMARY KEY,
-    name                TEXT NOT NULL,
-    distanceCovered     INTEGER NOT NULL
-);
-
-CREATE TABLE Part(
-    id      SERIAL PRIMARY KEY,
-    name    TEXT NOT NULL,
-    weight  FLOAT NOT NULL
-);
-
-CREATE TABLE BMSConfig(
-    id                  SERIAL PRIMARY KEY,
-    name                TEXT NOT NULL,
+    hardwareRevision    TEXT NOT NULL,
+    softwareCommitHash  TEXT NOT NULL,
     totalVoltageUnits   TEXT NOT NULL,
     batteryVoltageUnits TEXT NOT NULL,
     currentUnits        TEXT NOT NULL,
-    thermistorTempUnits TEXT NOT NULL,
     packTempUnits       TEXT NOT NULL,
     bqTempUnits         TEXT NOT NULL,
     cellVoltageUnits    TEXT NOT NULL
 );
 
-CREATE TABLE IMUConfig(
-    id          SERIAL PRIMARY KEY,
-    name        TEXT NOT NULL,
-    vectorUnits TEXT NOT NULL
+CREATE TABLE ImuConfig(
+    id                      SERIAL PRIMARY KEY,
+    hardwareRevision        TEXT NOT NULL,
+    softwareCommitHash      TEXT NOT NULL,
+    eulerUnits              TEXT NOT NULL,
+    gyroUnits               TEXT NOT NULL,
+    linearAccelerationUnits TEXT NOT NULL,
+    accelerometerUnits      TEXT NOT NULL,
 );
 
-CREATE TABLE TMUConfig(
-    id          SERIAL PRIMARY KEY,
-    name        TEXT NOT NULL,
-    thermUnits  TEXT NOT NULL
+CREATE TABLE TmuConfig(
+    id                 SERIAL PRIMARY KEY,
+    hardwareRevision   TEXT NOT NULL,
+    softwareCommitHash TEXT NOT NULL,
+    thermUnits         TEXT NOT NULL
 );
 
-CREATE TABLE TMSConfig(
+CREATE TABLE TmsConfig(
+    id                 SERIAL PRIMARY KEY,
+    hardwareRevision   TEXT NOT NULL,
+    softwareCommitHash TEXT NOT NULL,
+    tempUnits          TEXT NOT NULL,
+    pumpSpeedUnits     TEXT NOT NULL,
+    fanSpeedUnits      TEXT NOT NULL
+);
+
+CREATE TABLE PvcConfig(
+    id                 SERIAL PRIMARY KEY,
+    hardwareRevision   TEXT NOT NULL,
+    softwareCommitHash TEXT NOT NULL,
+);
+
+-- TODO: Add detail
+CREATE TABLE McConfig(
     id              SERIAL PRIMARY KEY,
-    name            TEXT NOT NULL,
-    sensorTempUnits TEXT NOT NULL,
-    pumpSpeedUnits  TEXT NOT NULL,
-    fanSpeedUnits   TEXT NOT NULL
+    model           TEXT NOT NULL,
+    firmwareVersion TEXT NOT NULL
 );
 
-CREATE TABLE PVCConfig(
-    id      SERIAL PRIMARY KEY,
-    name    TEXT NOT NULL
+CREATE TABLE BikeConfig(
+    id            SERIAL PRIMARY KEY,
+    platformName  TEXT NOT NULL,
+    tirePressure  FLOAT DEFAULT NULL,
+    coolantVolume FLOAT DEFAULT NULL,
+    bmsConfigId   INTEGER NOT NULL,
+    imuConfigId   INTEGER DEFAULT NULL,
+    tmuConfigId   INTEGER DEFAULT NULL,
+    tmsConfigId   INTEGER NOT NULL,
+    pvcConfigId   INTEGER NOT NULL,
+    mcConfigId    INTEGER NOT NULL,
+    FOREIGN KEY (bmsConfigId) REFERENCES BmsConfig(id),
+    FOREIGN KEY (imuConfigId) REFERENCES ImuConfig(id),
+    FOREIGN KEY (tmuConfigId) REFERENCES TmuConfig(id),
+    FOREIGN KEY (tmsConfigId) REFERENCES TmsConfig(id),
+    FOREIGN KEY (pvcConfigId) REFERENCES PvcConfig(id),
+    FOREIGN KEY (mcConfigId)  REFERENCES McConfig(id),
 );
 
-CREATE TABLE BikeBoardConfig(
-    bikeInfoid  INTEGER,
-    boardConfig INTEGER,
-    PRIMARY KEY ( bikeInfoid, boardConfig)
+CREATE TABLE Part(
+    partNumber INTEGER PRIMARY KEY,
+    name       TEXT NOT NULL,
+    weight     FLOAT NOT NULL,
+    imagePath  TEXT NOT NULL
 );
 
-CREATE TABLE BikePartConfig(
-    id          SERIAL PRIMARY KEY,
-    bikeInfoid  INTEGER NOT NULL,
-    partNumber  TEXT NOT NULL
+CREATE TABLE PartInBikeConfig(
+    bikeConfigId INTEGER,
+    partNumber   INTEGER,
+    PRIMARY KEY (bikeConfigId, partNumber),
+    FOREIGN KEY (bikeConfigId) REFERENCES BikeConfig(id),
+    FOREIGN KEY (partNumber)   REFERENCES Part(partNumber)
+);
+
+CREATE TABLE Event(
+    id        SERIAL PRIMARY KEY,
+    eventDate DATE NOT NULL,
+    eventType TEXT NOT NULL,
+    location  TEXT NOT NULL
 );
 
 CREATE TABLE Context(
-    id                      SERIAL PRIMARY KEY,
-    contextDate             DATE NOT NULL,
-    runEventType            TEXT NOT NULL,
-    airTemp                 INTEGER DEFAULT NULL,
-    altitude                INTEGER DEFAULT NULL,
-    location                TEXT NOT NULL,
-    windSpeed               FLOAT DEFAULT NULL,
-    windDirection           TEXT DEFAULT NULL,
-    riderOne                TEXT NOT NULL,
-    riderTwo                TEXT DEFAULT NULL,
-    riderOneCurrentWeight   FLOAT NOT NULL,
-    riderTwoCurrentWeight   FLOAT DEFAULT NULL,
-    humidity                FLOAT DEFAULT NULL,
-    driverFeedback          TEXT DEFAULT NULL
+    id              SERIAL PRIMARY KEY,
+    airTemp         FLOAT DEFAULT NULL,
+    humidity        FLOAT DEFAULT NULL,
+    windSpeed       FLOAT DEFAULT NULL,
+    windAngle       FLOAT DEFAULT NULL,
+    riderName       TEXT NOT NULL,
+    riderWeight     FLOAT DEFAULT NULL,
+    driverFeedback  TEXT DEFAULT NULL,
+    distanceCovered FLOAT NOT NULL,
+    startTime       DATETIME NOT NULL,
+    eventId         INTEGER NOT NULL,
+    bikeConfigId    INTEGER NOT NULL,
+    FOREIGN KEY (eventId) REFERENCES Event(id),
+    FOREIGN KEY (bikeConfigId REFERENCES BikeConfig(id)
 );
 
-CREATE TABLE BMSTotalVoltage(
+CREATE TABLE BmsBatteryVoltage(
     id          SERIAL PRIMARY KEY,
-    value       INTEGER NOT NULL,
-    moment      TIMESTAMP,
+    packId      INTEGER NOT NULL,
+    val         INTEGER NOT NULL,
+    receiveTime TIMESTAMP NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id)
 );
 
-CREATE TABLE BMSBatteryVoltage(
+CREATE TABLE BmsMinCellVoltage(
     id          SERIAL PRIMARY KEY,
-    value       INTEGER NOT NULL,
-    moment      TIMESTAMP,
+    packId      INTEGER NOT NULL,
+    cellId      INTEGER NOT NULL,
+    val         INTEGER NOT NULL,
+    receiveTime TIMESTAMP NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id)
 );
 
-CREATE TABLE BMSCurrent(
+CREATE TABLE BmsMaxCellVoltage(
     id          SERIAL PRIMARY KEY,
-    value       INTEGER NOT NULL,
-    moment      TIMESTAMP,
+    packId      INTEGER NOT NULL,
+    cellId      INTEGER NOT NULL,
+    val         INTEGER NOT NULL,
+    receiveTime TIMESTAMP NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id)
 );
 
-CREATE TABLE BMSThermistorTemp(
-    id          SERIAL,
-    thermNumber INTEGER,
-    value       INTEGER NOT NULL,
-    moment      TIMESTAMP,
+CREATE TABLE BmsCurrent(
+    id          SERIAL PRIMARY KEY,
+    packId      INTEGER NOT NULL,
+    val         INTEGER NOT NULL,
+    receiveTime TIMESTAMP NOT NULL,
+    contextId   INTEGER NOT NULL,
+    FOREIGN KEY (contextId) REFERENCES Context(id)
+);
+
+CREATE TABLE BmsMinPackTemp(
+    id          SERIAL PRIMARY KEY,
+    packId      INTEGER NOT NULL,
+    thermId     INTEGER NOT NULL,
+    val         INTEGER NOT NULL,
+    receiveTime TIMESTAMP NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id),
-    PRIMARY KEY (id, thermNumber)
 );
 
-CREATE TABLE BMSMinPackTemp(
+CREATE TABLE BmsMaxPackTemp(
     id          SERIAL PRIMARY KEY,
-    value       INTEGER,
-    packid      VARCHAR(2),
-    moment      TIMESTAMP,
+    packId      INTEGER NOT NULL,
+    thermId     INTEGER NOT NULL,
+    val         INTEGER NOT NULL,
+    receiveTime TIMESTAMP NOT NULL,
     contextId   INTEGER NOT NULL,
-    FOREIGN KEY (contextId) REFERENCES Context(id)
+    FOREIGN KEY (contextId) REFERENCES Context(id),
 );
 
-CREATE TABLE BMSMaxPackTemp(
+CREATE TABLE BmsBqTemp(
     id          SERIAL PRIMARY KEY,
-    value       INTEGER,
-    packid      INTEGER,
-    moment      TIMESTAMP,
+    packId      INTEGER NOT NULL,
+    tempId      INTEGER NOT NULL,
+    val         INTEGER NOT NULL,
+    receiveTime TIMESTAMP NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id)
 );
 
-CREATE TABLE BMSBqInternalTemp(
+CREATE TABLE BmsState(
     id          SERIAL PRIMARY KEY,
-    value       INTEGER NOT NULL,
-    moment      TIMESTAMP,
+    packId      INTEGER NOT NULL,
+    val         INTEGER NOT NULL,
+    receiveTime TIMESTAMP NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id)
 );
 
-CREATE TABLE BMSBqTemp(
+CREATE TABLE BmsThermistorTemp(
     id          SERIAL PRIMARY KEY,
-    value       INTEGER NOT NULL,
-    bqid        INTEGER NOT NULL,
-    moment      TIMESTAMP,
+    packId      INTEGER NOT NULL,
+    thermId     INTEGER NOT NULL,
+    val         INTEGER NOT NULL,
+    receiveTime TIMESTAMP NOT NULL,
     contextId   INTEGER NOT NULL,
-    FOREIGN KEY (contextId) REFERENCES Context(id)
+    FOREIGN KEY (contextId) REFERENCES Context(id),
 );
 
-CREATE TABLE BMSCellVoltage(
-    PRIMARY KEY (id, cellid),
-    id          SERIAL,
-    cellid      INTEGER,
-    value       INTEGER NOT NULL,
-    moment      TIMESTAMP,
-    contextId   INTEGER NOT NULL,
-    FOREIGN KEY (contextId) REFERENCES Context(id)
-);
-
-CREATE TABLE BMSMinCellVoltage(
+CREATE TABLE BmsErrorRegister(
     id          SERIAL PRIMARY KEY,
-    value       INTEGER NOT NULL,
-    cellid      INTEGER NOT NULL,
-    moment      TIMESTAMP,
+    packId      INTEGER NOT NULL,
+    val         INTEGER NOT NULL,
+    receiveTime TIMESTAMP NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id)
 );
 
-CREATE TABLE BMSMaxCellVoltage(
+CREATE TABLE BmsBqStatus(
     id          SERIAL PRIMARY KEY,
-    value       INTEGER NOT NULL,
-    cellid      INTEGER NOT NULL,
-    moment      TIMESTAMP,
+    packId      INTEGER NOT NULL,
+    val         INTEGER NOT NULL,
+    receiveTime TIMESTAMP NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id)
 );
 
-CREATE TABLE BMSBqStatus(
+CREATE TABLE BmsCellVoltage(
     id          SERIAL PRIMARY KEY,
-    value       INTEGER NOT NULL,
-    moment      TIMESTAMP,
+    packId      INTEGER NOT NULL,
+    cellId      INTEGER NOT NULL,
+    val         INTEGER NOT NULL,
+    receiveTime TIMESTAMP NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id)
 );
 
-CREATE TABLE BMSErrorRegister(
+CREATE TABLE ImuEulerComponent(
     id          SERIAL PRIMARY KEY,
-    value       INTEGER NOT NULL,
-    moment      TIMESTAMP,
+    axis        CHAR(1) NOT NULL,
+    val         INTEGER NOT NULL
+    receiveTime TIMESTAMP NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id)
 );
 
-CREATE TABLE BMSLastCheckedThermNum(
+CREATE TABLE ImuGyroComponent(
     id          SERIAL PRIMARY KEY,
-    value       INTEGER NOT NULL,
-    moment      TIMESTAMP,
+    axis        CHAR(1) NOT NULL,
+    val         INTEGER NOT NULL
+    receiveTime TIMESTAMP NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id)
 );
 
-CREATE TABLE IMUVector(
-    id                          SERIAL PRIMARY KEY,
-    vectorComponent             TEXT NOT NULL,
-    eulerVector                 INTEGER DEFAULT NULL,
-    gyroscopeVector             INTEGER DEFAULT NULL,
-    linearAccelerationVector    INTEGER DEFAULT NULL,
-    accelerometerVector         INTEGER DEFAULT NULL,
-    moment                      TIMESTAMP,
-    contextId                   INTEGER NOT NULL,
-    FOREIGN KEY (contextId) REFERENCES Context(id)
-);
-
-CREATE TABLE TMUThermistorTemp(
-    id                  SERIAL PRIMARY KEY,
-    thermistorOneTemp   INTEGER DEFAULT NULL,
-    thermistorTwoTemp   INTEGER DEFAULT NULL,
-    thermistorThreeTemp INTEGER DEFAULT NULL,
-    thermistorFourTemp  INTEGER DEFAULT NULL,
-    contextId           INTEGER NOT NULL,
-    FOREIGN KEY (contextId) REFERENCES Context(id)
-);
-
-CREATE TABLE TMSSensorTemp(
-    PRIMARY KEY (id, sensorid),
-    id          SERIAL,
-    sensorid    INTEGER,
-    value       INTEGER NOT NULL,
-    moment      TIMESTAMP,
-    contextId   INTEGER NOT NULL,
-    FOREIGN KEY (contextId) REFERENCES Context(id)
-);
-
-CREATE TABLE TMSPumpSpeed(
+CREATE TABLE ImuLinearAccelerationComponent(
     id          SERIAL PRIMARY KEY,
-    value       INTEGER NOT NULL,
-    moment      TIMESTAMP,
+    axis        CHAR(1) NOT NULL,
+    val         INTEGER NOT NULL
+    receiveTime TIMESTAMP NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id)
 );
 
-CREATE TABLE TMSFanSpeed(
-    PRIMARY KEY (id, fanid),
-    id          SERIAL,
-    fanid       INTEGER,
-    value       INTEGER NOT NULL,
-    moment      TIMESTAMP,
-    contextId   INTEGER NOT NULL,
-    FOREIGN KEY (contextId) REFERENCES Context(id)
-);
-
-CREATE TABLE PVCState(
+CREATE TABLE ImuAccelerometerComponent(
     id          SERIAL PRIMARY KEY,
-    value       INTEGER NOT NULL,
-    moment      TIMESTAMP,
+    axis        CHAR(1) NOT NULL,
+    val         INTEGER NOT NULL
+    receiveTime TIMESTAMP NOT NULL,
+    contextId   INTEGER NOT NULL,
+    FOREIGN KEY (contextId) REFERENCES Context(id)
+);
+
+CREATE TABLE TmuThermistorTemp(
+    id          SERIAL PRIMARY KEY,
+    thermId     INTEGER NOT NULL,
+    val         INTEGER NOT NULL,
+    receiveTime TIMESTAMP NOT NULL,
+    contextId   INTEGER NOT NULL,
+    FOREIGN KEY (contextId) REFERENCES Context(id)
+);
+
+CREATE TABLE TmuThermistorError(
+    id          SERIAL PRIMARY KEY,
+    thermId     INTEGER NOT NULL,
+    val         INTEGER NOT NULL,
+    receiveTime TIMESTAMP NOT NULL,
+    contextId   INTEGER NOT NULL,
+    FOREIGN KEY (contextId) REFERENCES Context(id)
+);
+
+CREATE TABLE TmsSensorTemp(
+    id          SERIAL PRIMARY KEY,
+    sensorId    INTEGER NOT NULL,
+    val         INTEGER NOT NULL,
+    receiveTime TIMESTAMP NOT NULL,
+    contextId   INTEGER NOT NULL,
+    FOREIGN KEY (contextId) REFERENCES Context(id)
+);
+
+CREATE TABLE TmsPumpSpeed(
+    id          SERIAL PRIMARY KEY,
+    pumpId      INTEGER NOT NULL,
+    val         INTEGER NOT NULL,
+    receiveTime TIMESTAMP NOT NULL,
+    contextId   INTEGER NOT NULL,
+    FOREIGN KEY (contextId) REFERENCES Context(id)
+);
+
+CREATE TABLE TmsFanSpeed(
+    id          SERIAL PRIMARY KEY,
+    fanId       INTEGER NOT NULL,
+    val         INTEGER NOT NULL,
+    receiveTime TIMESTAMP NOT NULL,
+    contextId   INTEGER NOT NULL,
+    FOREIGN KEY (contextId) REFERENCES Context(id)
+);
+
+CREATE TABLE PvcState(
+    id          SERIAL PRIMARY KEY,
+    val         INTEGER NOT NULL,
+    receiveTime TIMESTAMP NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id)
 );
