@@ -1,6 +1,23 @@
 from asammdf import MDF
 import re
+import psycopg2
+import dotenv
+import json
+import os
 
+configFilePath = "boardConfig.json"
+
+tpdoDictionary = {
+    "TPDO0"     : 0x180,
+    "DEADZONE_1": 0x200,
+    "TPDO1"     : 0x280,
+    "DEADZONE_2": 0x300,
+    "TPDO2"     : 0x380,
+    "DEADZONE_3": 0x400,
+    "TPDO3"     : 0x480,
+    "DEADZONE_4": 0x500,
+    "MAX_VAL"   : 0x580 
+}
 
 nodeIDDictionary = {
     "1" : "Motor Controller",
@@ -27,11 +44,22 @@ nodeIDDictionary = {
 }
 
 def main():
-    file_convert()
+    dotenv.load_dotenv("./credentials.env")
+    conn = psycopg2.connect(
+        database="bert", 
+        user=os.getenv("DB_USER"), 
+        password=os.getenv("PASSWORD"), 
+        host=os.getenv("HOST"), 
+        port=os.getenv("PORT")   
+    )
+    cursor = conn.cursor()
+    file_convert(cursor)
+
+
 
 """Converts .mf4 files to .csv files. There are 7 channel groups created in this conversion. We currently only use number 7.
 This fact will be hard coded into this process as I do not forsee a world where our Mech-E team ever uses another channel."""
-def file_convert():
+def file_convert(cursor):
     print("MF4 file path:")
     file = input().lower()
     files = []
@@ -47,48 +75,46 @@ def file_convert():
                 first_line = f.readline()
     else:
         print("You fool; thats not a valid file! The file must be a .mf4")
-    handle_data(files)
+    handle_data(files, cursor)
 
-def handle_data(files):
+def handle_data(files, cursor):
     for file in files:
         with open(file) as open_file:
             first_line = open_file.readline()
             first_line_listed = first_line.split(",")
-            status = "CAN_DataFrame.CAN_DataFrame.ID" in first_line_listed
-            counter = 0
+            #ID, busId, frameId, dataBytes, receiveTime, contextId
             for line in open_file:
-                counter += 1
-                if(status):
-                    outboard, COB_ID = determine_board_owner(line, first_line_listed.index("CAN_DataFrame.CAN_DataFrame.ID"))
+                
 
 
 
 
 
-def determine_board_owner(line, index):
-    listed_line = line.split(",")
-    id = int(listed_line[index])
-    if(id < 0x180):
-        return("Unknown COBID")
-    if(id <= 0x200):
-        default_COB_ID = 0x180
-    elif(id <= 0x280):
-        default_COB_ID = 0x200
-    elif(id <= 0x300):
-        default_COB_ID = 0x280
-    elif(id <= 0x380):
-        default_COB_ID = 0x300
-    elif(id <= 0x400):
-        default_COB_ID = 0x380
-    elif(id <= 0x480):
-        default_COB_ID = 0x400
-    elif(id <= 0x500):
-        default_COB_ID = 0x480
-    elif(id <= 0x580):
-        default_COB_ID = 0x600
-    else:
-        return("Unknown COBID")
-    return(nodeIDDictionary[str(id-default_COB_ID)], default_COB_ID)
+
+# def determine_board_owner(line, index):
+#     listed_line = line.split(",")
+#     id = int(listed_line[index])
+#     if(id < 0x180):
+#         return("Unknown COBID")
+#     if(id <= 0x200):
+#         default_COB_ID = 0x180
+#     elif(id <= 0x280):
+#         default_COB_ID = 0x200
+#     elif(id <= 0x300):
+#         default_COB_ID = 0x280
+#     elif(id <= 0x380):
+#         default_COB_ID = 0x300
+#     elif(id <= 0x400):
+#         default_COB_ID = 0x380
+#     elif(id <= 0x480):
+#         default_COB_ID = 0x400
+#     elif(id <= 0x500):
+#         default_COB_ID = 0x480
+#     elif(id <= 0x580):
+#         default_COB_ID = 0x600
+#     else:
+#         return("Unknown COBID")
+#     return(nodeIDDictionary[str(id-default_COB_ID)], default_COB_ID)
 
     
 
