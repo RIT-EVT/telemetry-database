@@ -100,11 +100,11 @@ CREATE TABLE Context(
     riderWeight     FLOAT DEFAULT NULL,
     driverFeedback  TEXT DEFAULT NULL,
     distanceCovered FLOAT NOT NULL,
-    startTime       DATETIME NOT NULL,
+    startTime       TIMESTAMP NOT NULL,
     eventId         INTEGER NOT NULL,
     bikeConfigId    INTEGER NOT NULL,
     FOREIGN KEY (eventId) REFERENCES Event(id),
-    FOREIGN KEY (bikeConfigId REFERENCES BikeConfig(id)
+    FOREIGN KEY (bikeConfigId) REFERENCES BikeConfig(id)
 );
 
 CREATE TABLE CanMessage(

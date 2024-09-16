@@ -1,4 +1,8 @@
 *.csv
 *.MF4
+<<<<<<< HEAD
 .idea/
 *.env
+=======
+*.env
+>>>>>>> main

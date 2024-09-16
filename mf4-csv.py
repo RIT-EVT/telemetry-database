@@ -57,6 +57,7 @@ def main():
 
 
 
+
 """Converts .mf4 files to .csv files. There are 7 channel groups created in this conversion. We currently only use number 7.
 This fact will be hard coded into this process as I do not forsee a world where our Mech-E team ever uses another channel."""
 def file_convert(cursor):
@@ -67,12 +68,12 @@ def file_convert(cursor):
         mdf = MDF(file)
         file = file.strip(".mf4")
         mdf.export(fmt='csv', filename= file+'.csv')
-        #This is the location of the hard coding of the files we care about. To change this remove the line below and uncomment the one in the for loop.
+        #This is the location of the hard coding of the files we care about. To change this remove the line below and uncomment the for loop.
         files.append(file+'.ChannelGroup_' + str(7) + '.csv')
-        for x in range (0, 8): 
-            #files.append(file+'.ChannelGroup_' + str(x) + '.csv')
-            with open(file+'.ChannelGroup_' + str(x) + '.csv') as f:
-                first_line = f.readline()
+        # for x in range (0, 8): 
+        #     files.append(file+'.ChannelGroup_' + str(x) + '.csv')
+        #     with open(file+'.ChannelGroup_' + str(x) + '.csv') as f:
+        #         first_line = f.readline()
     else:
         print("You fool; thats not a valid file! The file must be a .mf4")
     handle_data(files, cursor)
@@ -84,40 +85,48 @@ def handle_data(files, cursor):
             first_line_listed = first_line.split(",")
             #ID, busId, frameId, dataBytes, receiveTime, contextId
             for line in open_file:
-                
+                status = "CAN_DataFrame.CAN_DataFrame.ID" in first_line_listed
+                dataLengthIndex = first_line_listed.index("CAN_DataFrame.CAN_DataFrame.DataLength")
+                dataBytesIndex = first_line_listed.index("CAN_DataFrame.CAN_DataFrame.DataBytes")
+                idIndex = first_line_listed.index("CAN_DataFrame.CAN_DataFrame.ID")
+                counter = 0
+                for line in open_file:
+                    counter += 1
+                    if(status):
+                        outboard, cob_id = determine_board_owner(line, idIndex)
+                        extract_data_bytes(outboard, cob_id, dataLengthIndex, dataBytesIndex)
 
 
 
-
-
-
-# def determine_board_owner(line, index):
-#     listed_line = line.split(",")
-#     id = int(listed_line[index])
-#     if(id < 0x180):
-#         return("Unknown COBID")
-#     if(id <= 0x200):
-#         default_COB_ID = 0x180
-#     elif(id <= 0x280):
-#         default_COB_ID = 0x200
-#     elif(id <= 0x300):
-#         default_COB_ID = 0x280
-#     elif(id <= 0x380):
-#         default_COB_ID = 0x300
-#     elif(id <= 0x400):
-#         default_COB_ID = 0x380
-#     elif(id <= 0x480):
-#         default_COB_ID = 0x400
-#     elif(id <= 0x500):
-#         default_COB_ID = 0x480
-#     elif(id <= 0x580):
-#         default_COB_ID = 0x600
-#     else:
-#         return("Unknown COBID")
-#     return(nodeIDDictionary[str(id-default_COB_ID)], default_COB_ID)
+def determine_board_owner(line, index):
+    listed_line = line.split(",")
+    id = int(listed_line[index])
+    """Values based on the CAN Open standard. Each hex value relates to a TPDO message"""
+    if(id < tpdoDictionary["TPDO0"]):
+        return("Unknown COBID", 0)
+    if(id <= tpdoDictionary["DEADZONE_1"]):
+        default_COB_ID = tpdoDictionary["TPDO0"]
+    elif(id <= tpdoDictionary["TPDO1"]):
+        return("Unknown COBID", tpdoDictionary["DEADZONE_1"])
+    elif(id <= tpdoDictionary["DEADZONE_2"]):
+        default_COB_ID = tpdoDictionary["TPDO1"]
+    elif(id <= tpdoDictionary["TPDO1"]):
+        return("Unknown COBID", tpdoDictionary["DEADZONE_2"])
+    elif(id <= tpdoDictionary["DEADZONE_3"]):
+        default_COB_ID = tpdoDictionary["TPDO2"]
+    elif(id <= tpdoDictionary["TPDO3"]):
+        return("Unknown COBID", tpdoDictionary["DEADZONE_3"])
+    elif(id <= tpdoDictionary["DEADZONE_4"]):
+        default_COB_ID = tpdoDictionary["TPDO3"]
+    else:
+        return("Unknown COBID", tpdoDictionary["DEADZONE_4"])
+    return(nodeIDDictionary[str(id-default_COB_ID)], default_COB_ID)
 
     
-
+def extract_data_bytes(outboard, cob_id, dataLengthIndex, dataBytesIndex):
+    config_file = open(configFilePath)
+    config = json.load(config_file)
+    print(config[outboard][hex(cob_id)])
 
 if __name__ == '__main__':
     main()
