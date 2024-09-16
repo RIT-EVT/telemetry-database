@@ -112,7 +112,7 @@ CREATE TABLE CanMessage(
     busId       INTEGER NOT NULL,
     frameId     INTEGER NOT NULL,
     dataBytes   INTEGER ARRAY NOT NULL,
-    receiveTime TIMESTAMP NOT NULL,
+    receiveTime DECIMAL(11,6) NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id)
 );
@@ -163,7 +163,7 @@ CREATE TABLE BmsMinPackTemp(
     receiveTime TIMESTAMP NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id)
-);
+);  
 
 CREATE TABLE BmsMaxPackTemp(
     id          SERIAL PRIMARY KEY,
