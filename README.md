@@ -38,3 +38,13 @@ To the poor soul who takes my place; I beg of you, keep this up to date. It will
 Entity Relationship Diagram:<br>
 I want to move this off of Lucid Chart but for now there it shall lie.<br>
 [Entity Relationship Diagram](https://lucid.app/lucidchart/ff611a92-9484-4606-a11d-d142f54ee428/edit?viewport_loc=-2095%2C-830%2C4919%2C2456%2CMMHz0DLYv6yU&invitationId=inv_5c98f0bf-e268-4e23-afe7-0b5b771f8459)
+
+
+
+## Data Upload Script (DUS)
+
+The script which is responsible for streaming the raw CAN data into the database.<br>
+
+Currently to use the script run main and when prompted input the path to the .mf4 file you want to have uploaded.<br>
+
+As we do not have means to collect context data yet, we use a dummy context with an id of 1. This is gross and bad. We will be removing that as soon as we have a way to query the user for context data.
