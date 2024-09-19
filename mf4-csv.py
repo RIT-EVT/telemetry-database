@@ -67,7 +67,7 @@ def file_convert():
         #     with open(file+'.ChannelGroup_' + str(x) + '.csv') as f:
         #         first_line = f.readline()
     else:
-        print("You fool; thats not a valid file! The file must be a .mf4")
+        print("You fool; thats not a valid file! The file must be an mf4")
     handle_data(files)
 
 
