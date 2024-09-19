@@ -4,8 +4,13 @@ import psycopg2
 import dotenv
 import json
 import os
+import utils
 
+"""@package docstring
+This file converts .mf4 files to .csv files and then uploads them to the database
+"""
 configFilePath = "boardConfig.json"
+expectedIdIndex = 0
 
 tpdoDictionary = {
     "TPDO0"     : 0x180,
@@ -43,23 +48,9 @@ nodeIDDictionary = {
     "35" : "BMS3BV",
 }
 
-def main():
-    dotenv.load_dotenv()
-    conn = psycopg2.connect(
-        database="postgres", user=os.getenv("USER"), password=os.getenv("PASSWORD"), host=os.getenv("HOST"), port=os.getenv("PORT")   
-    )
-    cursor = conn.cursor()
 
-    data = cursor.execute("""
-    SELECT * from PVCSTATE
-    """)
-    print(data)
-    #file_convert()
-
-
-
-"""Converts .mf4 files to .csv files. There are 7 channel groups created in this conversion. We currently only use number 7.
-This fact will be hard coded into this process as I do not forsee a world where our Mech-E team ever uses another channel."""
+##Converts .mf4 files to .csv files. There are 7 channel groups created in this conversion. We currently only use number 7.
+#This fact will be hard coded into this process as I do not forsee a world where our Mech-E team ever uses another channel.
 def file_convert():
     print("MF4 file path:")
     file = input().lower()
@@ -68,65 +59,51 @@ def file_convert():
         mdf = MDF(file)
         file = file.strip(".mf4")
         mdf.export(fmt='csv', filename= file+'.csv')
-        #This is the location of the hard coding of the files we care about. To change this remove the line below and uncomment the for loop.
+        # This is the location of the hard coding of the files we care about. To change this remove the line below and uncomment the for loop.
         files.append(file+'.ChannelGroup_' + str(7) + '.csv')
         # for x in range (0, 8): 
         #     files.append(file+'.ChannelGroup_' + str(x) + '.csv')
         #     with open(file+'.ChannelGroup_' + str(x) + '.csv') as f:
         #         first_line = f.readline()
     else:
-        print("You fool; thats not a valid file! The file must be an .mf4")
+        print("You fool; thats not a valid file! The file must be an mf4")
     handle_data(files)
 
+
+## Streams data into the DB 
+#
+# @param files The paths to the array of files being processed
 def handle_data(files):
     for file in files:
         with open(file) as open_file:
-            first_line = open_file.readline()
-            first_line_listed = first_line.split(",")
-            status = "CAN_DataFrame.CAN_DataFrame.ID" in first_line_listed
-            dataLengthIndex = first_line_listed.index("CAN_DataFrame.CAN_DataFrame.DataLength")
-            dataBytesIndex = first_line_listed.index("CAN_DataFrame.CAN_DataFrame.DataBytes")
-            idIndex = first_line_listed.index("CAN_DataFrame.CAN_DataFrame.ID")
-            counter = 0
             for line in open_file:
-                counter += 1
-                if(status):
-                    outboard, cob_id = determine_board_owner(line, idIndex)
-                    extract_data_bytes(outboard, cob_id, dataLengthIndex, dataBytesIndex)
+                canMessageArr = line.split(',')
+                formattedArray = format_data_bytes(canMessageArr[6])
+                # Currently hard coding the contextId input because there is only one (dummy) contextId
+                sql = "INSERT into canmessage (ID, busId, frameId, dataBytes, receiveTime, contextId) VALUES (DEFAULT, %s, %s, %s, %s, 1)"
+                utils.exec_commit(sql, (canMessageArr[1], canMessageArr[2], formattedArray, canMessageArr[0]))
+
+## Formats the data bytes into a format the DB can handle as an array
+#
+# @param bytes the data bytes as a text string similar to [  6   0   0   0  32 161   7   0]
+def format_data_bytes(bytes):
+    # Sample data before regex: [  6   0   0   0  32 161   7   0]
+    # Match and replace all characters until the first digit
+    exposedDigit = re.sub('^[\[\s]*', "", bytes)
+    # Replace all spaces with commas
+    spaceless = re.sub('\s+', ',', exposedDigit)
+    # Add the '{'
+    openBracket = "{" + spaceless
+    # Replace all ']' with '}' (Should only be one)
+    closeBracket = re.sub('\]+', '}', openBracket)
+    # Sample data after regex: {6,0,0,0,32,161,7,0}
+    return(closeBracket)
 
 
-
-
-
-def determine_board_owner(line, index):
-    listed_line = line.split(",")
-    id = int(listed_line[index])
-    """Values based on the CAN Open standard. Each hex value relates to a TPDO message"""
-    if(id < tpdoDictionary["TPDO0"]):
-        return("Unknown COBID", 0)
-    if(id <= tpdoDictionary["DEADZONE_1"]):
-        default_COB_ID = tpdoDictionary["TPDO0"]
-    elif(id <= tpdoDictionary["TPDO1"]):
-        return("Unknown COBID", tpdoDictionary["DEADZONE_1"])
-    elif(id <= tpdoDictionary["DEADZONE_2"]):
-        default_COB_ID = tpdoDictionary["TPDO1"]
-    elif(id <= tpdoDictionary["TPDO1"]):
-        return("Unknown COBID", tpdoDictionary["DEADZONE_2"])
-    elif(id <= tpdoDictionary["DEADZONE_3"]):
-        default_COB_ID = tpdoDictionary["TPDO2"]
-    elif(id <= tpdoDictionary["TPDO3"]):
-        return("Unknown COBID", tpdoDictionary["DEADZONE_3"])
-    elif(id <= tpdoDictionary["DEADZONE_4"]):
-        default_COB_ID = tpdoDictionary["TPDO3"]
-    else:
-        return("Unknown COBID", tpdoDictionary["DEADZONE_4"])
-    return(nodeIDDictionary[str(id-default_COB_ID)], default_COB_ID)
-
-    
-def extract_data_bytes(outboard, cob_id, dataLengthIndex, dataBytesIndex):
-    config_file = open(configFilePath)
-    config = json.load(config_file)
-    print(config[outboard][hex(cob_id)])
+## Main function to complete file conversion
+def main():
+    dotenv.load_dotenv("./credentials.env")
+    file_convert()
 
 if __name__ == '__main__':
     main()

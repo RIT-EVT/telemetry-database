@@ -1,3 +1,4 @@
 *.csv
 *.MF4
+.idea/
 *.env
