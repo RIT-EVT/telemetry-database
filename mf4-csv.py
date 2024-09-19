@@ -6,6 +6,9 @@ import json
 import os
 import utils
 
+"""@package docstring
+This file converts .mf4 files to .csv files and then uploads them to the database
+"""
 configFilePath = "boardConfig.json"
 expectedIdIndex = 0
 
@@ -45,8 +48,9 @@ nodeIDDictionary = {
     "35" : "BMS3BV",
 }
 
-# Converts .mf4 files to .csv files. There are 7 channel groups created in this conversion. We currently only use number 7.
-# This fact will be hard coded into this process as I do not forsee a world where our Mech-E team ever uses another channel.
+
+##Converts .mf4 files to .csv files. There are 7 channel groups created in this conversion. We currently only use number 7.
+#This fact will be hard coded into this process as I do not forsee a world where our Mech-E team ever uses another channel.
 def file_convert():
     print("MF4 file path:")
     file = input().lower()
@@ -66,7 +70,9 @@ def file_convert():
     handle_data(files)
 
 
-# Streams data into the DB 
+## Streams data into the DB 
+#
+# @param files The paths to the array of files being processed
 def handle_data(files):
     for file in files:
         with open(file) as open_file:
@@ -77,7 +83,9 @@ def handle_data(files):
                 sql = "INSERT into canmessage (ID, busId, frameId, dataBytes, receiveTime, contextId) VALUES (DEFAULT, %s, %s, %s, %s, 1)"
                 utils.exec_commit(sql, (canMessageArr[1], canMessageArr[2], formattedArray, canMessageArr[0]))
 
-
+## Formats the data bytes into a format the DB can handle as an array
+#
+# @param bytes the data bytes as a text string similar to [  6   0   0   0  32 161   7   0]
 def format_data_bytes(bytes):
     # Sample data before regex: [  6   0   0   0  32 161   7   0]
     # Match and replace all characters until the first digit
@@ -92,6 +100,7 @@ def format_data_bytes(bytes):
     return(closeBracket)
 
 
+## Main function to complete file conversion
 def main():
     dotenv.load_dotenv("./credentials.env")
     file_convert()

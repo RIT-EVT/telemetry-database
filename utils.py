@@ -1,6 +1,8 @@
 import psycopg2
 import os
 
+
+## Use to connect to the database using the .env file
 def connect():
     return psycopg2.connect("bert", 
                             os.getenv("DB_USER"), 
@@ -8,7 +10,9 @@ def connect():
                             os.getenv("HOST"), 
                             os.getenv("PORT") )
 
-# Executes all SQL commands in the file at the provided path
+## Executes all SQL commands in the file at the provided path
+#
+# @param path The path to the SQL file being executed
 def exec_sql_file(path):
     full_path = os.path.join(os.path.dirname(__file__), f'{path}')
     conn = connect()
@@ -18,8 +22,10 @@ def exec_sql_file(path):
     conn.commit()
     conn.close()
 
-# Use this to SELECT the top entry from the DB
-# Provide the SQL string and the arguments as a tuple, '(var1,)' for one arg
+## Use this to SELECT the top entry from the DB
+#
+# @param sql The sql command to be executed as a string. Any args should be given a "%s" and provided in the args
+# @param args A tuple which holds the args to be injected into the SQL string. Single args should be written as (arg,)
 def exec_get_one(sql, args={}):
     conn = connect()
     cur = conn.cursor()
@@ -28,8 +34,10 @@ def exec_get_one(sql, args={}):
     conn.close()
     return one
 
-# Use this to SELECT all entries from the database which match the select criteria
-# Provide the SQL string and the arguments as a tuple, '(var1,)' for one arg
+## Use this to SELECT all entries from the database which match the select criteria
+#
+# @param sql The sql command to be executed as a string. Any args should be given a "%s" and provided in the args
+# @param args A tuple which holds the args to be injected into the SQL string. Single args should be written as (arg,)
 def exec_get_all(sql, args={}):
     conn = connect()
     cur = conn.cursor()
@@ -38,8 +46,10 @@ def exec_get_all(sql, args={}):
     conn.close()
     return list_of_tuples
 
-# Use this to INSERT an entry into the database
-# Provide the SQL string and the arguments as a tuple, '(var1,)' for one arg
+## Use this to INSERT an entry into the database
+#
+# @param sql The sql command to be executed as a string. Any args should be given a "%s" and provided in the args
+# @param args A tuple which holds the args to be injected into the SQL string. Single args should be written as (arg,)
 def exec_commit(sql, args={}):
     conn = connect()
     cur = conn.cursor()
@@ -48,8 +58,10 @@ def exec_commit(sql, args={}):
     conn.close()
     return result
 
-# Returns ID of whatever was committed
-# Usage: 'INSERT INTO myTable (col1, col2) VALUES (%s,%s)  RETURNING id'
+## Returns ID of whatever was committed
+#
+# @param sql The sql command to be executed as a string. Any args should be given a "%s" and provided in the args
+# @param args A tuple which holds the args to be injected into the SQL string. Single args should be written as (arg,)
 def exec_commit_with_id(sql, args={}):
     conn = connect()
     cur = conn.cursor()
