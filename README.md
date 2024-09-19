@@ -45,7 +45,7 @@ I want to move this off of Lucid Chart but for now there it shall lie.<br>
 
 
 
-## Data Upload Script (DUS)
+## Data Upload Script
 
 The script which is responsible for streaming the raw CAN data into the database.<br>
 
