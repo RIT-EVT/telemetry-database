@@ -2,12 +2,13 @@ import psycopg2
 import os
 
 def connect():
-    return psycopg2.connect(database="bert", 
-                            user=os.getenv("DB_USER"), 
-                            password=os.getenv("PASSWORD"), 
-                            host=os.getenv("HOST"), 
-                            port=os.getenv("PORT") )
+    return psycopg2.connect("bert", 
+                            os.getenv("DB_USER"), 
+                            os.getenv("PASSWORD"), 
+                            os.getenv("HOST"), 
+                            os.getenv("PORT") )
 
+# Executes all SQL commands in the file at the provided path
 def exec_sql_file(path):
     full_path = os.path.join(os.path.dirname(__file__), f'{path}')
     conn = connect()
@@ -17,6 +18,8 @@ def exec_sql_file(path):
     conn.commit()
     conn.close()
 
+# Use this to SELECT the top entry from the DB
+# Provide the SQL string and the arguments as a tuple, '(var1,)' for one arg
 def exec_get_one(sql, args={}):
     conn = connect()
     cur = conn.cursor()
@@ -25,17 +28,19 @@ def exec_get_one(sql, args={}):
     conn.close()
     return one
 
+# Use this to SELECT all entries from the database which match the select criteria
+# Provide the SQL string and the arguments as a tuple, '(var1,)' for one arg
 def exec_get_all(sql, args={}):
     conn = connect()
     cur = conn.cursor()
     cur.execute(sql, args)
-    # https://www.psycopg.org/docs/cursor.html#cursor.fetchall
     list_of_tuples = cur.fetchall()
     conn.close()
     return list_of_tuples
 
+# Use this to INSERT an entry into the database
+# Provide the SQL string and the arguments as a tuple, '(var1,)' for one arg
 def exec_commit(sql, args={}):
-    #print("exec_commit:\n" + sql+"\n")
     conn = connect()
     cur = conn.cursor()
     result = cur.execute(sql, args)
