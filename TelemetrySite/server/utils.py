@@ -1,14 +1,15 @@
 import psycopg2
 import os
 
-
 ## Use to connect to the database using the .env file
 def connect():
-    return psycopg2.connect("bert", 
-                            os.getenv("DB_USER"), 
-                            os.getenv("PASSWORD"), 
-                            os.getenv("HOST"), 
-                            os.getenv("PORT") )
+ 
+    return psycopg2.connect(
+                            database="bert", 
+                            user=os.getenv("DB_USER"), 
+                            password=os.getenv("PASSWORD"), 
+                            host=os.getenv("HOST"), 
+                            port=os.getenv("PORT") )
 
 ## Executes all SQL commands in the file at the provided path
 #
@@ -71,4 +72,3 @@ def exec_commit_with_id(sql, args={}):
     conn.commit()
     conn.close()
     return result
-

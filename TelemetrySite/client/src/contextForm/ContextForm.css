@@ -1,0 +1,107 @@
+.MainFormGroups {
+  padding: 10px;
+
+}
+
+
+.ContextForm {
+
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.FormGroupElement {
+  padding: 5px;
+}
+
+Label {
+  padding-right: 20px;
+}
+
+Input {
+  height: 24px;
+  /* Change this value to your desired height */
+  font-size: 20px;
+  /* Optional: Adjust font size */
+}
+
+.container {
+  display: flex;
+}
+
+.left-panel {
+  flex: 1;
+  /* Takes up 50% of the width */
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  min-width: 50%;
+  /* Prevent the panel from shrinking too much */
+  min-height: 100%;
+  /* Ensure it takes full height */
+
+}
+
+.right-panel {
+  flex: 1;
+  /* Takes up 50% of the width */
+  display: flex;
+  flex-direction: column;
+  /* Stack children vertically */
+  min-width: 50%;
+  /* Prevent the right panel from shrinking */
+}
+
+.top-right-panel, .bottom-right-panel {
+  flex: 1;
+  /* Takes up 50% of the right panel height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+
+}
+
+
+
+
+.panel {
+  flex: 1 0 33.33%;
+  /* Each panel takes up 1/6 of the container's width */
+  height: 50%;
+  /* Each panel takes half the height of the container */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #ccc;
+  /* Optional: Add border for visibility */
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(3, auto);
+  gap: 10px;
+}
+
+.grid-item {
+
+  padding: 20px;
+  text-align: center;
+  /* Add flexibility */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+}
+
+.submitButton {
+  display: block;
+  position: fixed;
+  left: 10px;
+  bottom: 10px;
+  cursor: pointer;
+}

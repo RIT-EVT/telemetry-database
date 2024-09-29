@@ -1,0 +1,63 @@
+{
+    "Context": {
+        "MainBody": [
+            "airTemp",
+            "humidity",
+            "windSpeed",
+            "windAngle",
+            "riderName",
+            "riderWeight",
+            "driverFeedback",
+            "distanceCovered",
+            "startTime"
+        ],
+        "Event": [
+            "eventDate",
+            "eventType",
+            "location"
+        ],
+        "BikeConfig": [
+            "platformName",
+            "tirePressure",
+            "coolantVolume"
+        ],
+        "BmsConfig": [
+            "hardwareRevisionBMS",
+            "softwareCommitHashBMS",
+            "totalVoltageUnits",
+            "batteryVoltageUnits",
+            "currentUnits",
+            "packTempUnits",
+            "bqTempUnits",
+            "cellVoltageUnits"
+        ],
+        "ImuConfig": [
+            "hardwareRevisionIMU",
+            "softwareCommitHashIMU",
+            "eulerUnits",
+            "gyroUnits",
+            "linearAccelerationUnits",
+            "accelerometerUnits"
+        ],
+        "TmuConfig": [
+            "hardwareRevisionTMU",
+            "softwareCommitHashTMU",
+            "thermUnits"
+        ],
+        "TmsConfig": [
+            "hardwareRevisionTMS",
+            "softwareCommitHashTMS",
+            "tempUnits",
+            "pumpSpeedUnits",
+            "fanSpeedUnits"
+        ],
+        "PvcConfig": [
+            "hardwareRevisionPVC",
+            "softwareCommitHashPVC"
+        ],
+        "McConfig": [
+            "model",
+            "firmwareVersion"
+        ]
+    }
+}

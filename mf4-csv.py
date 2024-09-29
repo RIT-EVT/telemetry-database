@@ -4,7 +4,7 @@ import psycopg2
 import dotenv
 import json
 import os
-import utils
+import TelemetrySite.server.utils as utils
 
 """@package docstring
 This file converts .mf4 files to .csv files and then uploads them to the database
