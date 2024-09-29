@@ -18,14 +18,14 @@ function ContextForm({ getExistingContext }) {
   const [contextId, setContextId] = useState(null);
 
   const [eventId, setEventID] = useState(null);
-  const [bikeConfigId, setBikeConfigId] = useState(null);
+  // const [bikeConfigId, setBikeConfigId] = useState(null);
 
-  const [bmsConfigId, setBMSConfig] = useState(null);
-  const [imuConfigId, setIMUConfig] = useState(null);
-  const [tmuConfigId, setTMUConfig] = useState(null);
-  const [tmsConfigId, setTMSConfig] = useState(null);
-  const [pvcConfigId, setPVCConfig] = useState(null);
-  const [mcConfigId, setMCConfig] = useState(null);
+  // const [bmsConfigId, setBMSConfig] = useState(null);
+  // const [imuConfigId, setIMUConfig] = useState(null);
+  // const [tmuConfigId, setTMUConfig] = useState(null);
+  // const [tmsConfigId, setTMSConfig] = useState(null);
+  // const [pvcConfigId, setPVCConfig] = useState(null);
+  // const [mcConfigId, setMCConfig] = useState(null);
 
   //initialize all form elements
   const [mainContextForm, UpdateContext] = useState(null);
@@ -42,43 +42,44 @@ function ContextForm({ getExistingContext }) {
 
   //fetch id values
   //parse from json
-  useEffect(() => {
-    fetch(BASE_URL + "/ID")
-      .then((response) => response.json())
-      .then((data) => {
-        // set each value to its corresponding key in the data object
-        console.log(data);
-        setContextId(data.contextId);
-        setEventID(data.eventId);
-        setBikeConfigId(data.bikeId);
-        setBMSConfig(data.bmsId);
-        setIMUConfig(data.imuId);
-        setTMUConfig(data.tmuId);
-        setTMSConfig(data.tmsId);
-        setPVCConfig(data.pvcId);
-        setMCConfig(data.mcId);
-      })
-      .catch((error) => {
-        //catch any error that could have ocurred
-        console.error("Error fetching data:", error);
-      });
-  }, []); // Empty dependency array ensures this runs only once when the component mounts
+  //no longer display the id values
+  // useEffect(() => {
+  //   fetch(BASE_URL + "/ID")
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       // set each value to its corresponding key in the data object
+  //       console.log(data);
+  //       setContextId(data.contextId);
+  //       setEventID(data.eventId);
+  //       setBikeConfigId(data.bikeId);
+  //       setBMSConfig(data.bmsId);
+  //       setIMUConfig(data.imuId);
+  //       setTMUConfig(data.tmuId);
+  //       setTMSConfig(data.tmsId);
+  //       setPVCConfig(data.pvcId);
+  //       setMCConfig(data.mcId);
+  //     })
+  //     .catch((error) => {
+  //       //catch any error that could have ocurred
+  //       console.error("Error fetching data:", error);
+  //     });
+  // }, []); // Empty dependency array ensures this runs only once when the component mounts
 
   //convert between an id name to an id value
   //key: id name, value: id variable
-  const idValueSearch = {
-    id: contextId,
+  // const idValueSearch = {
+  //   id: contextId,
 
-    eventId: eventId,
-    bikeConfigId: bikeConfigId,
+  //   eventId: eventId,
+  //   bikeConfigId: bikeConfigId,
 
-    bmsConfigId: bmsConfigId,
-    tmuConfigId: tmuConfigId,
-    imuConfigId: imuConfigId,
-    tmsConfigId: tmsConfigId,
-    pvcConfigId: pvcConfigId,
-    mcConfigId: mcConfigId,
-  };
+  //   bmsConfigId: bmsConfigId,
+  //   tmuConfigId: tmuConfigId,
+  //   imuConfigId: imuConfigId,
+  //   tmsConfigId: tmsConfigId,
+  //   pvcConfigId: pvcConfigId,
+  //   mcConfigId: mcConfigId,
+  // };
 
   const GenerateFormElement = (jsonValue) => {
     return (
@@ -96,7 +97,6 @@ function ContextForm({ getExistingContext }) {
                   placeholder={formElement["placeHolder"]}
                   required={formElement["required"] === "true"}
                   readOnly={formElement["readOnly"] === "true"}
-                  value={idValueSearch[idValue] || undefined}
                 >
                   {formElement["type"] === "select"
                     ? BikeList.TotalList.map((bikeName) => (

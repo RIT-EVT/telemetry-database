@@ -76,52 +76,6 @@ def SubmitContext():
 def DictToTuple(dictObject):
     return tuple(dictObject.values())
 
-## Fetch the lowest unused ID in the DB
-#
-# @return ID value
-@app.route('/ID')
-def GetIDNumbers():
-
-    sqlContext = "SELECT MAX(ID) from Context"
-
-    sqlEvent = "Select MAX(ID) FROM Event"
-    sqlBike = "Select MAX(ID) FROM BikeConfig"
-
-    # sqlBms= "Select nextval(pg_get_serial_sequence('BmsConfig', 'id'))"
-    # sqlImu = "Select nextval(pg_get_serial_sequence('ImuConfig', 'id'))"
-    # sqlTmu = "Select nextval(pg_get_serial_sequence('TmuConfig', 'id'))"
-    # sqlTms = "Select nextval(pg_get_serial_sequence('TmsConfig', 'id'))"
-    # sqlPvc = "Select nextval(pg_get_serial_sequence('PvcConfig', 'id'))"
-    # sqlMc = "Select nextval(pg_get_serial_sequence('McConfig', 'id'))"
-
-
-    contextId = utils.exec_get_one(sqlContext)[0]+1
-    print(contextId)
-    eventId = utils.exec_get_one(sqlEvent)[0]+1
-    bikeId = utils.exec_get_one(sqlBike)[0]+1
-
-    # bmsId = utils.exec_get_one(sqlBms)[0]
-    # imuId = utils.exec_get_one(sqlImu)[0]
-    # tmuId = utils.exec_get_one(sqlTmu)[0]
-    # tmsId = utils.exec_get_one(sqlTms)[0]
-    # pvcId = utils.exec_get_one(sqlPvc)[0]
-    # mcId = utils.exec_get_one(sqlMc)[0]
-
-    #so long as maxIDTuple contains a value that is greater than 1000
-    #use it + 1 as the id value
-  
-
-    return jsonify({
-    "contextId": contextId,
-    "eventId": eventId,
-    "bikeId": bikeId,
-    # "bmsId": bmsId,
-    # "imuId": imuId,
-    # "tmuId": tmuId,
-    # "tmsId": tmsId,
-    # "pvcId": pvcId,
-    # "mcId": mcId
-    })
 
 
 ## Get all the past config data saved and return 
