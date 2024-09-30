@@ -40,6 +40,13 @@ function ContextForm({ getExistingContext }) {
   const [pvcConfigForm, UpdatePVCForm] = useState(null);
   const [mcConfigForm, UpdateMCForm] = useState(null);
 
+  const [bmsConfigDropDown, UpdateBMSConfigDropDown] = useState(null);
+  const [tmsConfigDropDown, UpdateTMSConfigDropDown] = useState(null);
+  const [imuConfigDropDown, UpdateIMUConfigDropDown] = useState(null);
+  const [tmuConfigDropDown, UpdateTMUConfigDropDown] = useState(null);
+  const [pvcConfigDropDown, UpdatePVCConfigDropDown] = useState(null);
+  const [mcConfigDropDown, UpdateMCConfigDropDown] = useState(null);
+
   const ConfigName = [
     "BmsConfig",
     "ImuConfig",
@@ -69,12 +76,21 @@ function ContextForm({ getExistingContext }) {
   };
 
   const ConfigNameToUpdate = {
-    BmsConfig: HandleBMSForm,
-    TmsConfig: HandleTMSForm,
-    ImuConfig: HandleIMUForm,
-    TmuConfig: HandleTMUForm,
-    PvcConfig: HandlePVCForm,
-    McConfig: HandleMCForm,
+    bmsConfig: HandleBMSForm,
+    tmsConfig: HandleTMSForm,
+    imuConfig: HandleIMUForm,
+    tmuConfig: HandleTMUForm,
+    pvcConfig: HandlePVCForm,
+    mcConfig: HandleMCForm,
+  };
+  //todo fix this later. this is a shit solution for required
+  const RequiredSelects = {
+    bmsConfig: true,
+    tmsConfig: false,
+    imuConfig: false,
+    tmuConfig: true,
+    pvcConfig: true,
+    mcConfig: true,
   };
   //does not work yet
   //tables do not contain a name column
@@ -142,6 +158,7 @@ function ContextForm({ getExistingContext }) {
         type="select"
         onChange={ConfigNameToUpdate[name]}
         placeholder="Select a config"
+        required={RequiredSelects[name]}
       >
         <option value="" disabled selected hidden>
           Select an option
@@ -163,24 +180,17 @@ function ContextForm({ getExistingContext }) {
 
     UpdateBikeForm(GenerateFormElement("BikeConfig"));
     UpdateEventForm(GenerateFormElement("Event"));
-    //TODO replace the temp data
-    UpdateBMSForm(SelectCreator(["test"], "BmsConfig"));
-    UpdateIMUForm(SelectCreator(["test"], "ImuConfig"));
-    UpdateTMUForm(SelectCreator(["test"], "TmuConfig"));
-    UpdateTMSForm(SelectCreator(["test"], "TmsConfig"));
-    UpdatePVCForm(SelectCreator(["test"], "PvcConfig"));
-    UpdateMCForm(SelectCreator(["test"], "McConfig"));
+  }, []);
 
-    //Create a drop down for each config
-    //all user to either select a previous config
-    //or create their own
-    // FetchConfigOptions();
-    // UpdateBMSForm(GenerateFormElement("BmsConfig"));
-    // UpdateIMUForm(GenerateFormElement("ImuConfig"));
-    // UpdateTMUForm(GenerateFormElement("TmuConfig"));
-    // UpdateTMSForm(GenerateFormElement("TmsConfig"));
-    // UpdatePVCForm(GenerateFormElement("PvcConfig"));
-    // UpdateMCForm(GenerateFormElement("McConfig"));
+  useEffect(() => {
+    //TODO replace the temp data
+    //establish drop downs for each config
+    UpdateBMSConfigDropDown(SelectCreator(["test"], "bmsConfig"));
+    UpdateTMSConfigDropDown(SelectCreator(["test"], "tmsConfig"));
+    UpdateIMUConfigDropDown(SelectCreator(["test"], "imuConfig"));
+    UpdateTMUConfigDropDown(SelectCreator(["test"], "tmuConfig"));
+    UpdatePVCConfigDropDown(SelectCreator(["test"], "pvcConfig"));
+    UpdateMCConfigDropDown(SelectCreator(["test"], "mcConfig"));
   }, []);
 
   //fetch any data from context file
@@ -191,6 +201,56 @@ function ContextForm({ getExistingContext }) {
       .catch((error) => console.error("Error:", error));
     //Get the context here context here
   }
+  //TODO Fix padding issue. When bms is created, all the gird elements become long
+  //TODO also fix overflow problem on the input fields
+  //TODO Also keep the select field when it displays
+  useEffect(() => {
+    if (bmsConfigSelect === "Custom") {
+      UpdateBMSForm(GenerateFormElement("BmsConfig"));
+    } else {
+      UpdateBMSForm(null);
+    }
+  }, [bmsConfigSelect]);
+
+  useEffect(() => {
+    if (tmsConfigSelect === "Custom") {
+      UpdateTMSForm(GenerateFormElement("TmsConfig"));
+    } else {
+      UpdateTMSForm(null);
+    }
+  }, [tmsConfigSelect]);
+
+  useEffect(() => {
+    if (imuConfigSelect === "Custom") {
+      UpdateIMUForm(GenerateFormElement("ImuConfig"));
+    } else {
+      UpdateIMUForm(null);
+    }
+  }, [imuConfigSelect]);
+
+  useEffect(() => {
+    if (tmuConfigSelect === "Custom") {
+      UpdateTMUForm(GenerateFormElement("TmuConfig"));
+    } else {
+      UpdateTMUForm(null);
+    }
+  }, [tmuConfigSelect]);
+
+  useEffect(() => {
+    if (pvcConfigSelect === "Custom") {
+      UpdatePVCForm(GenerateFormElement("PvcConfig"));
+    } else {
+      UpdatePVCForm(null);
+    }
+  }, [pvcConfigSelect]);
+
+  useEffect(() => {
+    if (mcConfigSelect === "Custom") {
+      UpdateMCForm(GenerateFormElement("McConfig"));
+    } else {
+      UpdateMCForm(null);
+    }
+  }, [mcConfigSelect]);
 
   const SubmitData = (action) => {
     action.preventDefault();
@@ -261,35 +321,47 @@ function ContextForm({ getExistingContext }) {
             <div className="panel-content">{eventContextForm}</div>
           </div>
           <div className="bottom-right-panel">
-            <h3 className="panel-header">Bike Context</h3>
-            <div className="panel-content">{bikeContextForm}</div>
+            <div className="panel-content">
+              <h3 className="panel-header">Bike Context</h3>
+              {bikeContextForm}
+            </div>
           </div>
         </div>
       </div>
 
       <div className="grid-container">
         <div className="grid-item">
-          <h3 className="grid-header">BMS Configuration</h3>
+          <h3 className="grid-header">
+            BMS Configuration: {bmsConfigDropDown}
+          </h3>
           {bmsConfigForm}
         </div>
         <div className="grid-item">
-          <h3 className="grid-header">TMS Configuration</h3>
+          <h3 className="grid-header">
+            TMS Configuration: {tmsConfigDropDown}
+          </h3>
           {tmsConfigForm}
         </div>
         <div className="grid-item">
-          <h3 className="grid-header">IMU Configuration</h3>
+          <h3 className="grid-header">
+            IMU Configuration: {imuConfigDropDown}
+          </h3>
           {imuConfigForm}
         </div>
         <div className="grid-item">
-          <h3 className="grid-header">TMU Configuration</h3>
+          <h3 className="grid-header">
+            TMU Configuration: {tmuConfigDropDown}
+          </h3>
           {tmuConfigForm}
         </div>
         <div className="grid-item">
-          <h3 className="grid-header">PVC Configuration</h3>
+          <h3 className="grid-header">
+            PVC Configuration: {pvcConfigDropDown}
+          </h3>
           {pvcConfigForm}
         </div>
         <div className="grid-item">
-          <h3 className="grid-header">MC Configuration</h3>
+          <h3 className="grid-header">MC Configuration: {mcConfigDropDown}</h3>
           {mcConfigForm}
         </div>
       </div>

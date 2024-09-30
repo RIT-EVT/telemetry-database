@@ -1,11 +1,8 @@
 .MainFormGroups {
   padding: 10px;
-
 }
 
-
 .ContextForm {
-
   margin-left: 10px;
   margin-right: 10px;
 }
@@ -47,8 +44,9 @@ Input {
   gap: 20px;
 }
 
+/* TODO May want align the bike and event forms so they take up the same vertical space as the main form */
 .panel-header {
-  margin-bottom: 10px;
+
   font-weight: bold;
   color: #F36917
 }
@@ -57,8 +55,9 @@ Input {
   flex-grow: 1;
   /* Allows content to grow inside the panel */
   padding: 10px;
-  background-color: #231F20;
-  border: 1px solid #211e1f;
+  /*background-color: #231F20;*/
+  background-color: #504A43;
+  border: 1px solid #181617;
   color: #ffffff;
   /* Optional: Adds a border */
 }
@@ -66,14 +65,16 @@ Input {
 /* Grid layout for configuration forms */
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+
+  grid-template-columns: repeat(2, minmax(200px, 1fr));
   gap: 20px;
   margin-top: 20px;
 }
 
 .grid-item {
   padding: 15px;
-  background-color: #231F20;
+  /*background-color: #231F20;*/
+  background-color: #504A43;
   border: 1px solid #211e1f;
   color: #ffffff;
 }
@@ -91,13 +92,19 @@ Input {
 .submitButton {
   margin-top: 20px;
   padding: 10px 20px;
-  background-color: #007bff;
+  background-color: #F36917;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  position: fixed;
+  display: block;
+  right: 10px;
+  bottom: 10px;
+  transition: 10ms;
 }
 
 .submitButton:hover {
-  background-color: #0056b3;
+  background-color: #9d4614;
+  scale: 1.05;
 }
