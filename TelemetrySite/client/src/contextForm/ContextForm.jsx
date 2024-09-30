@@ -40,6 +40,29 @@ function ContextForm({ getExistingContext }) {
   const [pvcConfigForm, UpdatePVCForm] = useState(null);
   const [mcConfigForm, UpdateMCForm] = useState(null);
 
+  //does not work yet
+  //tables do not contain a name column
+  //TODO update config tables to include a name
+  //fetch names of config files to display for user to choose from
+  const FetchConfigOptions = () => {
+    fetch(BASE_URL + "/Context/Configs")
+      .then((response) => {
+        if (!response.ok) {
+          console.error("Did you turn your server on?");
+          throw new Error("Network response was not ok " + response.statusText);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((error) => {
+        throw new Error(
+          "Error has occurred while fetching config data " + error.error
+        );
+      });
+  };
+
   //fetch id values
   //parse from json
   //no longer display the id values
@@ -125,6 +148,7 @@ function ContextForm({ getExistingContext }) {
     //Create a drop down for each config
     //all user to either select a previous config
     //or create their own
+    // FetchConfigOptions();
     // UpdateBMSForm(GenerateFormElement("BmsConfig"));
     // UpdateIMUForm(GenerateFormElement("ImuConfig"));
     // UpdateTMUForm(GenerateFormElement("TmuConfig"));
@@ -191,6 +215,7 @@ function ContextForm({ getExistingContext }) {
       });
   };
 
+  //display the final result
   return (
     <Form
       className="ContextForm"

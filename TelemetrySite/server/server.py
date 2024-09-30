@@ -13,6 +13,7 @@ api = Api(app)  # API router
 
 CORS(app)
 
+
 #function to pull data from the data base
 @app.route('/Context')
 def GetContext():
@@ -56,7 +57,6 @@ def SubmitContext():
 
     for i in range(len(sqlCommands)):
         #save the id for each config for reference in the Bike Config
-
         idBikeConfig.append(utils.exec_commit_with_id(sqlCommands[i], DictToTuple(contextValue[i+3]))[0][0])
    
     #save the event and bike ids for to reference in the context db
@@ -81,16 +81,40 @@ def DictToTuple(dictObject):
 ## Get all the past config data saved and return 
 ## any of them with a name
 #
-# @param configName Name to fetch saved configs 
-@app.route('/Context/Configs/<configName>')
+# @return
+@app.route('/Context/Configs')
 def GetConfigData():
-    return jsonify(0)
+    #declare tuple of all special config names
+    configNames = ("BmsConfig", "ImuConfig", "TmuConfig", "TmsConfig", "PvcConfig", "McConfig")
+    #declare dictionary for returning data
+    configData={}
+    #loop through each table and pull the names
+    #0 used as a place holder, no args needed
+    #can't use the %s for table names
+    for i in configNames:
+          sqlCommand = f"SELECT name FROM {i} WHERE name IS NOT NULL"
+          configData[i] = utils.exec_get_all(sqlCommand, [0,])
+  
     
+    return jsonify(configData)
+
+## Fetch the names of saved configs for a config type
+#
+# @param ConfigName Config table to search through
+# @return configData Data of all configs saved
+@app.route('/Context/Configs/<ConfigName>')
+def GetSingleConfigName(ConfigName):
+   
+    configData={}
+    sqlCommand = f"SELECT name FROM {ConfigName} WHERE name IS NOT NULL"
+    configData[ConfigName] = utils.exec_get_all(sqlCommand, [0,])
+  
+    return jsonify(configData)
 
 if __name__ == '__main__':
     dotenv.load_dotenv()
     print("Starting flask")
     app.run(debug=True)  # Starts Flask
 
-GetIDNumbers()
+
     
