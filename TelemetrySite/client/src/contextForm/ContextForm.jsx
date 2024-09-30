@@ -20,12 +20,12 @@ function ContextForm({ getExistingContext }) {
   const [eventId, setEventID] = useState(null);
   // const [bikeConfigId, setBikeConfigId] = useState(null);
 
-  // const [bmsConfigId, setBMSConfig] = useState(null);
-  // const [imuConfigId, setIMUConfig] = useState(null);
-  // const [tmuConfigId, setTMUConfig] = useState(null);
-  // const [tmsConfigId, setTMSConfig] = useState(null);
-  // const [pvcConfigId, setPVCConfig] = useState(null);
-  // const [mcConfigId, setMCConfig] = useState(null);
+  const [bmsConfigSelect, setBMSConfigSelect] = useState(null);
+  const [imuConfigSelect, setIMUConfigSelect] = useState(null);
+  const [tmuConfigSelect, setTMUConfigSelect] = useState(null);
+  const [tmsConfigSelect, setTMSConfigSelect] = useState(null);
+  const [pvcConfigSelect, setPVCConfigSelect] = useState(null);
+  const [mcConfigSelect, setMCConfigSelect] = useState(null);
 
   //initialize all form elements
   const [mainContextForm, UpdateContext] = useState(null);
@@ -40,6 +40,42 @@ function ContextForm({ getExistingContext }) {
   const [pvcConfigForm, UpdatePVCForm] = useState(null);
   const [mcConfigForm, UpdateMCForm] = useState(null);
 
+  const ConfigName = [
+    "BmsConfig",
+    "ImuConfig",
+    "TmuConfig",
+    "TmsConfig",
+    "PvcConfig",
+    "McConfig",
+  ];
+
+  const HandleBMSForm = (event) => {
+    setBMSConfigSelect(event.target.value);
+  };
+  const HandleTMSForm = (event) => {
+    setTMSConfigSelect(event.target.value);
+  };
+  const HandleIMUForm = (event) => {
+    setIMUConfigSelect(event.target.value);
+  };
+  const HandleTMUForm = (event) => {
+    setTMUConfigSelect(event.target.value);
+  };
+  const HandlePVCForm = (event) => {
+    setPVCConfigSelect(event.target.value);
+  };
+  const HandleMCForm = (event) => {
+    setMCConfigSelect(event.target.value);
+  };
+
+  const ConfigNameToUpdate = {
+    BmsConfig: HandleBMSForm,
+    TmsConfig: HandleTMSForm,
+    ImuConfig: HandleIMUForm,
+    TmuConfig: HandleTMUForm,
+    PvcConfig: HandlePVCForm,
+    McConfig: HandleMCForm,
+  };
   //does not work yet
   //tables do not contain a name column
   //TODO update config tables to include a name
@@ -63,47 +99,8 @@ function ContextForm({ getExistingContext }) {
       });
   };
 
-  //fetch id values
-  //parse from json
-  //no longer display the id values
-  // useEffect(() => {
-  //   fetch(BASE_URL + "/ID")
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       // set each value to its corresponding key in the data object
-  //       console.log(data);
-  //       setContextId(data.contextId);
-  //       setEventID(data.eventId);
-  //       setBikeConfigId(data.bikeId);
-  //       setBMSConfig(data.bmsId);
-  //       setIMUConfig(data.imuId);
-  //       setTMUConfig(data.tmuId);
-  //       setTMSConfig(data.tmsId);
-  //       setPVCConfig(data.pvcId);
-  //       setMCConfig(data.mcId);
-  //     })
-  //     .catch((error) => {
-  //       //catch any error that could have ocurred
-  //       console.error("Error fetching data:", error);
-  //     });
-  // }, []); // Empty dependency array ensures this runs only once when the component mounts
-
-  //convert between an id name to an id value
-  //key: id name, value: id variable
-  // const idValueSearch = {
-  //   id: contextId,
-
-  //   eventId: eventId,
-  //   bikeConfigId: bikeConfigId,
-
-  //   bmsConfigId: bmsConfigId,
-  //   tmuConfigId: tmuConfigId,
-  //   imuConfigId: imuConfigId,
-  //   tmsConfigId: tmsConfigId,
-  //   pvcConfigId: pvcConfigId,
-  //   mcConfigId: mcConfigId,
-  // };
-
+  //create needed from fields from json file
+  //return the form group
   const GenerateFormElement = (jsonValue) => {
     return (
       <FormGroup>
@@ -137,6 +134,27 @@ function ContextForm({ getExistingContext }) {
     );
   };
 
+  //Create the drop down for each config
+  const SelectCreator = (data, name) => {
+    console.log(name);
+    return (
+      <Input
+        type="select"
+        onChange={ConfigNameToUpdate[name]}
+        placeholder="Select a config"
+      >
+        <option value="" disabled selected hidden>
+          Select an option
+        </option>
+
+        {data.map((configNameValue) => {
+          return <option value={configNameValue}>{configNameValue}</option>;
+        })}
+        <option value="Custom">Custom</option>
+      </Input>
+    );
+  };
+
   //toggle if the IMU and TMU fields show in the form
   //based off the bike name
 
@@ -145,6 +163,14 @@ function ContextForm({ getExistingContext }) {
 
     UpdateBikeForm(GenerateFormElement("BikeConfig"));
     UpdateEventForm(GenerateFormElement("Event"));
+    //TODO replace the temp data
+    UpdateBMSForm(SelectCreator(["test"], "BmsConfig"));
+    UpdateIMUForm(SelectCreator(["test"], "ImuConfig"));
+    UpdateTMUForm(SelectCreator(["test"], "TmuConfig"));
+    UpdateTMSForm(SelectCreator(["test"], "TmsConfig"));
+    UpdatePVCForm(SelectCreator(["test"], "PvcConfig"));
+    UpdateMCForm(SelectCreator(["test"], "McConfig"));
+
     //Create a drop down for each config
     //all user to either select a previous config
     //or create their own
@@ -225,20 +251,49 @@ function ContextForm({ getExistingContext }) {
       }}
     >
       <div className="container">
-        <div className="left-panel">{mainContextForm}</div>
+        <div className="left-panel">
+          <h3 className="panel-header">Main Context</h3>
+          <div className="panel-content">{mainContextForm}</div>
+        </div>
         <div className="right-panel">
-          <div className="top-right-panel">{eventContextForm}</div>
-          <div className="bottom-right-panel">{bikeContextForm}</div>
+          <div className="top-right-panel">
+            <h3 className="panel-header">Event Context</h3>
+            <div className="panel-content">{eventContextForm}</div>
+          </div>
+          <div className="bottom-right-panel">
+            <h3 className="panel-header">Bike Context</h3>
+            <div className="panel-content">{bikeContextForm}</div>
+          </div>
         </div>
       </div>
+
       <div className="grid-container">
-        <div className="grid-item">{bmsConfigForm}</div>
-        <div className="grid-item">{tmsConfigForm}</div>
-        <div className="grid-item">{imuConfigForm}</div>
-        <div className="grid-item">{tmuConfigForm}</div>
-        <div className="grid-item">{pvcConfigForm}</div>
-        <div className="grid-item">{mcConfigForm}</div>
+        <div className="grid-item">
+          <h3 className="grid-header">BMS Configuration</h3>
+          {bmsConfigForm}
+        </div>
+        <div className="grid-item">
+          <h3 className="grid-header">TMS Configuration</h3>
+          {tmsConfigForm}
+        </div>
+        <div className="grid-item">
+          <h3 className="grid-header">IMU Configuration</h3>
+          {imuConfigForm}
+        </div>
+        <div className="grid-item">
+          <h3 className="grid-header">TMU Configuration</h3>
+          {tmuConfigForm}
+        </div>
+        <div className="grid-item">
+          <h3 className="grid-header">PVC Configuration</h3>
+          {pvcConfigForm}
+        </div>
+        <div className="grid-item">
+          <h3 className="grid-header">MC Configuration</h3>
+          {mcConfigForm}
+        </div>
       </div>
+
       <Button className="submitButton">Submit</Button>
     </Form>
   );

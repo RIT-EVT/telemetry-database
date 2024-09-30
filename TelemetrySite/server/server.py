@@ -90,6 +90,7 @@ def GetConfigData():
     configData={}
     #loop through each table and pull the names
     #0 used as a place holder, no args needed
+    #TODO Test once db is setup
     #can't use the %s for table names
     for i in configNames:
           sqlCommand = f"SELECT name FROM {i} WHERE name IS NOT NULL"
