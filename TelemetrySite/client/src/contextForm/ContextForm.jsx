@@ -122,14 +122,16 @@ function ContextForm({ getExistingContext }) {
 
     UpdateBikeForm(GenerateFormElement("BikeConfig"));
     UpdateEventForm(GenerateFormElement("Event"));
-
+    //Create a drop down for each config
+    //all user to either select a previous config
+    //or create their own
     // UpdateBMSForm(GenerateFormElement("BmsConfig"));
     // UpdateIMUForm(GenerateFormElement("ImuConfig"));
     // UpdateTMUForm(GenerateFormElement("TmuConfig"));
     // UpdateTMSForm(GenerateFormElement("TmsConfig"));
     // UpdatePVCForm(GenerateFormElement("PvcConfig"));
     // UpdateMCForm(GenerateFormElement("McConfig"));
-  }, contextId);
+  }, []);
 
   //fetch any data from context file
   if (getExistingContext) {
@@ -204,13 +206,13 @@ function ContextForm({ getExistingContext }) {
           <div className="bottom-right-panel">{bikeContextForm}</div>
         </div>
       </div>
-      <div class="grid-container">
-        <div class="grid-item">{bmsConfigForm}</div>
-        <div class="grid-item">{tmsConfigForm}</div>
-        <div class="grid-item">{imuConfigForm}</div>
-        <div class="grid-item">{tmuConfigForm}</div>
-        <div class="grid-item">{pvcConfigForm}</div>
-        <div class="grid-item">{mcConfigForm}</div>
+      <div className="grid-container">
+        <div className="grid-item">{bmsConfigForm}</div>
+        <div className="grid-item">{tmsConfigForm}</div>
+        <div className="grid-item">{imuConfigForm}</div>
+        <div className="grid-item">{tmuConfigForm}</div>
+        <div className="grid-item">{pvcConfigForm}</div>
+        <div className="grid-item">{mcConfigForm}</div>
       </div>
       <Button className="submitButton">Submit</Button>
     </Form>
