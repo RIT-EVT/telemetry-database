@@ -1,5 +1,5 @@
 {
-    "Context": {
+    "MainElements": {
         "MainBody": [
             "airTemp",
             "humidity",
@@ -20,7 +20,9 @@
             "platformName",
             "tirePressure",
             "coolantVolume"
-        ],
+        ]
+    },
+    "ConfigElements": {
         "BmsConfig": [
             "hardwareRevisionBMS",
             "softwareCommitHashBMS",
@@ -30,6 +32,13 @@
             "packTempUnits",
             "bqTempUnits",
             "cellVoltageUnits"
+        ],
+        "TmsConfig": [
+            "hardwareRevisionTMS",
+            "softwareCommitHashTMS",
+            "tempUnits",
+            "pumpSpeedUnits",
+            "fanSpeedUnits"
         ],
         "ImuConfig": [
             "hardwareRevisionIMU",
@@ -44,13 +53,6 @@
             "softwareCommitHashTMU",
             "thermUnits"
         ],
-        "TmsConfig": [
-            "hardwareRevisionTMS",
-            "softwareCommitHashTMS",
-            "tempUnits",
-            "pumpSpeedUnits",
-            "fanSpeedUnits"
-        ],
         "PvcConfig": [
             "hardwareRevisionPVC",
             "softwareCommitHashPVC"
@@ -58,6 +60,14 @@
         "McConfig": [
             "model",
             "firmwareVersion"
-        ]
+        ],
+        "ConfigSelects": {
+            "bmsConfigSelect": "BmsConfig",
+            "tmsConfigSelect": "TmsConfig",
+            "imuConfigSelect": "ImuConfig",
+            "tmuConfigSelect": "TmuConfig",
+            "pvcConfigSelect": "PvcConfig",
+            "mcConfigSelect": "McConfig"
+        }
     }
 }

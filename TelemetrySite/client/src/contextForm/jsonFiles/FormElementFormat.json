@@ -103,7 +103,7 @@
     "coolantVolume": {
       "id": "coolantVolume",
       "type": "number",
-      "placeHolder": "L",
+      "placeHolder": "mL",
       "label": "Coolant Volume",
       "required": "false"
     }

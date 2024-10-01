@@ -1,3 +1,14 @@
+/*
+ * To any poor EVT freshman who has been assigned
+ * This project, if this comment is still here, that
+ * Means I never went back and cleaned up the logic.
+ * This was meant to be a quick and dirty application
+ * So I wish you the bets of luck and hope you like JSON
+ * files and for loops
+ */
+
+//TODO remove this block if I ever fix the bs I wrote
+
 import { Form, FormGroup, Label, Input, Button } from "reactstrap";
 import { useEffect, useState } from "react";
 
@@ -46,15 +57,6 @@ function ContextForm({ getExistingContext }) {
   const [tmuConfigDropDown, UpdateTMUConfigDropDown] = useState(null);
   const [pvcConfigDropDown, UpdatePVCConfigDropDown] = useState(null);
   const [mcConfigDropDown, UpdateMCConfigDropDown] = useState(null);
-
-  const ConfigName = [
-    "BmsConfig",
-    "ImuConfig",
-    "TmuConfig",
-    "TmsConfig",
-    "PvcConfig",
-    "McConfig",
-  ];
 
   const HandleBMSForm = (event) => {
     setBMSConfigSelect(event.target.value);
@@ -152,13 +154,14 @@ function ContextForm({ getExistingContext }) {
 
   //Create the drop down for each config
   const SelectCreator = (data, name) => {
-    console.log(name);
     return (
       <Input
         type="select"
         onChange={ConfigNameToUpdate[name]}
         placeholder="Select a config"
         required={RequiredSelects[name]}
+        className="ConfigDropdown"
+        id={name + "Select"}
       >
         <option value="" disabled selected hidden>
           Select an option
@@ -201,9 +204,6 @@ function ContextForm({ getExistingContext }) {
       .catch((error) => console.error("Error:", error));
     //Get the context here context here
   }
-  //TODO Fix padding issue. When bms is created, all the gird elements become long
-  //TODO also fix overflow problem on the input fields
-  //TODO Also keep the select field when it displays
   useEffect(() => {
     if (bmsConfigSelect === "Custom") {
       UpdateBMSForm(GenerateFormElement("BmsConfig"));
@@ -254,6 +254,7 @@ function ContextForm({ getExistingContext }) {
 
   const SubmitData = (action) => {
     action.preventDefault();
+
     //gather all the data
     const collectedData = {
       Context: {
@@ -269,18 +270,46 @@ function ContextForm({ getExistingContext }) {
       },
     };
     // Loop through each key in Context and collect data
-    for (const key in ContextJSON.Context) {
-      ContextJSON.Context[key].forEach((id) => {
+
+    //check each select
+    //if they are != "Custom"
+    //data needs to be gathered from the input field
+    //TODO clean up this logic and make it read abel
+    const ConfigElements = ContextJSON.ConfigElements;
+    for (const key in ConfigElements.ConfigSelects) {
+      const keyPairValue = ConfigElements.ConfigSelects[key];
+      //check if the selected element is custom
+      if (document.getElementById(key).value === "Custom") {
+        ConfigElements[keyPairValue].forEach((id) => {
+          //get the item and make sure it exists
+          const element = document.getElementById(id);
+          if (element) {
+            collectedData.Context[keyPairValue][id] = element.value; // Collect the value from the form element
+          }
+        });
+      } else {
+        collectedData.Context[keyPairValue]["selected"] =
+          document.getElementById(key).value;
+      }
+    }
+
+    const MainElements = ContextJSON.MainElements;
+
+    for (const key in MainElements) {
+      MainElements[key].forEach((id) => {
+        //get the item and make sure it exists
         const element = document.getElementById(id);
         if (element) {
           collectedData.Context[key][id] = element.value; // Collect the value from the form element
         }
       });
     }
+
     console.log("It's data time!");
+    console.log(collectedData);
     fetch(BASE_URL + "/Context", {
       //post data to the server
-      method: "POST",
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },

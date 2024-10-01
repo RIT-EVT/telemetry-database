@@ -1,7 +1,6 @@
 import { Button } from "reactstrap";
 import React, { useCallback, useEffect, useState } from "react";
 import "./ContextHeader.css";
-import ContextBody from "./contextBody/ContextBody";
 import ContextForm from "./contextForm/ContextForm.jsx";
 
 function ContextHeader() {
