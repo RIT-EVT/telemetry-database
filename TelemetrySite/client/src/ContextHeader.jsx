@@ -86,7 +86,7 @@ function ContextHeader() {
         //display a the base input fields
         bodyContent = <ContextForm getExistingContext={false} />;
         break;
-
+      //TODO May remove unless we want user to be able to edit previous data
       case displayModeEnum.EXISTING_CONTEXT:
         //prompt user for which context file they want
         bodyContent = <ContextForm getExistingContext={true} />;

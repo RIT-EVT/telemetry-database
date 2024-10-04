@@ -1,21 +1,16 @@
-/*
- * To any poor EVT freshman who has been assigned
- * This project, if this comment is still here, that
- * Means I never went back and cleaned up the logic.
- * This was meant to be a quick and dirty application
- * So I wish you the bets of luck and hope you like JSON
- * files and for loops
+/**
+ * EHughes
+ * 2024
+ *
+ * Create form elements for each of the needed context
+ * forms
  */
-
-//TODO remove this block if I ever fix the bs I wrote
 
 import { Form, FormGroup, Label, Input, Button } from "reactstrap";
 import { useEffect, useState } from "react";
 
 import "./ContextForm.css";
 
-//list of bike for drop down
-import BikeList from "./jsonFiles/BikeList.json";
 //list of all id values to pass to backend
 import ContextJSON from "./jsonFiles/ContextForm.json";
 //all elements to have as input field and their properties
@@ -24,67 +19,62 @@ import ContextJSONFormElements from "./jsonFiles/FormElementFormat.json";
 //url to call to
 const BASE_URL = "http://127.0.0.1:5000";
 
+/**
+ * Create needed context forms. Return the configured elements
+ *
+ * @param {boolean} getExistingContext - Form should fetch an existing config
+ * @return {HTMLDivElement} Div element for all the form
+ */
 function ContextForm({ getExistingContext }) {
-  //initialize all id values
-  const [contextId, setContextId] = useState(null);
-
-  const [eventId, setEventID] = useState(null);
-  // const [bikeConfigId, setBikeConfigId] = useState(null);
-
-  const [bmsConfigSelect, setBMSConfigSelect] = useState(null);
-  const [imuConfigSelect, setIMUConfigSelect] = useState(null);
-  const [tmuConfigSelect, setTMUConfigSelect] = useState(null);
-  const [tmsConfigSelect, setTMSConfigSelect] = useState(null);
-  const [pvcConfigSelect, setPVCConfigSelect] = useState(null);
-  const [mcConfigSelect, setMCConfigSelect] = useState(null);
-
-  //initialize all form elements
+  /* -------------------------------------------------------------------------- */
+  /* -------------------------- Establish State Hooks ------------------------- */
+  /* -------------------------------------------------------------------------- */
   const [mainContextForm, UpdateContext] = useState(null);
 
   const [eventContextForm, UpdateEventForm] = useState(null);
   const [bikeContextForm, UpdateBikeForm] = useState(null);
 
-  const [bmsConfigForm, UpdateBMSForm] = useState(null);
-  const [tmsConfigForm, UpdateTMSForm] = useState(null);
-  const [imuConfigForm, UpdateIMUForm] = useState(null);
-  const [tmuConfigForm, UpdateTMUForm] = useState(null);
-  const [pvcConfigForm, UpdatePVCForm] = useState(null);
-  const [mcConfigForm, UpdateMCForm] = useState(null);
+  const [configSelects, setConfigSelects] = useState({
+    bms: null,
+    imu: null,
+    tmu: null,
+    tms: null,
+    pvc: null,
+    mc: null,
+  });
 
-  const [bmsConfigDropDown, UpdateBMSConfigDropDown] = useState(null);
-  const [tmsConfigDropDown, UpdateTMSConfigDropDown] = useState(null);
-  const [imuConfigDropDown, UpdateIMUConfigDropDown] = useState(null);
-  const [tmuConfigDropDown, UpdateTMUConfigDropDown] = useState(null);
-  const [pvcConfigDropDown, UpdatePVCConfigDropDown] = useState(null);
-  const [mcConfigDropDown, UpdateMCConfigDropDown] = useState(null);
+  const [configForm, setFormElements] = useState({
+    bms: null,
+    imu: null,
+    tmu: null,
+    tms: null,
+    pvc: null,
+    mc: null,
+  });
 
-  const HandleBMSForm = (event) => {
-    setBMSConfigSelect(event.target.value);
-  };
-  const HandleTMSForm = (event) => {
-    setTMSConfigSelect(event.target.value);
-  };
-  const HandleIMUForm = (event) => {
-    setIMUConfigSelect(event.target.value);
-  };
-  const HandleTMUForm = (event) => {
-    setTMUConfigSelect(event.target.value);
-  };
-  const HandlePVCForm = (event) => {
-    setPVCConfigSelect(event.target.value);
-  };
-  const HandleMCForm = (event) => {
-    setMCConfigSelect(event.target.value);
-  };
+  const [dropDowns, setDropDowns] = useState({
+    bms: null,
+    imu: null,
+    tmu: null,
+    tms: null,
+    pvc: null,
+    mc: null,
+  });
 
-  const ConfigNameToUpdate = {
-    bmsConfig: HandleBMSForm,
-    tmsConfig: HandleTMSForm,
-    imuConfig: HandleIMUForm,
-    tmuConfig: HandleTMUForm,
-    pvcConfig: HandlePVCForm,
-    mcConfig: HandleMCForm,
-  };
+  const [checkBox, setCheckBox] = useState({
+    bms: false,
+    imu: false,
+    tmu: false,
+    tms: false,
+    pvc: false,
+    mc: false,
+  });
+
+  /* -------------------------------------------------------------------------- */
+  /* --------------------------- Initialize Constants ------------------------- */
+  /* -------------------------------------------------------------------------- */
+  const ConfigName = ["bms", "imu", "tmu", "tms", "pvc", "mc"];
+
   //todo fix this later. this is a shit solution for required
   const RequiredSelects = {
     bmsConfig: true,
@@ -94,12 +84,64 @@ function ContextForm({ getExistingContext }) {
     pvcConfig: true,
     mcConfig: true,
   };
-  //does not work yet
-  //tables do not contain a name column
-  //TODO update config tables to include a name
-  //fetch names of config files to display for user to choose from
+
+  /* -------------------------------------------------------------------------- */
+  /* ----------------------------- Const Functions ---------------------------- */
+  /* -------------------------------------------------------------------------- */
+
+  /**
+   * When a select field for the config forms updates
+   * Call here and assign update the UseState hook to
+   * the new value
+   *
+   * @param {string} configName - Name of config to update
+   * @param {string} value - New value of select field
+   */
+  const handleConfigSelectChange = (configName, value) => {
+    setConfigSelects((prev) => ({ ...prev, [configName]: value }));
+  };
+
+  /**
+   * Whenever the select field on a config form changes
+   * check if it is Custom. If its is display form elements.
+   * Else set form object to null
+   *
+   * @param {Event} event - Event that occurred
+   * @param {string} configName - Name of the config to update
+   */
+  const handleConfigFormChange = (event, configName) => {
+    const value = event.target.value;
+    handleConfigSelectChange(configName, value);
+    if (value === "Custom") {
+      const formElement = GenerateFormElement(`${configName}Config`);
+      setFormElements((prev) => ({ ...prev, [configName]: formElement }));
+    } else {
+      setFormElements((prev) => ({ ...prev, [configName]: null }));
+    }
+  };
+
+  /**
+   * Handle the change of a check box for the
+   * config config save toggle
+   *
+   * @param {string} value - new value of the checkbox
+   * @param {string} configName - config form the value is from
+   */
+  const checkBoxChange = (value, configName) => {
+    setCheckBox((prev) => ({ ...prev, [configName]: value }));
+  };
+
+  /**
+   * Call to the python API. For each of the config
+   * forms, get any saved configs that are in the DB.
+   * Set them to the corresponding dropdown option
+   */
   const FetchConfigOptions = () => {
-    fetch(BASE_URL + "/Context/Configs")
+    //does not work yet
+    //tables do not contain a name column
+    //TODO update config tables to include a name
+    //fetch names of config files to display for user to choose from
+    fetch(BASE_URL + "/Context")
       .then((response) => {
         if (!response.ok) {
           console.error("Did you turn your server on?");
@@ -117,8 +159,14 @@ function ContextForm({ getExistingContext }) {
       });
   };
 
-  //create needed from fields from json file
-  //return the form group
+  /**
+   * Create a form group based off of the json key passed in.
+   * Loop through all elements in the json object and create that
+   * many input and label objects.
+   *
+   * @param {string} jsonValue - Key for the element in the FormElementFormat.json file
+   * @return {HTMLFormElement} Form group of all the input elements on the json file
+   */
   const GenerateFormElement = (jsonValue) => {
     return (
       <FormGroup>
@@ -133,13 +181,17 @@ function ContextForm({ getExistingContext }) {
                   id={idValue}
                   type={formElement["type"]}
                   placeholder={formElement["placeHolder"]}
-                  required={formElement["required"] === "true"}
-                  readOnly={formElement["readOnly"] === "true"}
+                  required={formElement["required"]}
+                  readOnly={formElement["readOnly"]}
                 >
+                  {/*
+                   * If the object is a select, it must contain a field called "selectValues"
+                   * loop through each value and make it an option
+                   */}
                   {formElement["type"] === "select"
-                    ? BikeList.TotalList.map((bikeName) => (
-                        <option key={bikeName} value={bikeName}>
-                          {bikeName}
+                    ? formElement["selectValues"].map((value) => (
+                        <option key={value} value={value}>
+                          {value}
                         </option>
                       ))
                     : null}
@@ -151,109 +203,47 @@ function ContextForm({ getExistingContext }) {
       </FormGroup>
     );
   };
-
-  //Create the drop down for each config
-  const SelectCreator = (data, name) => {
+  /**
+   * Create the select dropdowns for the config forms
+   * On change check if value is Custom
+   * If it is then display the normal form
+   *
+   * @param {string} displayValues - Options to display in select
+   * @param {string} name - Name of config form
+   * @return {HTMLInputElement} - HTML Select Input
+   */
+  const SelectCreator = (displayValues, name) => {
     return (
       <Input
         type="select"
-        onChange={ConfigNameToUpdate[name]}
+        onChange={(e) => handleConfigFormChange(e, name)}
         placeholder="Select a config"
         required={RequiredSelects[name]}
         className="ConfigDropdown"
-        id={name + "Select"}
+        id={`${name}Select`}
       >
         <option value="" disabled selected hidden>
           Select an option
         </option>
-
-        {data.map((configNameValue) => {
-          return <option value={configNameValue}>{configNameValue}</option>;
-        })}
+        {displayValues.map((configNameValue) => (
+          <option key={configNameValue} value={configNameValue}>
+            {configNameValue}
+          </option>
+        ))}
         <option value="Custom">Custom</option>
       </Input>
     );
   };
-
-  //toggle if the IMU and TMU fields show in the form
-  //based off the bike name
-
-  useEffect(() => {
-    UpdateContext(GenerateFormElement("MainBody"));
-
-    UpdateBikeForm(GenerateFormElement("BikeConfig"));
-    UpdateEventForm(GenerateFormElement("Event"));
-  }, []);
-
-  useEffect(() => {
-    //TODO replace the temp data
-    //establish drop downs for each config
-    UpdateBMSConfigDropDown(SelectCreator(["test"], "bmsConfig"));
-    UpdateTMSConfigDropDown(SelectCreator(["test"], "tmsConfig"));
-    UpdateIMUConfigDropDown(SelectCreator(["test"], "imuConfig"));
-    UpdateTMUConfigDropDown(SelectCreator(["test"], "tmuConfig"));
-    UpdatePVCConfigDropDown(SelectCreator(["test"], "pvcConfig"));
-    UpdateMCConfigDropDown(SelectCreator(["test"], "mcConfig"));
-  }, []);
-
-  //fetch any data from context file
-  if (getExistingContext) {
-    fetch(BASE_URL + "/Context") // By default, fetch uses GET method
-      .then((response) => response.json())
-      .then((data) => console.log(data))
-      .catch((error) => console.error("Error:", error));
-    //Get the context here context here
-  }
-  useEffect(() => {
-    if (bmsConfigSelect === "Custom") {
-      UpdateBMSForm(GenerateFormElement("BmsConfig"));
-    } else {
-      UpdateBMSForm(null);
-    }
-  }, [bmsConfigSelect]);
-
-  useEffect(() => {
-    if (tmsConfigSelect === "Custom") {
-      UpdateTMSForm(GenerateFormElement("TmsConfig"));
-    } else {
-      UpdateTMSForm(null);
-    }
-  }, [tmsConfigSelect]);
-
-  useEffect(() => {
-    if (imuConfigSelect === "Custom") {
-      UpdateIMUForm(GenerateFormElement("ImuConfig"));
-    } else {
-      UpdateIMUForm(null);
-    }
-  }, [imuConfigSelect]);
-
-  useEffect(() => {
-    if (tmuConfigSelect === "Custom") {
-      UpdateTMUForm(GenerateFormElement("TmuConfig"));
-    } else {
-      UpdateTMUForm(null);
-    }
-  }, [tmuConfigSelect]);
-
-  useEffect(() => {
-    if (pvcConfigSelect === "Custom") {
-      UpdatePVCForm(GenerateFormElement("PvcConfig"));
-    } else {
-      UpdatePVCForm(null);
-    }
-  }, [pvcConfigSelect]);
-
-  useEffect(() => {
-    if (mcConfigSelect === "Custom") {
-      UpdateMCForm(GenerateFormElement("McConfig"));
-    } else {
-      UpdateMCForm(null);
-    }
-  }, [mcConfigSelect]);
-
-  const SubmitData = (action) => {
-    action.preventDefault();
+  /**
+   * Once all needed fields have been filled out,
+   * collect and send data to the backend as a json
+   * object.
+   *
+   * @param {Event} event - event of form submit
+   */
+  const SubmitData = (event) => {
+    //prevent the form from clearing data
+    event.preventDefault();
 
     //gather all the data
     const collectedData = {
@@ -261,38 +251,46 @@ function ContextForm({ getExistingContext }) {
         MainBody: {},
         Event: {},
         BikeConfig: {},
-        BmsConfig: {},
-        ImuConfig: {},
-        TmuConfig: {},
-        TmsConfig: {},
-        PvcConfig: {},
-        McConfig: {},
+        bms: {},
+        imu: {},
+        tmu: {},
+        tms: {},
+        pvc: {},
+        mc: {},
       },
     };
-    // Loop through each key in Context and collect data
 
-    //check each select
-    //if they are != "Custom"
-    //data needs to be gathered from the input field
-    //TODO clean up this logic and make it read abel
+    //get the needed json object
     const ConfigElements = ContextJSON.ConfigElements;
-    for (const key in ConfigElements.ConfigSelects) {
-      const keyPairValue = ConfigElements.ConfigSelects[key];
+    const jsonObjectSuffix = "Config";
+    ConfigName.forEach((configName) => {
+      //get the json object of ids
+      const configIds = ConfigElements[configName + jsonObjectSuffix];
+
       //check if the selected element is custom
-      if (document.getElementById(key).value === "Custom") {
-        ConfigElements[keyPairValue].forEach((id) => {
+      if (document.getElementById(configName + "Select").value === "Custom") {
+        configIds.forEach((id) => {
           //get the item and make sure it exists
+          console.log(configName);
           const element = document.getElementById(id);
           if (element) {
-            collectedData.Context[keyPairValue][id] = element.value; // Collect the value from the form element
+            collectedData.Context[configName][id] = element.value; // Collect the value from the form element
           }
         });
-      } else {
-        collectedData.Context[keyPairValue]["selected"] =
-          document.getElementById(key).value;
-      }
-    }
 
+        collectedData.Context[configName]["saved"] = checkBox[configName];
+        //if the box is checked save the name
+        if (checkBox[configName]) {
+          collectedData.Context[configName]["savedName"] =
+            document.getElementById(configName + "SavedName").value;
+        }
+      } else {
+        collectedData.Context[configName] = document.getElementById(
+          configName + "Select"
+        ).value;
+      }
+    });
+    //handle the main, bike, and event
     const MainElements = ContextJSON.MainElements;
 
     for (const key in MainElements) {
@@ -307,6 +305,7 @@ function ContextForm({ getExistingContext }) {
 
     console.log("It's data time!");
     console.log(collectedData);
+    return;
     fetch(BASE_URL + "/Context", {
       //post data to the server
       method: "PUT",
@@ -329,6 +328,81 @@ function ContextForm({ getExistingContext }) {
         console.error("Error:", error); // Handle any errors
       });
   };
+  /**
+   * Create a check box with label.
+   * If the box is clicked -> Also display
+   * a text input box to take a name input
+   *
+   * @param {string} name - Name of config form
+   *
+   * @return {HTMLDivElement} - Div containing a Label, Check Box, and a Text Input
+   */
+  const CreateCheckBox = (name) => {
+    //TODO work on the css for the button
+    const checkBoxId = name + "CheckBox";
+
+    if (configSelects[name] === "Custom") {
+      return (
+        <div>
+          <Label for={checkBoxId}>Save preset</Label>
+          <Input
+            type="checkbox"
+            id={checkBoxId}
+            name={checkBoxId}
+            checked={checkBox[name]}
+            onChange={(e) => {
+              checkBoxChange(e.target.checked, name);
+            }}
+          />
+          {checkBox[name] && (
+            <Input
+              type="text"
+              placeholder="Enter some text"
+              id={name + "SavedName"}
+              style={{ marginLeft: "10px" }} // Inline with the checkbox
+              required
+            />
+          )}
+        </div>
+      );
+    }
+  };
+
+  /* -------------------------------------------------------------------------- */
+  /* ----------------------- Establish Use Effect Hooks ----------------------- */
+  /* -------------------------------------------------------------------------- */
+
+  /**
+   * Create all form elements for the main, bike, and event
+   * sections and create dropdowns for the config fields
+   */
+  //TODO Replace temp data
+  useEffect(() => {
+    const tempData = ["test"]; // This should eventually be replaced with real data.
+    //FetchConfigOptions();
+    ConfigName.forEach((name) => {
+      console.log(name);
+      const dropDown = SelectCreator(tempData, name);
+      setDropDowns((prev) => ({ ...prev, [name]: dropDown }));
+    });
+
+    UpdateContext(GenerateFormElement("MainBody"));
+    UpdateBikeForm(GenerateFormElement("BikeConfig"));
+    UpdateEventForm(GenerateFormElement("Event"));
+  }, []);
+
+  useEffect(() => {
+    ConfigName.forEach((configName) => {
+      const configSelectValue = configSelects[configName]; // Access the corresponding value for the config
+
+      if (configSelectValue === "Custom") {
+        const formElement = GenerateFormElement(`${configName}Config`);
+        setFormElements((prev) => ({ ...prev, [configName]: formElement }));
+      } else {
+        setFormElements((prev) => ({ ...prev, [configName]: null }));
+      }
+    });
+  }, [configSelects]);
 
   //display the final result
   return (
@@ -350,49 +424,30 @@ function ContextForm({ getExistingContext }) {
             <div className="panel-content">{eventContextForm}</div>
           </div>
           <div className="bottom-right-panel">
-            <div className="panel-content">
-              <h3 className="panel-header">Bike Context</h3>
-              {bikeContextForm}
-            </div>
+            <h3 className="panel-header">Bike Context</h3>
+            <div className="panel-content">{bikeContextForm}</div>
           </div>
         </div>
       </div>
 
       <div className="grid-container">
-        <div className="grid-item">
-          <h3 className="grid-header">
-            BMS Configuration: {bmsConfigDropDown}
-          </h3>
-          {bmsConfigForm}
-        </div>
-        <div className="grid-item">
-          <h3 className="grid-header">
-            TMS Configuration: {tmsConfigDropDown}
-          </h3>
-          {tmsConfigForm}
-        </div>
-        <div className="grid-item">
-          <h3 className="grid-header">
-            IMU Configuration: {imuConfigDropDown}
-          </h3>
-          {imuConfigForm}
-        </div>
-        <div className="grid-item">
-          <h3 className="grid-header">
-            TMU Configuration: {tmuConfigDropDown}
-          </h3>
-          {tmuConfigForm}
-        </div>
-        <div className="grid-item">
-          <h3 className="grid-header">
-            PVC Configuration: {pvcConfigDropDown}
-          </h3>
-          {pvcConfigForm}
-        </div>
-        <div className="grid-item">
-          <h3 className="grid-header">MC Configuration: {mcConfigDropDown}</h3>
-          {mcConfigForm}
-        </div>
+        {ConfigName.map((name) => {
+          return (
+            <div className="grid-item">
+              <h3 className="grid-header">
+                {/*
+                 *Create each element of the grid. Initially each has the name
+                 *of the config and a dropdown. Dropdown is populated by past
+                 *configs of the same type that have been saved. Allow user to also
+                 *create a new one with the option to save it with a name
+                 */}
+                {name.toLocaleUpperCase()} Configuration: {dropDowns[name]}
+              </h3>
+              {configForm[name]}
+              {CreateCheckBox(name)}
+            </div>
+          );
+        })}
       </div>
 
       <Button className="submitButton">Submit</Button>

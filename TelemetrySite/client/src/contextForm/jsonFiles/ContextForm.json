@@ -23,7 +23,7 @@
         ]
     },
     "ConfigElements": {
-        "BmsConfig": [
+        "bmsConfig": [
             "hardwareRevisionBMS",
             "softwareCommitHashBMS",
             "totalVoltageUnits",
@@ -33,14 +33,14 @@
             "bqTempUnits",
             "cellVoltageUnits"
         ],
-        "TmsConfig": [
+        "tmsConfig": [
             "hardwareRevisionTMS",
             "softwareCommitHashTMS",
             "tempUnits",
             "pumpSpeedUnits",
             "fanSpeedUnits"
         ],
-        "ImuConfig": [
+        "imuConfig": [
             "hardwareRevisionIMU",
             "softwareCommitHashIMU",
             "eulerUnits",
@@ -48,26 +48,18 @@
             "linearAccelerationUnits",
             "accelerometerUnits"
         ],
-        "TmuConfig": [
+        "tmuConfig": [
             "hardwareRevisionTMU",
             "softwareCommitHashTMU",
             "thermUnits"
         ],
-        "PvcConfig": [
+        "pvcConfig": [
             "hardwareRevisionPVC",
             "softwareCommitHashPVC"
         ],
-        "McConfig": [
+        "mcConfig": [
             "model",
             "firmwareVersion"
-        ],
-        "ConfigSelects": {
-            "bmsConfigSelect": "BmsConfig",
-            "tmsConfigSelect": "TmsConfig",
-            "imuConfigSelect": "ImuConfig",
-            "tmuConfigSelect": "TmuConfig",
-            "pvcConfigSelect": "PvcConfig",
-            "mcConfigSelect": "McConfig"
-        }
+        ]
     }
 }

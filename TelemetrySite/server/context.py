@@ -11,11 +11,10 @@ class Context(MethodView):
     ## Get all the past config data saved and return 
     ## any of them with a name
     #
-    # @return
+    # @return all saved past files
     def get(self):
 
-        
-
+    
         #declare tuple of all special config names
 
         #declare dictionary for returning data
@@ -75,6 +74,18 @@ class Context(MethodView):
         # Respond back to the client
         return jsonify({"message": "Data received successfully", "received": data}), 200
     
+
+    def post(self):
+
+
+        return "Post Called"
+    
+    def delete(self):
+
+
+        return "Post Called"
+
+
     ## Convert a dictionary to a python tuple
     ## And remove the first value
     #
