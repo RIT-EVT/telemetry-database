@@ -1,0 +1,352 @@
+{
+    "Motor Controller": {
+        "dummydata": "dummy"
+    },
+    "TMU": {
+        "0x180": [
+            {
+                "table": "TmuThermistorTemp", 
+                "thermId": 1,
+                "size": 16
+            },
+            {
+                "table": "TmuThermistorTemp",
+                "thermId": 2,
+                "size": 16
+            },
+            {
+                "table": "TmuThermistorTemp",
+                "thermId": 3,
+                "size": 16
+            },
+            {
+                "table": "TmuThermistorTemp",
+                "thermId": 4,
+                "size": 16
+            }
+        ]
+    },
+    "TMS": {
+        "0x180": [
+            {
+                "table": "TmsSensorTemp",
+                "sensorId": 1,
+                "size": 16
+            },
+            {
+                "table": "TmsSensorTemp",
+                "sensorId": 2,
+                "size": 16
+            },
+            {
+                "table": "TmsSensorTemp",
+                "sensorId": 3,
+                "size": 16
+            },
+            {
+                "table": "TmsSensorTemp",
+                "sensorId": 4,
+                "size": 16
+            }
+        ],
+        "0x280": [
+            {
+                "table": "TmsPumpSpeed",
+                "pumpId": 1,
+                "size": 8
+            },
+            {
+                "table": "TmsFanSpeed",
+                "fanId": 1,
+                "size": 8
+            },
+            {
+                "table": "TmsFanSpeed",
+                "fanId": 2,
+                "size": 8
+            }
+        ]
+    },
+    "IMU": {
+        "0x180": [
+            {
+                "table": "ImuEulerComponent",
+                "axis": "x",
+                "size": 16
+            },
+            {
+                "table": "ImuGyroComponent",
+                "axis": "x",
+                "size": 16
+            },
+            {
+                "table": "ImuLinearAccelerationComponent",
+                "axis": "x",
+                "size": 16
+            },
+            {
+                "table": "ImuAccelerometerComponent",
+                "axis": "x",
+                "size": 16
+            }
+        ],
+        "0x280": [
+            {
+                "table": "ImuEulerComponent",
+                "axis": "y",
+                "size": 16
+            },
+            {
+                "table": "ImuGyroComponent",
+                "axis": "y",
+                "size": 16
+            },
+            {
+                "table": "ImuLinearAccelerationComponent",
+                "axis": "y",
+                "size": 16
+            },
+            {
+                "table": "ImuAccelerometerComponent",
+                "axis": "y",
+                "size": 16
+            }
+        ],
+        "0x380": [
+            {
+                "table": "ImuEulerComponent",
+                "axis": "z",
+                "size": 16
+            },
+            {
+                "table": "ImuGyroComponent",
+                "axis": "z",
+                "size": 16
+            },
+            {
+                "table": "ImuLinearAccelerationComponent",
+                "axis": "z",
+                "size": 16
+            },
+            {
+                "table": "ImuAccelerometerComponent",
+                "axis": "z",
+                "size": 16
+            }
+        ]
+    },
+    "PVC": {
+        "0x180": [
+            {
+                "table": "PvcState",
+                "size": 16
+            }
+        ]
+    },
+    "BMSX_0": {
+        "0x180": [
+            {
+                "table": "batteryVoltage",
+                "size": 16
+            },
+            {
+                "table": "THROW_AWAY",
+                "size": 16
+            },
+            {
+                "table": "THROW_AWAY",
+                "size": 8
+            },
+            {
+                "table": "THROW_AWAY",
+                "size": 16
+            },
+            {
+                "table": "THROW_AWAY",
+                "size": 8
+            }
+        ],
+        "0x280": [
+            {
+                "table": "BmsCurrent",
+                "size": 16
+            },
+            {
+                "table": "THROW_AWAY",
+                "size": 8
+            },
+            {
+                "table": "THROW_AWAY",
+                "size": 8
+            },
+            {
+                "table": "THROW_AWAY",
+                "size": 8
+            },
+            {
+                "table": "THROW_AWAY",
+                "size": 8
+            },
+            {
+                "table": "BmsThermistorTemp",
+                "size": 8
+            },
+            {
+                "table": "BmsState",
+                "size": 8
+            }
+        ],
+        "0x380": [
+            {
+                "table": "TmuThermistorTemp",
+                "thermId": 1,
+                "size": 8
+            },
+            {
+                "table": "TmuThermistorTemp",
+                "thermId": 2,
+                "size": 8
+            },
+            {
+                "table": "TmuThermistorTemp",
+                "thermId": 3,
+                "size": 8
+            },
+            {
+                "table": "TmuThermistorTemp",
+                "thermId": 4,
+                "size": 8
+            },
+            {
+                "table": "TmuThermistorTemp",
+                "thermId": 5,
+                "size": 8
+            },
+            {
+                "table": "TmuThermistorTemp",
+                "thermId": 6,
+                "size": 8
+            },
+            {
+                "table": "BmsBqTemp",
+                "tempId": 1,
+                "size": 8
+            },
+            {
+                "table": "BmsBqTemp",
+                "tempId": 2,
+                "size": 8
+            }
+        ],
+        "0x480": [
+            {
+                "table": "BmsErrorRegister",
+                "size": 8
+            },
+            {
+                "table": "BmsBqStatus",
+                "packId": 1,
+                "size": 8
+            },
+            {
+                "table": "BmsBqStatus",
+                "packId": 2,
+                "size": 8
+            },
+            {
+                "table": "BmsBqStatus",
+                "packId": 3,
+                "size": 8
+            },
+            {
+                "table": "BmsBqStatus",
+                "packId": 4,
+                "size": 8
+            },
+            {
+                "table": "BmsBqStatus",
+                "packId": 5,
+                "size": 8
+            },
+            {
+                "table": "BmsBqStatus",
+                "packId": 6,
+                "size": 8
+            },
+            {
+                "table": "BmsBqStatus",
+                "packId": 7,
+                "size": 8
+            }
+        ]
+    },
+    "BMSX_1": {
+        "0x180": [
+            {
+                "table": "BmsCellVoltage",
+                "packId": 1,
+                "size": 8
+            },
+            {
+                "table": "BmsCellVoltage",
+                "packId": 2,
+                "size": 8
+            },
+            {
+                "table": "BmsCellVoltage",
+                "packId": 3,
+                "size": 8
+            },
+            {
+                "table": "BmsCellVoltage",
+                "packId": 4,
+                "size": 8
+            }
+        ],
+        "0x280": [
+            {
+                "table": "BmsCellVoltage",
+                "packId": 5,
+                "size": 8
+            },
+            {
+                "table": "BmsCellVoltage",
+                "packId": 6,
+                "size": 8
+            },
+            {
+                "table": "BmsCellVoltage",
+                "packId": 7,
+                "size": 8
+            },
+            {
+                "table": "BmsCellVoltage",
+                "packId": 8,
+                "size": 8
+            }
+        ],
+        "0x380": [
+            {
+                "table": "BmsCellVoltage",
+                "packId": 9,
+                "size": 8
+            },
+            {
+                "table": "BmsCellVoltage",
+                "packId": 10,
+                "size": 8
+            },
+            {
+                "table": "BmsCellVoltage",
+                "packId": 11,
+                "size": 8
+            },
+            {
+                "table": "BmsCellVoltage",
+                "packId": 12,
+                "size": 8
+            }
+        ]
+    }
+
+}
