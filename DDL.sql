@@ -1,5 +1,6 @@
 CREATE TABLE BmsConfig(
     id                  SERIAL PRIMARY KEY,
+    configName          TEXT NOT NULL,
     hardwareRevision    TEXT NOT NULL,
     softwareCommitHash  TEXT NOT NULL,
     totalVoltageUnits   TEXT NOT NULL,
@@ -12,6 +13,7 @@ CREATE TABLE BmsConfig(
 
 CREATE TABLE ImuConfig(
     id                      SERIAL PRIMARY KEY,
+    configName              TEXT NOT NULL,
     hardwareRevision        TEXT NOT NULL,
     softwareCommitHash      TEXT NOT NULL,
     eulerUnits              TEXT NOT NULL,
@@ -22,6 +24,7 @@ CREATE TABLE ImuConfig(
 
 CREATE TABLE TmuConfig(
     id                 SERIAL PRIMARY KEY,
+    configName         TEXT NOT NULL,
     hardwareRevision   TEXT NOT NULL,
     softwareCommitHash TEXT NOT NULL,
     thermUnits         TEXT NOT NULL
@@ -29,6 +32,7 @@ CREATE TABLE TmuConfig(
 
 CREATE TABLE TmsConfig(
     id                 SERIAL PRIMARY KEY,
+    configName         TEXT NOT NULL,
     hardwareRevision   TEXT NOT NULL,
     softwareCommitHash TEXT NOT NULL,
     tempUnits          TEXT NOT NULL,
@@ -38,6 +42,7 @@ CREATE TABLE TmsConfig(
 
 CREATE TABLE PvcConfig(
     id                 SERIAL PRIMARY KEY,
+    configName         TEXT NOT NULL,
     hardwareRevision   TEXT NOT NULL,
     softwareCommitHash TEXT NOT NULL
 );
@@ -45,12 +50,14 @@ CREATE TABLE PvcConfig(
 -- TODO: Add detail
 CREATE TABLE McConfig(
     id              SERIAL PRIMARY KEY,
+    configName      TEXT NOT NULL,
     model           TEXT NOT NULL,
     firmwareVersion TEXT NOT NULL
 );
 
 CREATE TABLE BikeConfig(
     id            SERIAL PRIMARY KEY,
+    configName    TEXT NOT NULL,
     platformName  TEXT NOT NULL,
     tirePressure  FLOAT DEFAULT NULL,
     coolantVolume FLOAT DEFAULT NULL,
@@ -126,49 +133,9 @@ CREATE TABLE BmsBatteryVoltage(
     FOREIGN KEY (contextId) REFERENCES Context(id)
 );
 
-CREATE TABLE BmsMinCellVoltage(
-    id          SERIAL PRIMARY KEY,
-    packId      INTEGER NOT NULL,
-    cellId      INTEGER NOT NULL,
-    val         INTEGER NOT NULL,
-    receiveTime DECIMAL(11,6) NOT NULL,
-    contextId   INTEGER NOT NULL,
-    FOREIGN KEY (contextId) REFERENCES Context(id)
-);
-
-CREATE TABLE BmsMaxCellVoltage(
-    id          SERIAL PRIMARY KEY,
-    packId      INTEGER NOT NULL,
-    cellId      INTEGER NOT NULL,
-    val         INTEGER NOT NULL,
-    receiveTime DECIMAL(11,6) NOT NULL,
-    contextId   INTEGER NOT NULL,
-    FOREIGN KEY (contextId) REFERENCES Context(id)
-);
-
 CREATE TABLE BmsCurrent(
     id          SERIAL PRIMARY KEY,
     packId      INTEGER NOT NULL,
-    val         INTEGER NOT NULL,
-    receiveTime DECIMAL(11,6) NOT NULL,
-    contextId   INTEGER NOT NULL,
-    FOREIGN KEY (contextId) REFERENCES Context(id)
-);
-
-CREATE TABLE BmsMinPackTemp(
-    id          SERIAL PRIMARY KEY,
-    packId      INTEGER NOT NULL,
-    thermId     INTEGER NOT NULL,
-    val         INTEGER NOT NULL,
-    receiveTime DECIMAL(11,6) NOT NULL,
-    contextId   INTEGER NOT NULL,
-    FOREIGN KEY (contextId) REFERENCES Context(id)
-);  
-
-CREATE TABLE BmsMaxPackTemp(
-    id          SERIAL PRIMARY KEY,
-    packId      INTEGER NOT NULL,
-    thermId     INTEGER NOT NULL,
     val         INTEGER NOT NULL,
     receiveTime DECIMAL(11,6) NOT NULL,
     contextId   INTEGER NOT NULL,

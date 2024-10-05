@@ -146,101 +146,117 @@
     "BMSX_0": {
         "0x180": [
             {
-                "table": "batteryVoltage",
+                "table": "BmsBatteryVoltage",
+                "packId": "UNKNOWN",
                 "size": 16
             },
             {
                 "table": "THROW_AWAY",
+                "packId": "UNKNOWN",
                 "size": 16
             },
             {
                 "table": "THROW_AWAY",
+                "packId": "UNKNOWN",
                 "size": 8
             },
             {
                 "table": "THROW_AWAY",
+                "packId": "UNKNOWN",
                 "size": 16
             },
             {
                 "table": "THROW_AWAY",
+                "packId": "UNKNOWN",
                 "size": 8
             }
         ],
         "0x280": [
             {
                 "table": "BmsCurrent",
+                "packId": "UNKNOWN",
                 "size": 16
             },
             {
                 "table": "THROW_AWAY",
+                "packId": "UNKNOWN",
                 "size": 8
             },
             {
                 "table": "THROW_AWAY",
+                "packId": "UNKNOWN",
                 "size": 8
             },
             {
                 "table": "THROW_AWAY",
+                "packId": "UNKNOWN",
                 "size": 8
             },
             {
                 "table": "THROW_AWAY",
+                "packId": "UNKNOWN",
                 "size": 8
             },
             {
                 "table": "BmsThermistorTemp",
+                "thermId": 1,
+                "packId": "UNKNOWN",
                 "size": 8
             },
             {
                 "table": "BmsState",
+                "packId": "UNKNOWN",
                 "size": 8
             }
         ],
         "0x380": [
             {
-                "table": "TmuThermistorTemp",
+                "table": "BmsThermistorTemp",
                 "thermId": 1,
                 "size": 8
             },
             {
-                "table": "TmuThermistorTemp",
+                "table": "BmsThermistorTemp",
                 "thermId": 2,
                 "size": 8
             },
             {
-                "table": "TmuThermistorTemp",
+                "table": "BmsThermistorTemp",
                 "thermId": 3,
                 "size": 8
             },
             {
-                "table": "TmuThermistorTemp",
+                "table": "BmsThermistorTemp",
                 "thermId": 4,
                 "size": 8
             },
             {
-                "table": "TmuThermistorTemp",
+                "table": "BmsThermistorTemp",
                 "thermId": 5,
                 "size": 8
             },
             {
-                "table": "TmuThermistorTemp",
+                "table": "BmsThermistorTemp",
                 "thermId": 6,
                 "size": 8
             },
             {
                 "table": "BmsBqTemp",
-                "tempId": 1,
+                "packId": "UNKNOWN",
+                "tempId": 2,
                 "size": 8
             },
             {
                 "table": "BmsBqTemp",
-                "tempId": 2,
+                "packId": "UNKNOWN",
+                "tempId": 3,
                 "size": 8
             }
         ],
         "0x480": [
             {
                 "table": "BmsErrorRegister",
+                "packId": "UNKNOWN",
                 "size": 8
             },
             {
@@ -284,69 +300,104 @@
         "0x180": [
             {
                 "table": "BmsCellVoltage",
-                "packId": 1,
+                "packId": "UNKNOWN",
+                "cellId": 1,
                 "size": 8
             },
             {
                 "table": "BmsCellVoltage",
-                "packId": 2,
+                "packId": "UNKNOWN",
+                "cellId": 2,
                 "size": 8
             },
             {
                 "table": "BmsCellVoltage",
-                "packId": 3,
+                "packId": "UNKNOWN",
+                "cellId": 3,
                 "size": 8
             },
             {
                 "table": "BmsCellVoltage",
-                "packId": 4,
+                "packId": "UNKNOWN",
+                "cellId": 4,
                 "size": 8
             }
         ],
         "0x280": [
             {
                 "table": "BmsCellVoltage",
-                "packId": 5,
+                "packId": "UNKNOWN",
+                "cellId": 5,
                 "size": 8
             },
             {
                 "table": "BmsCellVoltage",
-                "packId": 6,
+                "packId": "UNKNOWN",
+                "cellId": 6,
                 "size": 8
             },
             {
                 "table": "BmsCellVoltage",
-                "packId": 7,
+                "packId": "UNKNOWN",
+                "cellId": 7,
                 "size": 8
             },
             {
                 "table": "BmsCellVoltage",
-                "packId": 8,
+                "packId": "UNKNOWN",
+                "cellId": 8,
                 "size": 8
             }
         ],
         "0x380": [
             {
                 "table": "BmsCellVoltage",
-                "packId": 9,
+                "packId": "UNKNOWN",
+                "cellId": 9,
                 "size": 8
             },
             {
                 "table": "BmsCellVoltage",
-                "packId": 10,
+                "packId": "UNKNOWN",
+                "cellId": 10,
                 "size": 8
             },
             {
                 "table": "BmsCellVoltage",
-                "packId": 11,
+                "packId": "UNKNOWN",
+                "cellId": 11,
                 "size": 8
             },
             {
                 "table": "BmsCellVoltage",
-                "packId": 12,
+                "packId": "UNKNOWN",
+                "cellId": 12,
                 "size": 8
             }
         ]
+    },
+    "nodeIDDictionary": {
+        "1" : "Motor Controller",
+        "7" : "TMU",
+        "8" : "TMS",
+        "9" : "IMU",
+        "10" : "PVC",
+        "11" : "HUDL",
+        "12" : "TPMS",
+        "13" : "APM",
+        "16" : "Charge Controller",
+        "20" : "BMS0_0",
+        "21" : "BMS1_0",
+        "22" : "BMS2_0",
+        "23" : "BMS3_0",
+        "24" : "BMS4_0",
+        "25" : "BMS5_0",
+        "30" : "BMS0_1",
+        "31" : "BMS1_1",
+        "32" : "BMS2_1",
+        "33" : "BMS3_1",
+        "34" : "BMS4_1",
+        "35" : "BMS5_1"
     }
 
 }
