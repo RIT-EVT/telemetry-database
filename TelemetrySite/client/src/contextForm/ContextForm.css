@@ -44,7 +44,6 @@ Input {
   gap: 20px;
 }
 
-/* TODO May want align the bike and event forms so they take up the same vertical space as the main form */
 .panel-header {
   font-size: 1.2em;
   font-weight: bold;

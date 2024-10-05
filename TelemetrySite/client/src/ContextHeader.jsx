@@ -1,100 +1,64 @@
-import { Button } from "reactstrap";
-import React, { useCallback, useEffect, useState } from "react";
+import { Button, Alert } from "reactstrap";
+import React, { useEffect, useState } from "react";
 import "./ContextHeader.css";
 import ContextForm from "./contextForm/ContextForm.jsx";
 
 function ContextHeader() {
-  const handleClick = useCallback(() => {
-    console.log("Button clicked!");
-  }, []);
-
-  const displayModeEnum = Object.freeze({
-    BASE_MODE: 0,
-    NEW_CONTEXT: 1,
-    EXISTING_CONTEXT: 2,
-  });
+  const [serverOnline, setServerOnline] = useState(false);
+  const [ButtonsForSelect, updateButtons] = useState(null);
 
   const [body, updateBody] = useState(null);
-  const [displayMode, updateDisplayMode] = useState(displayModeEnum.BASE_MODE);
 
-  /**
-   * Set the display mode for the body on button click
-   * If the display mode is the same as the current mode
-   * Set to base display
-   * @param {displayModeEnum} newDisplayMode - display mode to set to
-   */
-  const ButtonDisplayClicked = (newDisplayMode) => {
-    //if the button clicked was the same as the
-    //current mode, return to default
-    //else set to new mode
-    if (displayMode == newDisplayMode) {
-      updateDisplayMode(displayModeEnum.BASE_MODE);
-    } else {
-      updateDisplayMode(newDisplayMode);
-    }
+  const [error, setError] = useState(null);
+
+  const clearError = () => {
+    setError(null);
   };
 
-  const ButtonsForSelect = (
-    <div className="ButtonDisplayBody">
-      <table>
-        <tbody>
-          <tr>
-            <td>
-              <center>
-                <Button
-                  className="ButtonBody"
-                  onClick={() => {
-                    ButtonDisplayClicked(displayModeEnum.NEW_CONTEXT);
-                  }}
-                >
-                  New Context
-                </Button>
-              </center>
-            </td>
-            <td>
-              <center>
-                <Button
-                  className="ButtonBody"
-                  onClick={() => {
-                    ButtonDisplayClicked(displayModeEnum.EXISTING_CONTEXT);
-                  }}
-                >
-                  Existing Context
-                </Button>
-              </center>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  );
-  var setMode;
+  const CheckBackendConnection = () => {
+    fetch("http://127.0.0.1:5000/Test")
+      .then((data) => {
+        setServerOnline(true);
+        clearError();
+      })
+
+      .catch((error) => {
+        setServerOnline(false);
+        setError(<Alert color="danger">An error has occurred</Alert>);
+      });
+  };
+
   useEffect(() => {
-    var bodyContent;
-    if (setMode === displayMode) {
-      return;
-    } else {
-      setMode = displayMode;
-    }
-    switch (displayMode) {
-      case displayModeEnum.BASE_MODE:
-        //display an welcome/prompt screen
-        bodyContent = <div>I'm empty</div>;
-        break;
+    const interval = setInterval(() => {
+      // Only check backend if the server is offline
+      if (!serverOnline) {
+        CheckBackendConnection();
+      } else {
+        clearInterval(interval); // Stop interval when server is online
+      }
+    }, 1000);
 
-      case displayModeEnum.NEW_CONTEXT:
-        //display a the base input fields
-        bodyContent = <ContextForm getExistingContext={false} />;
-        break;
-      //TODO May remove unless we want user to be able to edit previous data
-      case displayModeEnum.EXISTING_CONTEXT:
-        //prompt user for which context file they want
-        bodyContent = <ContextForm getExistingContext={true} />;
-        break;
-    }
+    // Cleanup interval when component unmounts
+    return () => clearInterval(interval);
+  }, [serverOnline]); // Add serverOnline as a dependency to stop interval when it's true
 
-    updateBody(bodyContent);
-  }, [displayMode]);
+  useEffect(() => {
+    updateButtons(
+      <div className="ButtonDisplayBody">
+        <center>
+          <Button
+            className="ButtonBody"
+            disabled={!serverOnline}
+            onClick={() => {
+              updateBody(<ContextForm />);
+            }}
+          >
+            New Context
+          </Button>
+        </center>
+      </div>
+    );
+  }, [serverOnline, error]);
 
   return (
     <div className="MainBody">
@@ -107,6 +71,7 @@ function ContextHeader() {
 
         {ButtonsForSelect}
       </div>
+      {error}
       {body}
     </div>
   );

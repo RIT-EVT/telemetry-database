@@ -4,6 +4,9 @@
  *
  * Create form elements for each of the needed context
  * forms
+ *
+ * Submit data entered by user to the backend
+ * server
  */
 
 import { Form, FormGroup, Label, Input, Button } from "reactstrap";
@@ -22,27 +25,19 @@ const BASE_URL = "http://127.0.0.1:5000";
 /**
  * Create needed context forms. Return the configured elements
  *
- * @param {boolean} getExistingContext - Form should fetch an existing config
- * @return {HTMLDivElement} Div element for all the form
+ * @return {HTMLFormElement} Form element for all the needed fields
  */
-function ContextForm({ getExistingContext }) {
+function ContextForm() {
   /* -------------------------------------------------------------------------- */
   /* -------------------------- Establish State Hooks ------------------------- */
   /* -------------------------------------------------------------------------- */
+
   const [mainContextForm, UpdateContext] = useState(null);
 
   const [eventContextForm, UpdateEventForm] = useState(null);
   const [bikeContextForm, UpdateBikeForm] = useState(null);
 
-  const [configSelects, setConfigSelects] = useState({
-    bms: null,
-    imu: null,
-    tmu: null,
-    tms: null,
-    pvc: null,
-    mc: null,
-  });
-
+  //each config form object
   const [configForm, setFormElements] = useState({
     bms: null,
     imu: null,
@@ -51,7 +46,7 @@ function ContextForm({ getExistingContext }) {
     pvc: null,
     mc: null,
   });
-
+  //each dropdown object
   const [dropDowns, setDropDowns] = useState({
     bms: null,
     imu: null,
@@ -60,7 +55,16 @@ function ContextForm({ getExistingContext }) {
     pvc: null,
     mc: null,
   });
-
+  //current selected value of each dropdown
+  const [configSelects, setConfigSelects] = useState({
+    bms: null,
+    imu: null,
+    tmu: null,
+    tms: null,
+    pvc: null,
+    mc: null,
+  });
+  //value of each config checkbox
   const [checkBox, setCheckBox] = useState({
     bms: false,
     imu: false,
@@ -69,14 +73,23 @@ function ContextForm({ getExistingContext }) {
     pvc: false,
     mc: false,
   });
+  //values passed from back end
+  const [dropDownOptions, setDropdownOptions] = useState({
+    bms: [],
+    imu: [],
+    tmu: [],
+    tms: [],
+    pvc: [],
+    mc: [],
+  });
 
   /* -------------------------------------------------------------------------- */
   /* --------------------------- Initialize Constants ------------------------- */
   /* -------------------------------------------------------------------------- */
-  const ConfigName = ["bms", "imu", "tmu", "tms", "pvc", "mc"];
+  let ConfigName = ["bms", "imu", "tmu", "tms", "pvc", "mc"];
 
-  //todo fix this later. this is a shit solution for required
-  const RequiredSelects = {
+  //which config selects are optional
+  let RequiredSelects = {
     bmsConfig: true,
     tmsConfig: false,
     imuConfig: false,
@@ -139,7 +152,6 @@ function ContextForm({ getExistingContext }) {
   const FetchConfigOptions = () => {
     //does not work yet
     //tables do not contain a name column
-    //TODO update config tables to include a name
     //fetch names of config files to display for user to choose from
     fetch(BASE_URL + "/Context")
       .then((response) => {
@@ -150,7 +162,7 @@ function ContextForm({ getExistingContext }) {
         return response.json();
       })
       .then((data) => {
-        console.log(data);
+        setDropdownOptions(data);
       })
       .catch((error) => {
         throw new Error(
@@ -262,30 +274,30 @@ function ContextForm({ getExistingContext }) {
 
     //get the needed json object
     const ConfigElements = ContextJSON.ConfigElements;
-    const jsonObjectSuffix = "Config";
+
     ConfigName.forEach((configName) => {
       //get the json object of ids
-      const configIds = ConfigElements[configName + jsonObjectSuffix];
+      const configIds = ConfigElements[configName + "Config"];
 
       //check if the selected element is custom
       if (document.getElementById(configName + "Select").value === "Custom") {
         configIds.forEach((id) => {
           //get the item and make sure it exists
-          console.log(configName);
           const element = document.getElementById(id);
           if (element) {
             collectedData.Context[configName][id] = element.value; // Collect the value from the form element
           }
         });
 
-        collectedData.Context[configName]["saved"] = checkBox[configName];
         //if the box is checked save the name
         if (checkBox[configName]) {
           collectedData.Context[configName]["savedName"] =
             document.getElementById(configName + "SavedName").value;
+        } else {
+          collectedData.Context[configName]["savedName"] = "";
         }
       } else {
-        collectedData.Context[configName] = document.getElementById(
+        collectedData.Context[configName]["selected"] = document.getElementById(
           configName + "Select"
         ).value;
       }
@@ -303,9 +315,6 @@ function ContextForm({ getExistingContext }) {
       });
     }
 
-    console.log("It's data time!");
-    console.log(collectedData);
-    return;
     fetch(BASE_URL + "/Context", {
       //post data to the server
       method: "PUT",
@@ -327,6 +336,7 @@ function ContextForm({ getExistingContext }) {
       .catch((error) => {
         console.error("Error:", error); // Handle any errors
       });
+    //document.getElementById("ContextForm").reset();
   };
   /**
    * Create a check box with label.
@@ -338,7 +348,6 @@ function ContextForm({ getExistingContext }) {
    * @return {HTMLDivElement} - Div containing a Label, Check Box, and a Text Input
    */
   const CreateCheckBox = (name) => {
-    //TODO work on the css for the button
     const checkBoxId = name + "CheckBox";
 
     if (configSelects[name] === "Custom") {
@@ -376,21 +385,26 @@ function ContextForm({ getExistingContext }) {
    * Create all form elements for the main, bike, and event
    * sections and create dropdowns for the config fields
    */
-  //TODO Replace temp data
+
   useEffect(() => {
-    const tempData = ["test"]; // This should eventually be replaced with real data.
     //FetchConfigOptions();
     ConfigName.forEach((name) => {
-      console.log(name);
-      const dropDown = SelectCreator(tempData, name);
+      const dropDown = SelectCreator(dropDownOptions[name], name);
       setDropDowns((prev) => ({ ...prev, [name]: dropDown }));
     });
 
     UpdateContext(GenerateFormElement("MainBody"));
     UpdateBikeForm(GenerateFormElement("BikeConfig"));
     UpdateEventForm(GenerateFormElement("Event"));
-  }, []);
+  }, [dropDownOptions]);
 
+  /**
+   * Check all config select value. If it is == Custom
+   * generate the needed config page
+   * else set to null
+   *
+   * Run on configSelect change
+   */
   useEffect(() => {
     ConfigName.forEach((configName) => {
       const configSelectValue = configSelects[configName]; // Access the corresponding value for the config
@@ -404,28 +418,38 @@ function ContextForm({ getExistingContext }) {
     });
   }, [configSelects]);
 
-  //display the final result
+  /* -------------------------------------------------------------------------- */
+  /* ---------------------------- Return Final Form --------------------------- */
+  /* -------------------------------------------------------------------------- */
+
   return (
     <Form
       className="ContextForm"
       name="Context"
+      id="ContextForm"
       onSubmit={(e) => {
         SubmitData(e);
       }}
     >
       <div className="container">
         <div className="left-panel">
-          <h3 className="panel-header">Main Context</h3>
-          <div className="panel-content">{mainContextForm}</div>
+          <div className="panel-content">
+            <h3 className="panel-header">Main Context</h3>
+            {mainContextForm}
+          </div>
         </div>
         <div className="right-panel">
           <div className="top-right-panel">
-            <h3 className="panel-header">Event Context</h3>
-            <div className="panel-content">{eventContextForm}</div>
+            <div className="panel-content">
+              <h3 className="panel-header">Event Context</h3>
+              {eventContextForm}
+            </div>
           </div>
           <div className="bottom-right-panel">
-            <h3 className="panel-header">Bike Context</h3>
-            <div className="panel-content">{bikeContextForm}</div>
+            <div className="panel-content">
+              <h3 className="panel-header">Bike Context</h3>
+              {bikeContextForm}
+            </div>
           </div>
         </div>
       </div>
