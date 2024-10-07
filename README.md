@@ -72,33 +72,33 @@ The first step is to install Node JS if you do not already have it installed.<br
 
 After Node JS has been installed, clone this repo onto your computer. If you have installed, open the project in VS Code. If you don't have in installed, just follow along in the command window. <br>
 
-#### Running the Website
+#### **Running the Website**
 
 In the terminal, `cd` into the `~...\Telemetry-Database\TelemetrySite\client` folder and run the command `npm install`. <br>
 
-Once that has finished running, run the command `npm start`. This should start the website, and should display an error saying the server is offline. If your website didn't start, check that you are in the correct folder and you installed Node JS. <br>
+Once that has finished running, run the command `npm start`. <br>
+ If your website didn't start, check that you are in the correct folder and you installed Node JS. <br>
 
 After your sever is online, make sure you keep that terminal open. **Closing that terminal for any reason will kill your website**.<br>
 
-#### Running the Server
+#### **Running the Server**
 
-Open a new terminal and `cd` into the `~...\Telemetry-Database` folder. Run the command `pip instal -r requirements.txt`. <br>
+Open a new terminal and `cd` into the `~...\Telemetry-Database` folder. <br>
+Run the command `pip instal -r requirements.txt`. <br>
 
 If `pip` isn't being recognized, run `python -V`. If python isn't recognized, download the installer here [Python](https://www.python.org/downloads/) and make sure you click **Add as environment variable**.<br>
 
-If you are using VS Code, or some other Python compiler, compile and run the **server.py** file. Your server should now be online. <br>
+In your terminal `cd` into the `~...\Telemetry-Database\TelemetrySite\server` folder and run `python .\server.py`
 
-If you don't have a compiler installed, in your terminal `cd` into the `~...\Telemetry-Database\TelemetrySite\server` folder and run `python .\server.py`
-
-#### .env File
+#### **.env File**
 
 In order to connect to the database, you must contact one of the database leads for the .env file.<br> 
 
 Once they have sent it to you, place it in the `~...\Telemetry-Database\TelemetrySite\server` server in a file names **.env**.
 
-> **Warning**
+> **WARNING**
 
->.env files should never be shared or the contents sent anywhere without the Firmware Team's permission!
+>**.env files should never be shared or the contents sent anywhere without the Firmware Team's permission**
 
 
 

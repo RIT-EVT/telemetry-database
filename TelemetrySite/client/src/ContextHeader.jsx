@@ -30,10 +30,10 @@ function ContextHeader() {
   const setErrorMessage = () => {
     setError(
       <center>
-        <Alert className='Error' color='danger'>
+        <div className='Error' color='danger'>
           <center> Server appears to be offline</center>
           <center>Turn on sever and wait for page to read the response</center>
-        </Alert>
+        </div>
       </center>
     );
   };

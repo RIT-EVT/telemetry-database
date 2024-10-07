@@ -49,18 +49,15 @@ Input {
 .panel-header {
   font-size: 1.2em;
   font-weight: bold;
-  color: #F36917
+  color: #F36917;
 }
 
 .panel-content {
   flex-grow: 1;
-  /* Allows content to grow inside the panel */
   padding: 10px;
-  /*background-color: #231F20;*/
   background-color: #504A43;
   border: 1px solid #181617;
   color: #ffffff;
-  /* Optional: Adds a border */
 }
 
 /* Grid layout for configuration forms */
@@ -109,7 +106,6 @@ Input {
   background-color: #9d4614;
   scale: 1.05;
 }
-
 
 .ConfigDropdown {
   background-color: #ffffff;

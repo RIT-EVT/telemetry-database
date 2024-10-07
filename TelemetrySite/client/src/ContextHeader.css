@@ -57,7 +57,9 @@ td {
 
 .ButtonBody:hover {
 
-  border-radius: 30px;
+  background-color: #9d4614;
+  scale: 1.05;
+  cursor: pointer;
 }
 
 .ButtonBody:active {
