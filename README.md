@@ -84,7 +84,7 @@ After your sever is online, make sure you keep that terminal open. **Closing tha
 
 Open a new terminal and `cd` into the `~...\Telemetry-Database` folder. Run the command `pip instal -r requirements.txt`. <br>
 
-If `pip` isn't being recognized, run `python -V`. If python isn't recognized, download the installer here [Python][(https://www.python.org/downloads/)] and make sure you click **Add as environment variable**.<br>
+If `pip` isn't being recognized, run `python -V`. If python isn't recognized, download the installer here [Python](https://www.python.org/downloads/) and make sure you click **Add as environment variable**.<br>
 
 If you are using VS Code, or some other Python compiler, compile and run the **server.py** file. Your server should now be online. <br>
 
