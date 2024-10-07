@@ -63,6 +63,8 @@ In the future, I hope to host at least the backend restful api, and eventually t
 
 ### Download Instructions
 
+
+#### Node JS
 The first step is to install Node JS if you do not already have it installed.<br>
 
 1. Follow the download instructions found here [Node JS](https://nodejs.org/en/download/package-manager)
@@ -70,11 +72,15 @@ The first step is to install Node JS if you do not already have it installed.<br
 
 After Node JS has been installed, clone this repo onto your computer. If you have installed, open the project in VS Code. If you don't have in installed, just follow along in the command window. <br>
 
+#### Running the Website
+
 In the terminal, `cd` into the `~...\Telemetry-Database\TelemetrySite\client` folder and run the command `npm install`. <br>
 
 Once that has finished running, run the command `npm start`. This should start the website, and should display an error saying the server is offline. If your website didn't start, check that you are in the correct folder and you installed Node JS. <br>
 
 After your sever is online, make sure you keep that terminal open. **Closing that terminal for any reason will kill your website**.<br>
+
+#### Running the Server
 
 Open a new terminal and `cd` into the `~...\Telemetry-Database` folder. Run the command `pip instal -r requirements.txt`. <br>
 
