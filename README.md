@@ -90,6 +90,16 @@ If you are using VS Code, or some other Python compiler, compile and run the **s
 
 If you don't have a compiler installed, in your terminal `cd` into the `~...\Telemetry-Database\TelemetrySite\server` folder and run `python .\server.py`
 
+#### .env File
+
+In order to connect to the database, you must contact one of the database leads for the .env file.<br> 
+
+Once they have sent it to you, place it in the `~...\Telemetry-Database\TelemetrySite\server` server in a file names **.env**.
+
+> **Warning**
+
+>.env files should never be shared or the contents sent anywhere without the Firmware Team's permission!
+
 
 
 
