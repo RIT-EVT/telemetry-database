@@ -69,3 +69,18 @@ td {
 
 
 }
+
+.Error {
+
+  background-color: #F36917;
+  min-width: 300px;
+  max-width: 700px;
+
+  min-height: 300px;
+  max-height: 700px;
+
+  justify-content: center;
+  align-content: center;
+  font-size: 30px;
+
+}

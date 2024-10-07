@@ -13,6 +13,7 @@
 
 Label {
   padding-right: 20px;
+  font-size: 1.3em;
 }
 
 Input {
@@ -20,6 +21,7 @@ Input {
   /* Change this value to your desired height */
   font-size: 20px;
   /* Optional: Adjust font size */
+  border-radius: 5px;
 }
 
 /* Container with left and right panels */

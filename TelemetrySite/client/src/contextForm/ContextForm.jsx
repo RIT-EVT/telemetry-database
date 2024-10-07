@@ -187,7 +187,7 @@ function ContextForm() {
             const idValue = formElement["id"];
 
             return (
-              <FormGroup key={idValue} className="FormGroupElement">
+              <FormGroup key={idValue} className='FormGroupElement'>
                 <Label for={idValue}>{formElement["label"]} </Label>
                 <Input
                   id={idValue}
@@ -215,6 +215,7 @@ function ContextForm() {
       </FormGroup>
     );
   };
+
   /**
    * Create the select dropdowns for the config forms
    * On change check if value is Custom
@@ -227,14 +228,14 @@ function ContextForm() {
   const SelectCreator = (displayValues, name) => {
     return (
       <Input
-        type="select"
+        type='select'
         onChange={(e) => handleConfigFormChange(e, name)}
-        placeholder="Select a config"
+        placeholder='Select a config'
         required={RequiredSelects[name]}
-        className="ConfigDropdown"
+        className='ConfigDropdown'
         id={`${name}Select`}
       >
-        <option value="" disabled selected hidden>
+        <option value='' disabled selected hidden>
           Select an option
         </option>
         {displayValues.map((configNameValue) => (
@@ -242,10 +243,11 @@ function ContextForm() {
             {configNameValue}
           </option>
         ))}
-        <option value="Custom">Custom</option>
+        <option value='Custom'>Custom</option>
       </Input>
     );
   };
+
   /**
    * Once all needed fields have been filled out,
    * collect and send data to the backend as a json
@@ -336,6 +338,7 @@ function ContextForm() {
       .catch((error) => {
         console.error("Error:", error); // Handle any errors
       });
+    //TODO reset form fields
     //document.getElementById("ContextForm").reset();
   };
   /**
@@ -355,7 +358,7 @@ function ContextForm() {
         <div>
           <Label for={checkBoxId}>Save preset</Label>
           <Input
-            type="checkbox"
+            type='checkbox'
             id={checkBoxId}
             name={checkBoxId}
             checked={checkBox[name]}
@@ -365,8 +368,8 @@ function ContextForm() {
           />
           {checkBox[name] && (
             <Input
-              type="text"
-              placeholder="Enter some text"
+              type='text'
+              placeholder='Enter some text'
               id={name + "SavedName"}
               style={{ marginLeft: "10px" }} // Inline with the checkbox
               required
@@ -384,8 +387,8 @@ function ContextForm() {
   /**
    * Create all form elements for the main, bike, and event
    * sections and create dropdowns for the config fields
+   * Hook on update to dropdown values
    */
-
   useEffect(() => {
     //FetchConfigOptions();
     ConfigName.forEach((name) => {
@@ -403,7 +406,7 @@ function ContextForm() {
    * generate the needed config page
    * else set to null
    *
-   * Run on configSelect change
+   * Hook on configSelect change
    */
   useEffect(() => {
     ConfigName.forEach((configName) => {
@@ -424,41 +427,41 @@ function ContextForm() {
 
   return (
     <Form
-      className="ContextForm"
-      name="Context"
-      id="ContextForm"
+      className='ContextForm'
+      name='Context'
+      id='ContextForm'
       onSubmit={(e) => {
         SubmitData(e);
       }}
     >
-      <div className="container">
-        <div className="left-panel">
-          <div className="panel-content">
-            <h3 className="panel-header">Main Context</h3>
+      <div className='container'>
+        <div className='left-panel'>
+          <div className='panel-content'>
+            <h3 className='panel-header'>Main Context</h3>
             {mainContextForm}
           </div>
         </div>
-        <div className="right-panel">
-          <div className="top-right-panel">
-            <div className="panel-content">
-              <h3 className="panel-header">Event Context</h3>
+        <div className='right-panel'>
+          <div className='top-right-panel'>
+            <div className='panel-content'>
+              <h3 className='panel-header'>Event Context</h3>
               {eventContextForm}
             </div>
           </div>
-          <div className="bottom-right-panel">
-            <div className="panel-content">
-              <h3 className="panel-header">Bike Context</h3>
+          <div className='bottom-right-panel'>
+            <div className='panel-content'>
+              <h3 className='panel-header'>Bike Context</h3>
               {bikeContextForm}
             </div>
           </div>
         </div>
       </div>
 
-      <div className="grid-container">
+      <div className='grid-container'>
         {ConfigName.map((name) => {
           return (
-            <div className="grid-item">
-              <h3 className="grid-header">
+            <div className='grid-item'>
+              <h3 className='grid-header'>
                 {/*
                  *Create each element of the grid. Initially each has the name
                  *of the config and a dropdown. Dropdown is populated by past
@@ -473,8 +476,11 @@ function ContextForm() {
           );
         })}
       </div>
-
-      <Button className="submitButton">Submit</Button>
+      {/*
+       * Submitting data is handled in the
+       * SubmitData() const function
+       */}
+      <Button className='submitButton'>Submit</Button>
     </Form>
   );
 }

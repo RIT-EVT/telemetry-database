@@ -52,3 +52,40 @@ The script which is responsible for streaming the raw CAN data into the database
 Currently to use the script run main and when prompted input the path to the .mf4 file you want to have uploaded.<br>
 
 As we do not have means to collect context data yet, we use a dummy context with an id of 1. This is gross and bad. We will be removing that as soon as we have a way to query the user for context data.<br>
+
+## Web UI 
+
+This react-strap based website is responsible for gathering all the context relating to the data we gather.<br>
+
+Ideally, mechies will just download the files and run it on their computer. This includes running both the website and backend api that goes along with it.<br>
+
+In the future, I hope to host at least the backend restful api, and eventually the website itself, on a web server, but that is not going to happen for a long time. To anyone that works on this in the future, if this message is still here, that means I never went back and fixed the mess I made, and for that I sincerely apologize for. This was meant to be quick and dirty, but I attempted to follow best practices and self document the code where I could. <br>
+
+### Download Instructions
+
+The first step is to install Node JS if you do not already have it installed.<br>
+
+1. Follow the download instructions found here [Node JS](https://nodejs.org/en/download/package-manager)
+2. Verify download by running `npm --version` or `node -v`<br>
+
+After Node JS has been installed, clone this repo onto your computer. If you have installed, open the project in VS Code. If you don't have in installed, just follow along in the command window. <br>
+
+In the terminal, `cd` into the `~...\Telemetry-Database\TelemetrySite\client` folder and run the command `npm install`. <br>
+
+Once that has finished running, run the command `npm start`. This should start the website, and should display an error saying the server is offline. If your website didn't start, check that you are in the correct folder and you installed Node JS. <br>
+
+After your sever is online, make sure you keep that terminal open. **Closing that terminal for any reason will kill your website**.<br>
+
+Open a new terminal and `cd` into the `~...\Telemetry-Database` folder. Run the command `pip instal -r requirements.txt`. <br>
+
+If `pip` isn't being recognized, run `python -V`. If python isn't recognized, download the installer here [Python][(https://www.python.org/downloads/)] and make sure you click **Add as environment variable**.<br>
+
+If you are using VS Code, or some other Python compiler, compile and run the **server.py** file. Your server should now be online. <br>
+
+If you don't have a compiler installed, in your terminal `cd` into the `~...\Telemetry-Database\TelemetrySite\server` folder and run `python .\server.py`
+
+
+
+
+
+
