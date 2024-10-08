@@ -75,6 +75,8 @@ def file_convert():
 #
 # @param files The paths to the array of files being processed
 def handle_data(files):
+    conn = utils.connect()
+    cur = conn.cursor()
     for file in files:
         dataToExecuteMany = []
         with open(file) as open_file:
@@ -97,9 +99,11 @@ def handle_data(files):
                         print(len(dataToExecuteMany))
             sql = "INSERT into canmessage (ID, busId, frameId, dataBytes, receiveTime, contextId) VALUES (DEFAULT, %s, %s, %s, %s, %s)"
             try:
-                utils.exec_commit_many(sql, dataToExecuteMany)
+                cur.executemany(sql, dataToExecuteMany)
             except(TimeoutError):
                 print(len(dataToExecuteMany))
+    conn.commit()
+    conn.close()
 
 
 ## Formats the data bytes into a format the DB can handle as an array
