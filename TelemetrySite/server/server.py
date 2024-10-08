@@ -20,7 +20,7 @@ app.add_url_rule('/Test', view_func=server_test_view, methods=['GET'])
 
 
 if __name__ == '__main__':
-    dotenv.load_dotenv()
+    dotenv.load_dotenv(".env")
     print("Starting flask")
     app.run(debug=True)  # Starts Flask
     

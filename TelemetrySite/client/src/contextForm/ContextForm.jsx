@@ -15,7 +15,7 @@ import { useEffect, useState } from "react";
 import "./ContextForm.css";
 
 //list of all id values to pass to backend
-import ContextJSON from "./jsonFiles/ContextForm.json";
+import ContextJSONIdValues from "./jsonFiles/ContextForm.json";
 //all elements to have as input field and their properties
 import ContextJSONFormElements from "./jsonFiles/FormElementFormat.json";
 
@@ -275,7 +275,7 @@ function ContextForm() {
     };
 
     //get the needed json object
-    const ConfigElements = ContextJSON.ConfigElements;
+    const ConfigElements = ContextJSONIdValues.ConfigElements;
 
     ConfigName.forEach((configName) => {
       //get the json object of ids
@@ -305,7 +305,7 @@ function ContextForm() {
       }
     });
     //handle the main, bike, and event
-    const MainElements = ContextJSON.MainElements;
+    const MainElements = ContextJSONIdValues.MainElements;
 
     for (const key in MainElements) {
       MainElements[key].forEach((id) => {
@@ -316,7 +316,6 @@ function ContextForm() {
         }
       });
     }
-
     fetch(BASE_URL + "/Context", {
       //post data to the server
       method: "PUT",
@@ -390,7 +389,7 @@ function ContextForm() {
    * Hook on update to dropdown values
    */
   useEffect(() => {
-    //FetchConfigOptions();
+    FetchConfigOptions();
     ConfigName.forEach((name) => {
       const dropDown = SelectCreator(dropDownOptions[name], name);
       setDropDowns((prev) => ({ ...prev, [name]: dropDown }));

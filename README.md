@@ -72,6 +72,8 @@ The first step is to install Node JS if you do not already have it installed.<br
 
 After Node JS has been installed, clone this repo onto your computer. If you have installed, open the project in VS Code. If you don't have in installed, just follow along in the command window. <br>
 
+Also run `npm install react` and `npm install reactstrap`
+
 #### **Running the Website**
 
 In the terminal, `cd` into the `~...\Telemetry-Database\TelemetrySite\client` folder and run the command `npm install`. <br>
@@ -94,7 +96,7 @@ In your terminal `cd` into the `~...\Telemetry-Database\TelemetrySite\server` fo
 
 In order to connect to the database, you must contact one of the database leads for the .env file.<br> 
 
-Once they have sent it to you, place it in the `~...\Telemetry-Database\TelemetrySite\server` server in a file names **.env**.
+Once they have sent it to you, place it in the `~...\Telemetry-Database\TelemetrySite\server` server in a file names **credentials.env**.
 
 > **WARNING**
 
