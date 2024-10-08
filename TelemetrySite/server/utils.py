@@ -4,11 +4,13 @@ import os
 
 ## Use to connect to the database using the .env file
 def connect():
-    return psycopg2.connect("bert", 
-                            os.getenv("DB_USER"), 
-                            os.getenv("PASSWORD"), 
-                            os.getenv("HOST"), 
-                            os.getenv("PORT") )
+    return psycopg2.connect(
+                            database = "bert", 
+                            user     = os.getenv("DB_USER"), 
+                            password = os.getenv("PASSWORD"), 
+                            host     = os.getenv("HOST"), 
+                            port     = os.getenv("PORT")
+                            )
 
 ## Executes all SQL commands in the file at the provided path
 #
@@ -33,6 +35,14 @@ def exec_get_one(sql, args={}):
     one = cur.fetchone()
     conn.close()
     return one
+
+def exec_commit_many(sql, args):
+    conn = connect()
+    cur = conn.cursor()
+    result = cur.executemany(sql, args)
+    conn.commit()
+    conn.close()
+    return result
 
 ## Use this to SELECT all entries from the database which match the select criteria
 #

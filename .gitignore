@@ -2,3 +2,5 @@
 *.MF4
 .idea/
 *.env
+*.cpython-312.pyc
+*.vscode
