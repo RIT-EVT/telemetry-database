@@ -1,4 +1,4 @@
-import { Button, Alert } from "reactstrap";
+import { Button } from "reactstrap";
 import React, { useEffect, useState } from "react";
 import "./ContextHeader.css";
 import ContextForm from "./contextForm/ContextForm.jsx";
@@ -7,7 +7,7 @@ function ContextHeader() {
   /* -------------------------------------------------------------------------- */
   /* -------------------------- Establish State Hooks ------------------------- */
   /* -------------------------------------------------------------------------- */
-  const [serverOnline, setServerOnline] = useState(false);
+  const [serverNotOnline, setServerOnline] = useState(true);
   const [ButtonsForSelect, updateButtons] = useState(null);
 
   const [body, updateBody] = useState(null);
@@ -45,12 +45,12 @@ function ContextHeader() {
   const CheckBackendConnection = () => {
     fetch("http://127.0.0.1:5000/Test")
       .then(() => {
-        setServerOnline(true);
+        setServerOnline(false);
         clearError();
       })
 
       .catch(() => {
-        setServerOnline(false);
+        setServerOnline(true);
         setErrorMessage();
       });
   };
@@ -61,7 +61,7 @@ function ContextHeader() {
   useEffect(() => {
     const interval = setInterval(() => {
       // Only check backend if the server is offline
-      if (!serverOnline) {
+      if (serverNotOnline) {
         CheckBackendConnection();
       } else {
         clearInterval(interval); // Stop interval when server is online
@@ -70,7 +70,7 @@ function ContextHeader() {
 
     // Cleanup interval when component unmounts
     return () => clearInterval(interval);
-  }, [serverOnline]); // Add serverOnline as a dependency to stop interval when it's true
+  }, [serverNotOnline]); // Add serverOnline as a dependency to stop interval when it's true
 
   useEffect(() => {
     updateButtons(
@@ -78,7 +78,7 @@ function ContextHeader() {
         <center>
           <Button
             className='ButtonBody'
-            disabled={!serverOnline}
+            disabled={serverNotOnline}
             onClick={() => {
               updateBody(<ContextForm />);
             }}
@@ -88,7 +88,7 @@ function ContextHeader() {
         </center>
       </div>
     );
-  }, [serverOnline, error]);
+  }, [serverNotOnline, error]);
 
   /* -------------------------------------------------------------------------- */
   /* --------------------------- Return Final Object -------------------------- */

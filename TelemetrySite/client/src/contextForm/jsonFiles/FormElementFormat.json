@@ -160,6 +160,12 @@
       "type": "text",
       "required": true,
       "label": "Cell Voltage Units"
+    },
+    "name": {
+      "id": "bmsSavedName",
+      "type": "text",
+      "required": true,
+      "label": "Config saved name"
     }
   },
   "imuConfig": {
@@ -198,6 +204,12 @@
       "type": "text",
       "required": false,
       "label": "Accelerometer Units"
+    },
+    "name": {
+      "id": "imuSavedName",
+      "type": "text",
+      "required": true,
+      "label": "Config saved name"
     }
   },
   "tmuConfig": {
@@ -218,6 +230,12 @@
       "type": "text",
       "required": false,
       "label": "Thermal units"
+    },
+    "name": {
+      "id": "tmuSavedName",
+      "type": "text",
+      "required": true,
+      "label": "Config saved name"
     }
   },
   "tmsConfig": {
@@ -250,6 +268,12 @@
       "type": "text",
       "required": true,
       "label": "Fan Speed Units"
+    },
+    "name": {
+      "id": "tmsSavedName",
+      "type": "text",
+      "required": true,
+      "label": "Config saved name"
     }
   },
   "pvcConfig": {
@@ -264,6 +288,12 @@
       "type": "text",
       "required": true,
       "label": "Software Commit Hash"
+    },
+    "name": {
+      "id": "pvcSavedName",
+      "type": "text",
+      "required": true,
+      "label": "Config saved name"
     }
   },
   "mcConfig": {
@@ -278,6 +308,12 @@
       "type": "text",
       "required": true,
       "label": "Firmware Version"
+    },
+    "name": {
+      "id": "mcSavedName",
+      "type": "text",
+      "required": true,
+      "label": "Config saved name"
     }
   }
 }

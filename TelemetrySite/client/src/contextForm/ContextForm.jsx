@@ -64,15 +64,6 @@ function ContextForm() {
     pvc: null,
     mc: null,
   });
-  //value of each config checkbox
-  const [checkBox, setCheckBox] = useState({
-    bms: false,
-    imu: false,
-    tmu: false,
-    tms: false,
-    pvc: false,
-    mc: false,
-  });
   //values passed from back end
   const [dropDownOptions, setDropdownOptions] = useState({
     bms: [],
@@ -131,17 +122,6 @@ function ContextForm() {
     } else {
       setFormElements((prev) => ({ ...prev, [configName]: null }));
     }
-  };
-
-  /**
-   * Handle the change of a check box for the
-   * config config save toggle
-   *
-   * @param {string} value - new value of the checkbox
-   * @param {string} configName - config form the value is from
-   */
-  const checkBoxChange = (value, configName) => {
-    setCheckBox((prev) => ({ ...prev, [configName]: value }));
   };
 
   /**
@@ -290,14 +270,8 @@ function ContextForm() {
             collectedData.Context[configName][id] = element.value; // Collect the value from the form element
           }
         });
-
-        //if the box is checked save the name
-        if (checkBox[configName]) {
-          collectedData.Context[configName]["savedName"] =
-            document.getElementById(configName + "SavedName").value;
-        } else {
-          collectedData.Context[configName]["savedName"] = "";
-        }
+        collectedData.Context[configName]["savedName"] =
+          document.getElementById(configName + "SavedName").value;
       } else {
         collectedData.Context[configName]["selected"] = document.getElementById(
           configName + "Select"
@@ -326,7 +300,6 @@ function ContextForm() {
     })
       .then((response) => {
         if (!response.ok) {
-          console.error("Did you turn your server on?");
           throw new Error("Network response was not ok " + response.statusText);
         }
         return response.json();
@@ -340,44 +313,6 @@ function ContextForm() {
     //TODO reset form fields
     //document.getElementById("ContextForm").reset();
   };
-  /**
-   * Create a check box with label.
-   * If the box is clicked -> Also display
-   * a text input box to take a name input
-   *
-   * @param {string} name - Name of config form
-   *
-   * @return {HTMLDivElement} - Div containing a Label, Check Box, and a Text Input
-   */
-  const CreateCheckBox = (name) => {
-    const checkBoxId = name + "CheckBox";
-
-    if (configSelects[name] === "Custom") {
-      return (
-        <div>
-          <Label for={checkBoxId}>Save preset</Label>
-          <Input
-            type='checkbox'
-            id={checkBoxId}
-            name={checkBoxId}
-            checked={checkBox[name]}
-            onChange={(e) => {
-              checkBoxChange(e.target.checked, name);
-            }}
-          />
-          {checkBox[name] && (
-            <Input
-              type='text'
-              placeholder='Enter some text'
-              id={name + "SavedName"}
-              style={{ marginLeft: "10px" }} // Inline with the checkbox
-              required
-            />
-          )}
-        </div>
-      );
-    }
-  };
 
   /* -------------------------------------------------------------------------- */
   /* ----------------------- Establish Use Effect Hooks ----------------------- */
@@ -389,7 +324,7 @@ function ContextForm() {
    * Hook on update to dropdown values
    */
   useEffect(() => {
-    FetchConfigOptions();
+    //FetchConfigOptions();
     ConfigName.forEach((name) => {
       const dropDown = SelectCreator(dropDownOptions[name], name);
       setDropDowns((prev) => ({ ...prev, [name]: dropDown }));
@@ -470,7 +405,6 @@ function ContextForm() {
                 {name.toLocaleUpperCase()} Configuration: {dropDowns[name]}
               </h3>
               {configForm[name]}
-              {CreateCheckBox(name)}
             </div>
           );
         })}

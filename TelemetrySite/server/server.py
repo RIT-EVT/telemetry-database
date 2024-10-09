@@ -1,8 +1,7 @@
 from flask import Flask
 from flask_restful import Api
 from flask_cors import CORS
-
-import dotenv
+import dotenv 
 
 from context import Context
 from serverTest import ServerTest
@@ -20,7 +19,7 @@ app.add_url_rule('/Test', view_func=server_test_view, methods=['GET'])
 
 
 if __name__ == '__main__':
-    dotenv.load_dotenv(".env")
+    dotenv.load_dotenv()
     print("Starting flask")
     app.run(debug=True)  # Starts Flask
     
