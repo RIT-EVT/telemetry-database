@@ -12,6 +12,8 @@
 import { Form, FormGroup, Label, Input, Button } from "reactstrap";
 import { useEffect, useState } from "react";
 
+import { FetchConfigData, PostContextData } from "../ServerCall";
+
 import "./ContextForm.css";
 
 //list of all id values to pass to backend
@@ -89,6 +91,8 @@ function ContextForm() {
     mcConfig: true,
   };
 
+  let FormId = "ContextForm";
+
   /* -------------------------------------------------------------------------- */
   /* ----------------------------- Const Functions ---------------------------- */
   /* -------------------------------------------------------------------------- */
@@ -133,22 +137,7 @@ function ContextForm() {
     //does not work yet
     //tables do not contain a name column
     //fetch names of config files to display for user to choose from
-    fetch(BASE_URL + "/Context")
-      .then((response) => {
-        if (!response.ok) {
-          console.error("Did you turn your server on?");
-          throw new Error("Network response was not ok " + response.statusText);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setDropdownOptions(data);
-      })
-      .catch((error) => {
-        throw new Error(
-          "Error has occurred while fetching config data " + error.error
-        );
-      });
+    FetchConfigData().then((data) => setDropdownOptions(data));
   };
 
   /**
@@ -290,28 +279,11 @@ function ContextForm() {
         }
       });
     }
-    fetch(BASE_URL + "/Context", {
-      //post data to the server
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(collectedData), // Convert the data to JSON
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok " + response.statusText);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        console.log("Success:", data); // Handle the response
-      })
-      .catch((error) => {
-        console.error("Error:", error); // Handle any errors
-      });
+
+    PostContextData(collectedData);
+
     //TODO reset form fields
-    //document.getElementById("ContextForm").reset();
+    //document.getElementById(FormId).reset();
   };
 
   /* -------------------------------------------------------------------------- */
@@ -324,7 +296,7 @@ function ContextForm() {
    * Hook on update to dropdown values
    */
   useEffect(() => {
-    //FetchConfigOptions();
+    FetchConfigOptions();
     ConfigName.forEach((name) => {
       const dropDown = SelectCreator(dropDownOptions[name], name);
       setDropDowns((prev) => ({ ...prev, [name]: dropDown }));
@@ -363,7 +335,7 @@ function ContextForm() {
     <Form
       className='ContextForm'
       name='Context'
-      id='ContextForm'
+      id={FormId}
       onSubmit={(e) => {
         SubmitData(e);
       }}

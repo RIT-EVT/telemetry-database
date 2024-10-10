@@ -2,12 +2,13 @@ import { Button } from "reactstrap";
 import React, { useEffect, useState } from "react";
 import "./ContextHeader.css";
 import ContextForm from "./contextForm/ContextForm.jsx";
+import { FetchServerPaths, CheckServerStatus } from "./ServerCall.jsx";
 
 function ContextHeader() {
   /* -------------------------------------------------------------------------- */
   /* -------------------------- Establish State Hooks ------------------------- */
   /* -------------------------------------------------------------------------- */
-  const [serverNotOnline, setServerOnline] = useState(true);
+  const [serverNotOnline, setServerOnlineStatus] = useState(true);
   const [ButtonsForSelect, updateButtons] = useState(null);
 
   const [body, updateBody] = useState(null);
@@ -43,16 +44,15 @@ function ContextHeader() {
    * If it is inactive, display error and recall every second.
    */
   const CheckBackendConnection = () => {
-    fetch("http://127.0.0.1:5000/Test")
-      .then(() => {
-        setServerOnline(false);
+    CheckServerStatus().then((response) => {
+      if (response) {
+        setServerOnlineStatus(false);
         clearError();
-      })
-
-      .catch(() => {
-        setServerOnline(true);
+      } else {
+        setServerOnlineStatus(true);
         setErrorMessage();
-      });
+      }
+    });
   };
 
   /* -------------------------------------------------------------------------- */
@@ -64,6 +64,7 @@ function ContextHeader() {
       if (serverNotOnline) {
         CheckBackendConnection();
       } else {
+        FetchServerPaths();
         clearInterval(interval); // Stop interval when server is online
       }
     }, 1000);

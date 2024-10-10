@@ -21,8 +21,8 @@ class Context(MethodView):
         for i in range(0, len(self.configNames)):
             sqlCommand = f"SELECT configName FROM {self.configNames[i]} WHERE configName != '' AND configName IS NOT NULL"
             configData[self.configShort[i]] = utils.exec_get_all(sqlCommand, [0,])  
-    
-        return jsonify(configData)
+        #while(1); prevents json injections
+        return "while(1);"+jsonify(configData).get_data(as_text=True), 200
 
     def put(self):
         # Get JSON data from the request
@@ -93,8 +93,8 @@ class Context(MethodView):
 
         utils.exec_commit_with_id(sqlContext, self.DictToTuple(contextValue["BikeConfig"])+tuple(eventAndBikeId))
 
-        # Respond back to the client
-        return jsonify({"message": "Data received successfully", "received": data}), 200
+        # Respond back to the client. 201 code for created
+        return jsonify({"message": "Data received successfully", "received": data}), 201
     
 
     def post(self):

@@ -1,10 +1,10 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_restful import Api
 from flask_cors import CORS
 import dotenv 
-
-from context import Context
-from serverTest import ServerTest
+import json
+from Context.context import Context
+ 
 
 app = Flask(__name__)  # Create Flask instance
 api = Api(app)  # API router
@@ -14,14 +14,27 @@ CORS(app)
 #create views for url rules
 user_view = Context.as_view('context_api')
 app.add_url_rule('/Context', view_func=user_view, methods=['GET', 'PUT', 'DELETE', 'POST'])
-server_test_view= ServerTest.as_view('server_test_api')
-app.add_url_rule('/Test', view_func=server_test_view, methods=['GET'])
 
+## Get all the url paths
+#
+# @return JSON file
+@app.route('/')
+def MainContext():
+     # Open the JSON file and load its contents
+    try:
+        with open('ServerPaths.json', 'r') as json_file:
+            data = json.load(json_file)
+        return jsonify(data), 200
+    except FileNotFoundError:
+        return jsonify({"error": "File not found"}), 404
+    except json.JSONDecodeError:
+        return jsonify({"error": "Error decoding JSON"}), 500
 
 if __name__ == '__main__':
-    dotenv.load_dotenv()
+    dotenv.load_dotenv('./credentials.env')
     print("Starting flask")
     app.run(debug=True)  # Starts Flask
+
     
 
 
