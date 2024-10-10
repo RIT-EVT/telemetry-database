@@ -13,7 +13,11 @@ CREATE TABLE BmsConfig(
 
 CREATE TABLE ImuConfig(
     id                      SERIAL PRIMARY KEY,
+<<<<<<< HEAD
     configName          TEXT NOT NULL,
+=======
+    configName              TEXT NOT NULL,
+>>>>>>> origin
     hardwareRevision        TEXT NOT NULL,
     softwareCommitHash      TEXT NOT NULL,
     eulerUnits              TEXT NOT NULL,
@@ -24,7 +28,11 @@ CREATE TABLE ImuConfig(
 
 CREATE TABLE TmuConfig(
     id                 SERIAL PRIMARY KEY,
+<<<<<<< HEAD
     configName          TEXT NOT NULL,
+=======
+    configName         TEXT NOT NULL,
+>>>>>>> origin
     hardwareRevision   TEXT NOT NULL,
     softwareCommitHash TEXT NOT NULL,
     thermUnits         TEXT NOT NULL
@@ -32,7 +40,11 @@ CREATE TABLE TmuConfig(
 
 CREATE TABLE TmsConfig(
     id                 SERIAL PRIMARY KEY,
+<<<<<<< HEAD
     configName          TEXT NOT NULL,
+=======
+    configName         TEXT NOT NULL,
+>>>>>>> origin
     hardwareRevision   TEXT NOT NULL,
     softwareCommitHash TEXT NOT NULL,
     tempUnits          TEXT NOT NULL,
@@ -42,7 +54,11 @@ CREATE TABLE TmsConfig(
 
 CREATE TABLE PvcConfig(
     id                 SERIAL PRIMARY KEY,
+<<<<<<< HEAD
     configName          TEXT NOT NULL,
+=======
+    configName         TEXT NOT NULL,
+>>>>>>> origin
     hardwareRevision   TEXT NOT NULL,
     softwareCommitHash TEXT NOT NULL
 );
@@ -50,13 +66,18 @@ CREATE TABLE PvcConfig(
 -- TODO: Add detail
 CREATE TABLE McConfig(
     id              SERIAL PRIMARY KEY,
+<<<<<<< HEAD
     configName          TEXT NOT NULL,
+=======
+    configName      TEXT NOT NULL,
+>>>>>>> origin
     model           TEXT NOT NULL,
     firmwareVersion TEXT NOT NULL
 );
 
 CREATE TABLE BikeConfig(
     id            SERIAL PRIMARY KEY,
+    configName    TEXT NOT NULL,
     platformName  TEXT NOT NULL,
     tirePressure  FLOAT DEFAULT NULL,
     coolantVolume FLOAT DEFAULT NULL,
@@ -127,27 +148,7 @@ CREATE TABLE BmsBatteryVoltage(
     id          SERIAL PRIMARY KEY,
     packId      INTEGER NOT NULL,
     val         INTEGER NOT NULL,
-    receiveTime TIMESTAMP NOT NULL,
-    contextId   INTEGER NOT NULL,
-    FOREIGN KEY (contextId) REFERENCES Context(id)
-);
-
-CREATE TABLE BmsMinCellVoltage(
-    id          SERIAL PRIMARY KEY,
-    packId      INTEGER NOT NULL,
-    cellId      INTEGER NOT NULL,
-    val         INTEGER NOT NULL,
-    receiveTime TIMESTAMP NOT NULL,
-    contextId   INTEGER NOT NULL,
-    FOREIGN KEY (contextId) REFERENCES Context(id)
-);
-
-CREATE TABLE BmsMaxCellVoltage(
-    id          SERIAL PRIMARY KEY,
-    packId      INTEGER NOT NULL,
-    cellId      INTEGER NOT NULL,
-    val         INTEGER NOT NULL,
-    receiveTime TIMESTAMP NOT NULL,
+    receiveTime DECIMAL(11,6) NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id)
 );
@@ -156,27 +157,7 @@ CREATE TABLE BmsCurrent(
     id          SERIAL PRIMARY KEY,
     packId      INTEGER NOT NULL,
     val         INTEGER NOT NULL,
-    receiveTime TIMESTAMP NOT NULL,
-    contextId   INTEGER NOT NULL,
-    FOREIGN KEY (contextId) REFERENCES Context(id)
-);
-
-CREATE TABLE BmsMinPackTemp(
-    id          SERIAL PRIMARY KEY,
-    packId      INTEGER NOT NULL,
-    thermId     INTEGER NOT NULL,
-    val         INTEGER NOT NULL,
-    receiveTime TIMESTAMP NOT NULL,
-    contextId   INTEGER NOT NULL,
-    FOREIGN KEY (contextId) REFERENCES Context(id)
-);  
-
-CREATE TABLE BmsMaxPackTemp(
-    id          SERIAL PRIMARY KEY,
-    packId      INTEGER NOT NULL,
-    thermId     INTEGER NOT NULL,
-    val         INTEGER NOT NULL,
-    receiveTime TIMESTAMP NOT NULL,
+    receiveTime DECIMAL(11,6) NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id)
 );
@@ -186,7 +167,7 @@ CREATE TABLE BmsBqTemp(
     packId      INTEGER NOT NULL,
     tempId      INTEGER NOT NULL,
     val         INTEGER NOT NULL,
-    receiveTime TIMESTAMP NOT NULL,
+    receiveTime DECIMAL(11,6) NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id)
 );
@@ -195,7 +176,7 @@ CREATE TABLE BmsState(
     id          SERIAL PRIMARY KEY,
     packId      INTEGER NOT NULL,
     val         INTEGER NOT NULL,
-    receiveTime TIMESTAMP NOT NULL,
+    receiveTime DECIMAL(11,6) NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id)
 );
@@ -205,7 +186,7 @@ CREATE TABLE BmsThermistorTemp(
     packId      INTEGER NOT NULL,
     thermId     INTEGER NOT NULL,
     val         INTEGER NOT NULL,
-    receiveTime TIMESTAMP NOT NULL,
+    receiveTime DECIMAL(11,6) NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id)
 );
@@ -214,7 +195,7 @@ CREATE TABLE BmsErrorRegister(
     id          SERIAL PRIMARY KEY,
     packId      INTEGER NOT NULL,
     val         INTEGER NOT NULL,
-    receiveTime TIMESTAMP NOT NULL,
+    receiveTime DECIMAL(11,6) NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id)
 );
@@ -223,7 +204,7 @@ CREATE TABLE BmsBqStatus(
     id          SERIAL PRIMARY KEY,
     packId      INTEGER NOT NULL,
     val         INTEGER NOT NULL,
-    receiveTime TIMESTAMP NOT NULL,
+    receiveTime DECIMAL(11,6) NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id)
 );
@@ -233,7 +214,7 @@ CREATE TABLE BmsCellVoltage(
     packId      INTEGER NOT NULL,
     cellId      INTEGER NOT NULL,
     val         INTEGER NOT NULL,
-    receiveTime TIMESTAMP NOT NULL,
+    receiveTime DECIMAL(11,6) NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id)
 );
@@ -242,7 +223,7 @@ CREATE TABLE ImuEulerComponent(
     id          SERIAL PRIMARY KEY,
     axis        CHAR(1) NOT NULL,
     val         INTEGER NOT NULL,
-    receiveTime TIMESTAMP NOT NULL,
+    receiveTime DECIMAL(11,6) NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id)
 );
@@ -251,7 +232,7 @@ CREATE TABLE ImuGyroComponent(
     id          SERIAL PRIMARY KEY,
     axis        CHAR(1) NOT NULL,
     val         INTEGER NOT NULL,
-    receiveTime TIMESTAMP NOT NULL,
+    receiveTime DECIMAL(11,6) NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id)
 );
@@ -260,7 +241,7 @@ CREATE TABLE ImuLinearAccelerationComponent(
     id          SERIAL PRIMARY KEY,
     axis        CHAR(1) NOT NULL,
     val         INTEGER NOT NULL,
-    receiveTime TIMESTAMP NOT NULL,
+    receiveTime DECIMAL(11,6) NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id)
 );
@@ -269,7 +250,7 @@ CREATE TABLE ImuAccelerometerComponent(
     id          SERIAL PRIMARY KEY,
     axis        CHAR(1) NOT NULL,
     val         INTEGER NOT NULL,
-    receiveTime TIMESTAMP NOT NULL,
+    receiveTime DECIMAL(11,6) NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id)
 );
@@ -278,7 +259,7 @@ CREATE TABLE TmuThermistorTemp(
     id          SERIAL PRIMARY KEY,
     thermId     INTEGER NOT NULL,
     val         INTEGER NOT NULL,
-    receiveTime TIMESTAMP NOT NULL,
+    receiveTime DECIMAL(11,6) NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id)
 );
@@ -287,16 +268,18 @@ CREATE TABLE TmuThermistorError(
     id          SERIAL PRIMARY KEY,
     thermId     INTEGER NOT NULL,
     val         INTEGER NOT NULL,
-    receiveTime TIMESTAMP NOT NULL,
+    receiveTime DECIMAL(11,6) NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id)
 );
 
 CREATE TABLE TmsSensorTemp(
     id          SERIAL PRIMARY KEY,
+--     sensorId  VARCHAR(30),
+--     CONSTRAINT DSI CHECK (sensorId IN ('Between Motor Inverter', 'Radiator Fan 1', 'Radiator Fan 2','TMS Internal')),
     sensorId    INTEGER NOT NULL,
     val         INTEGER NOT NULL,
-    receiveTime TIMESTAMP NOT NULL,
+    receiveTime DECIMAL(11,6) NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id)
 );
@@ -305,7 +288,7 @@ CREATE TABLE TmsPumpSpeed(
     id          SERIAL PRIMARY KEY,
     pumpId      INTEGER NOT NULL,
     val         INTEGER NOT NULL,
-    receiveTime TIMESTAMP NOT NULL,
+    receiveTime DECIMAL(11,6) NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id)
 );
@@ -314,7 +297,7 @@ CREATE TABLE TmsFanSpeed(
     id          SERIAL PRIMARY KEY,
     fanId       INTEGER NOT NULL,
     val         INTEGER NOT NULL,
-    receiveTime TIMESTAMP NOT NULL,
+    receiveTime DECIMAL(11,6) NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id)
 );
@@ -322,7 +305,7 @@ CREATE TABLE TmsFanSpeed(
 CREATE TABLE PvcState(
     id          SERIAL PRIMARY KEY,
     val         INTEGER NOT NULL,
-    receiveTime TIMESTAMP NOT NULL,
+    receiveTime DECIMAL(11,6) NOT NULL,
     contextId   INTEGER NOT NULL,
     FOREIGN KEY (contextId) REFERENCES Context(id)
 );

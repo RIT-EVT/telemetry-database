@@ -1,4 +1,10 @@
 *.csv
 *.MF4
 .idea/
+<<<<<<< HEAD
 *.env
+=======
+*.env
+*.cpython-312.pyc
+*.vscode
+>>>>>>> origin
