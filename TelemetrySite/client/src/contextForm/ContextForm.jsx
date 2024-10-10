@@ -225,6 +225,7 @@ function ContextForm() {
    * @param {Event} event - event of form submit
    */
   const SubmitData = (event) => {
+    console.log("submitting data");
     //prevent the form from clearing data
     event.preventDefault();
 
@@ -280,10 +281,14 @@ function ContextForm() {
       });
     }
 
-    PostContextData(collectedData);
+    PostContextData(collectedData).then((result) => {
+      if (result) {
+        //document.getElementById(FormId).reset();
+        console.log("data");
+      }
+    });
 
     //TODO reset form fields
-    //document.getElementById(FormId).reset();
   };
 
   /* -------------------------------------------------------------------------- */

@@ -17,7 +17,7 @@ app.add_url_rule('/Context', view_func=user_view, methods=['GET', 'PUT', 'DELETE
 
 ## Get all the url paths
 #
-# @return JSON file
+# @return JSON file of path values
 @app.route('/')
 def MainContext():
      # Open the JSON file and load its contents

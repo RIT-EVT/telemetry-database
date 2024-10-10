@@ -61,6 +61,14 @@ Ideally, mechies will just download the files and run it on their computer. This
 
 In the future, I hope to host at least the backend restful api, and eventually the website itself, on a web server, but that is not going to happen for a long time. To anyone that works on this in the future, if this message is still here, that means I never went back and fixed the mess I made, and for that I sincerely apologize for. This was meant to be quick and dirty, but I attempted to follow best practices and self document the code where I could. <br>
 
+## RESTful API
+
+The RESTful API is built off python using Flask. <br>
+
+Someday, this will be hosted on a central server, but for now it runs locally. To run this application, see directions below under **Running the Server**. <br>
+
+For any future developers, standard practices should be followed when building this API. This includes separating calls into different classes and using the `GET`, `PUT`, `POST`, and `DELETE` calls correctly. Additionally, any changes to the url path for a call should be updated in the ServerPath.json file.
+
 ### Download Instructions
 
 

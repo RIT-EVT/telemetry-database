@@ -36,6 +36,9 @@ const FetchConfigData = async () => {
  * @param {Object} postData - data to post to the backend. Formatted as an object
  */
 const PostContextData = async (postData) => {
+  console.log(postData);
+  await CheckData();
+
   try {
     const response = await fetch(BASE_URL + ServerCalls["context"], {
       //post data to the server
@@ -46,10 +49,11 @@ const PostContextData = async (postData) => {
       body: JSON.stringify(postData), // Convert the data to JSON
     });
     if (!response.ok) {
-      throw new Error("Network response was not ok " + response.statusText);
+      return false;
     }
+    return true;
   } catch (error) {
-    throw new Error("Error has occurred while submitting data " + error.error);
+    return false;
   }
 };
 
@@ -73,6 +77,15 @@ const CheckServerStatus = async () => {
     //if there is an error
     return false;
   }
+};
+
+const CheckData = async () => {
+  if (!ServerCalls) {
+    return CheckServerStatus().then(() => {
+      return true;
+    });
+  }
+  return false;
 };
 
 /**
