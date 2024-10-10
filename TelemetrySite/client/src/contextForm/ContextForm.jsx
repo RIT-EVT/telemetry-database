@@ -296,7 +296,7 @@ function ContextForm() {
    * Hook on update to dropdown values
    */
   useEffect(() => {
-    FetchConfigOptions();
+    // FetchConfigOptions();
     ConfigName.forEach((name) => {
       const dropDown = SelectCreator(dropDownOptions[name], name);
       setDropDowns((prev) => ({ ...prev, [name]: dropDown }));

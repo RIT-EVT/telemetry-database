@@ -62,14 +62,15 @@ const PostContextData = async (postData) => {
  */
 const CheckServerStatus = async () => {
   try {
-    //only hard code this call
-    fetch(BASE_URL + "/")
+    await fetch(BASE_URL + "/")
       .then((response) => response.json())
       .then((data) => {
         ServerCalls = data;
       });
+    //if there is no error
     return true;
   } catch {
+    //if there is an error
     return false;
   }
 };
@@ -81,9 +82,4 @@ const CheckServerStatus = async () => {
  */
 const CleanInput = (input) => input.slice(9);
 
-export {
-  FetchServerPaths,
-  FetchConfigData,
-  PostContextData,
-  CheckServerStatus,
-};
+export { FetchConfigData, PostContextData, CheckServerStatus };
