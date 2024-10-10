@@ -4,13 +4,14 @@ import psycopg2
 import dotenv
 import json
 import os
+from tqdm import tqdm
 import utils
 
 """@package docstring
 This file converts .mf4 files to .csv files and then uploads them to the database
 """
 configFilePath = "boardConfig.json"
-expectedIdIndex = 0
+expectedIdIndex = 1
 
 tpdoDictionary = {
     "TPDO0"     : 0x180,
@@ -74,14 +75,36 @@ def file_convert():
 #
 # @param files The paths to the array of files being processed
 def handle_data(files):
+    conn = utils.connect()
+    cur = conn.cursor()
     for file in files:
+        dataToExecuteMany = []
         with open(file) as open_file:
-            for line in open_file:
+            # Used to skip the first line of the file which is string values to indicate the values in the can message
+            firstLine = open_file.readline()
+            counter = 0
+            # Creates the loading bar. Value displayed represents the number of lines handled
+            for line in tqdm(open_file):
+                counter += 1
                 canMessageArr = line.split(',')
                 formattedArray = format_data_bytes(canMessageArr[6])
+                dataToExecuteMany.append((canMessageArr[1], canMessageArr[2], formattedArray, canMessageArr[0], expectedIdIndex))
                 # Currently hard coding the contextId input because there is only one (dummy) contextId
-                sql = "INSERT into canmessage (ID, busId, frameId, dataBytes, receiveTime, contextId) VALUES (DEFAULT, %s, %s, %s, %s, 1)"
-                utils.exec_commit(sql, (canMessageArr[1], canMessageArr[2], formattedArray, canMessageArr[0]))
+                if(counter % 1000 == 0):
+                    sql = "INSERT into canmessage (ID, busId, frameId, dataBytes, receiveTime, contextId) VALUES (DEFAULT, %s, %s, %s, %s, %s)"
+                    try:
+                        utils.exec_commit_many(sql, dataToExecuteMany)
+                        dataToExecuteMany = []
+                    except(TimeoutError):
+                        print(len(dataToExecuteMany))
+            sql = "INSERT into canmessage (ID, busId, frameId, dataBytes, receiveTime, contextId) VALUES (DEFAULT, %s, %s, %s, %s, %s)"
+            try:
+                cur.executemany(sql, dataToExecuteMany)
+            except(TimeoutError):
+                print(len(dataToExecuteMany))
+    conn.commit()
+    conn.close()
+
 
 ## Formats the data bytes into a format the DB can handle as an array
 #
