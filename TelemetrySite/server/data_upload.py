@@ -4,12 +4,8 @@ import psycopg2
 import dotenv
 import json
 import os
-<<<<<<< HEAD:mf4-csv.py
-import TelemetrySite.server.utils as utils
-=======
 from tqdm import tqdm
 import utils
->>>>>>> origin:TelemetrySite/server/data_upload.py
 
 """@package docstring
 This file converts .mf4 files to .csv files and then uploads them to the database

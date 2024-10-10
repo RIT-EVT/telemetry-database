@@ -1,14 +1,10 @@
 from flask import Flask, jsonify
 from flask_restful import Api
 from flask_cors import CORS
-<<<<<<< HEAD
 import dotenv 
 import json
 from Context.context import Context
  
-=======
-import dotenv
->>>>>>> origin
 
 app = Flask(__name__)  # Create Flask instance
 api = Api(app)  # API router

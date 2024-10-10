@@ -13,11 +13,7 @@ CREATE TABLE BmsConfig(
 
 CREATE TABLE ImuConfig(
     id                      SERIAL PRIMARY KEY,
-<<<<<<< HEAD
-    configName          TEXT NOT NULL,
-=======
     configName              TEXT NOT NULL,
->>>>>>> origin
     hardwareRevision        TEXT NOT NULL,
     softwareCommitHash      TEXT NOT NULL,
     eulerUnits              TEXT NOT NULL,
@@ -28,11 +24,7 @@ CREATE TABLE ImuConfig(
 
 CREATE TABLE TmuConfig(
     id                 SERIAL PRIMARY KEY,
-<<<<<<< HEAD
-    configName          TEXT NOT NULL,
-=======
     configName         TEXT NOT NULL,
->>>>>>> origin
     hardwareRevision   TEXT NOT NULL,
     softwareCommitHash TEXT NOT NULL,
     thermUnits         TEXT NOT NULL
@@ -40,11 +32,7 @@ CREATE TABLE TmuConfig(
 
 CREATE TABLE TmsConfig(
     id                 SERIAL PRIMARY KEY,
-<<<<<<< HEAD
-    configName          TEXT NOT NULL,
-=======
     configName         TEXT NOT NULL,
->>>>>>> origin
     hardwareRevision   TEXT NOT NULL,
     softwareCommitHash TEXT NOT NULL,
     tempUnits          TEXT NOT NULL,
@@ -54,11 +42,7 @@ CREATE TABLE TmsConfig(
 
 CREATE TABLE PvcConfig(
     id                 SERIAL PRIMARY KEY,
-<<<<<<< HEAD
-    configName          TEXT NOT NULL,
-=======
     configName         TEXT NOT NULL,
->>>>>>> origin
     hardwareRevision   TEXT NOT NULL,
     softwareCommitHash TEXT NOT NULL
 );
@@ -66,11 +50,7 @@ CREATE TABLE PvcConfig(
 -- TODO: Add detail
 CREATE TABLE McConfig(
     id              SERIAL PRIMARY KEY,
-<<<<<<< HEAD
-    configName          TEXT NOT NULL,
-=======
     configName      TEXT NOT NULL,
->>>>>>> origin
     model           TEXT NOT NULL,
     firmwareVersion TEXT NOT NULL
 );
