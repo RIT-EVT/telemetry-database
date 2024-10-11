@@ -23,7 +23,7 @@ import ContextJSONFormElements from "./jsonFiles/FormElementFormat.json";
 
 //url to call to
 const BASE_URL = "http://127.0.0.1:5000";
-
+//TODO Verify config names to avoid duplicates
 /**
  * Create needed context forms. Return the configured elements
  *
@@ -50,6 +50,7 @@ function ContextForm() {
   });
   //each dropdown object
   const [dropDowns, setDropDowns] = useState({
+    bike: null,
     bms: null,
     imu: null,
     tmu: null,
@@ -74,7 +75,10 @@ function ContextForm() {
     tms: [],
     pvc: [],
     mc: [],
+    bike: [],
   });
+
+  const [bikeSelected, setBikeSelected] = useState(false);
 
   /* -------------------------------------------------------------------------- */
   /* --------------------------- Initialize Constants ------------------------- */
@@ -119,12 +123,22 @@ function ContextForm() {
    */
   const handleConfigFormChange = (event, configName) => {
     const value = event.target.value;
-    handleConfigSelectChange(configName, value);
-    if (value === "Custom") {
-      const formElement = GenerateFormElement(`${configName}Config`);
-      setFormElements((prev) => ({ ...prev, [configName]: formElement }));
+    if (configName != "bike") {
+      handleConfigSelectChange(configName, value);
+      if (value === "Custom") {
+        const formElement = GenerateFormElement(`${configName}Config`);
+        setFormElements((prev) => ({ ...prev, [configName]: formElement }));
+      } else {
+        setFormElements((prev) => ({ ...prev, [configName]: null }));
+      }
     } else {
-      setFormElements((prev) => ({ ...prev, [configName]: null }));
+      if (value === "Custom") {
+        UpdateBikeForm(GenerateFormElement("BikeConfig"));
+        setBikeSelected(true);
+      } else {
+        UpdateBikeForm(null);
+        setBikeSelected(false);
+      }
     }
   };
 
@@ -137,7 +151,12 @@ function ContextForm() {
     //does not work yet
     //tables do not contain a name column
     //fetch names of config files to display for user to choose from
-    FetchConfigData().then((data) => setDropdownOptions(data));
+    FetchConfigData().then((data) => {
+      if (!data) {
+        return;
+      }
+      setDropdownOptions(data);
+    });
   };
 
   /**
@@ -243,52 +262,60 @@ function ContextForm() {
         mc: {},
       },
     };
-
+    var bikeIsCustom = false;
     //get the needed json object
     const ConfigElements = ContextJSONIdValues.ConfigElements;
+    if (document.getElementById("bikeSelect").value === "Custom") {
+      bikeIsCustom = true;
+      ConfigName.forEach((configName) => {
+        //get the json object of ids
+        const configIds = ConfigElements[configName + "Config"];
 
-    ConfigName.forEach((configName) => {
-      //get the json object of ids
-      const configIds = ConfigElements[configName + "Config"];
-
-      //check if the selected element is custom
-      if (document.getElementById(configName + "Select").value === "Custom") {
-        configIds.forEach((id) => {
-          //get the item and make sure it exists
-          const element = document.getElementById(id);
-          if (element) {
-            collectedData.Context[configName][id] = element.value; // Collect the value from the form element
-          }
-        });
-        collectedData.Context[configName]["savedName"] =
-          document.getElementById(configName + "SavedName").value;
-      } else {
-        collectedData.Context[configName]["selected"] = document.getElementById(
-          configName + "Select"
-        ).value;
-      }
-    });
+        //check if the selected element is custom
+        if (document.getElementById(configName + "Select").value === "Custom") {
+          configIds.forEach((id) => {
+            //get the item and make sure it exists
+            const element = document.getElementById(id);
+            if (element) {
+              collectedData.Context[configName][id] = element.value; // Collect the value from the form element
+            }
+          });
+          collectedData.Context[configName]["savedName"] =
+            document.getElementById(configName + "SavedName").value;
+        } else {
+          collectedData.Context[configName]["selected"] =
+            document.getElementById(configName + "Select").value;
+        }
+      });
+    }
     //handle the main, bike, and event
     const MainElements = ContextJSONIdValues.MainElements;
 
     for (const key in MainElements) {
-      MainElements[key].forEach((id) => {
-        //get the item and make sure it exists
-        const element = document.getElementById(id);
-        if (element) {
-          collectedData.Context[key][id] = element.value; // Collect the value from the form element
-        }
-      });
+      if (key !== "BikeConfig" || bikeIsCustom) {
+        MainElements[key].forEach((id) => {
+          //get the item and make sure it exists
+          const element = document.getElementById(id);
+          if (element) {
+            collectedData.Context[key][id] = element.value; // Collect the value from the form element
+          }
+        });
+      } else if (key === "BikeConfig") {
+        console.log();
+        const element = document.getElementById("bikeSelect").value;
+        console.log(element);
+
+        collectedData.Context[key]["selected"] = element; // Collect the value from the form element
+      }
     }
 
     PostContextData(collectedData).then((result) => {
       if (result) {
-        //document.getElementById(FormId).reset();
-        console.log("data");
+        document.getElementById(FormId).reset();
+      } else {
+        throw new Error("An error has occurred while submitting data");
       }
     });
-
-    //TODO reset form fields
   };
 
   /* -------------------------------------------------------------------------- */
@@ -301,17 +328,22 @@ function ContextForm() {
    * Hook on update to dropdown values
    */
   useEffect(() => {
-    // FetchConfigOptions();
     ConfigName.forEach((name) => {
       const dropDown = SelectCreator(dropDownOptions[name], name);
       setDropDowns((prev) => ({ ...prev, [name]: dropDown }));
     });
 
     UpdateContext(GenerateFormElement("MainBody"));
-    UpdateBikeForm(GenerateFormElement("BikeConfig"));
+
+    const bikeDrop = SelectCreator(dropDownOptions["bike"], "bike");
+    setDropDowns((prev) => ({ ...prev, ["bike"]: bikeDrop }));
+
     UpdateEventForm(GenerateFormElement("Event"));
   }, [dropDownOptions]);
 
+  useEffect(() => {
+    FetchConfigOptions();
+  }, []);
   /**
    * Check all config select value. If it is == Custom
    * generate the needed config page
@@ -361,31 +393,34 @@ function ContextForm() {
           </div>
           <div className='bottom-right-panel'>
             <div className='panel-content'>
-              <h3 className='panel-header'>Bike Context</h3>
+              <h3 className='panel-header'>
+                Bike Context: {dropDowns["bike"]}
+              </h3>
               {bikeContextForm}
             </div>
           </div>
         </div>
       </div>
-
-      <div className='grid-container'>
-        {ConfigName.map((name) => {
-          return (
-            <div className='grid-item'>
-              <h3 className='grid-header'>
-                {/*
-                 *Create each element of the grid. Initially each has the name
-                 *of the config and a dropdown. Dropdown is populated by past
-                 *configs of the same type that have been saved. Allow user to also
-                 *create a new one with the option to save it with a name
-                 */}
-                {name.toLocaleUpperCase()} Configuration: {dropDowns[name]}
-              </h3>
-              {configForm[name]}
-            </div>
-          );
-        })}
-      </div>
+      {bikeSelected ? (
+        <div className='grid-container'>
+          {ConfigName.map((name) => {
+            return (
+              <div className='grid-item'>
+                <h3 className='grid-header'>
+                  {/*
+                   *Create each element of the grid. Initially each has the name
+                   *of the config and a dropdown. Dropdown is populated by past
+                   *configs of the same type that have been saved. Allow user to also
+                   *create a new one with the option to save it with a name
+                   */}
+                  {name.toLocaleUpperCase()} Configuration: {dropDowns[name]}
+                </h3>
+                {configForm[name]}
+              </div>
+            );
+          })}
+        </div>
+      ) : null}
       {/*
        * Submitting data is handled in the
        * SubmitData() const function

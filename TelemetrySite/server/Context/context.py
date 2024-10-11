@@ -16,17 +16,22 @@ class Context(MethodView):
         configData={}
         #loop through each table and pull the names
         #0 used as a place holder, no args needed
-        #TODO Test once db is setup
         #can't use the %s for table names
+        
         for i in range(0, len(self.configNames)):
-            sqlCommand = f"SELECT configName FROM {self.configNames[i]} WHERE configName != '' AND configName IS NOT NULL"
+            #TODO remove the NOT LIkE. Test data went a bit far
+            sqlCommand = f"SELECT configName FROM {self.configNames[i]} WHERE configName NOT LIKE 'test_' AND configName IS NOT NULL"
             configData[self.configShort[i]] = utils.exec_get_all(sqlCommand, [0,])  
+
+        configData["bike"]=utils.exec_get_all("SELECT configName FROM BikeConfig WHERE configName IS NOT NULL", [0,])
         #while(1); prevents json injections
-        return "while(1);"+jsonify(configData).get_data(as_text=True), 200
+        print(configData)
+        return jsonify(configData).get_data(as_text=True), 200
 
     def put(self):
         # Get JSON data from the request
         data = request.get_json()
+        print(data)
         sqlCommands = [
             "INSERT into BmsConfig (id, hardwareRevision, softwareCommitHash, totalVoltageUnits, batteryVoltageUnits, currentUnits, packTempUnits," 
             +"bqTempUnits, cellVoltageUnits, configName) VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id",
@@ -49,49 +54,60 @@ class Context(MethodView):
 
         hasIMU=True
         hasTMU=True
-
-        #loop through each config and check if they have a selected 
-        #config instead of a new one
-        for index in range(0, len(self.configShort)):
-            currentConfigData = contextValue[self.configShort[index]]
-            if not "selected" in currentConfigData:           
-                idBikeConfig.append(utils.exec_commit_with_id(sqlCommands[index], self.DictToTuple(currentConfigData))[0][0])
-            else:
-                #execute a query to find the id where the name is the same as the passed name
-                query = f"SELECT id FROM {self.configNames[index]} WHERE configName = {currentConfigData["selected"]}"
-                
-                if currentConfigData["selected"]=="":
-                    if index == 1:
-                        hasIMU=False
-                    else:
-                        hasTMU=False
-                    continue
-                idBikeConfig.append(utils.exec_get_one(query, [0,])[0])
-        
+        #ensure the bike isn't already saved
+        if not "selected" in contextValue["BikeConfig"]:
+            #loop through each config and check if they have a selected 
+            #config instead of a new one
+            for index in range(0, len(self.configShort)):
+                currentConfigData = contextValue[self.configShort[index]]
+                if not "selected" in currentConfigData:           
+                    idBikeConfig.append(utils.exec_commit_with_id(sqlCommands[index], self.DictToTuple(currentConfigData))[0][0])
+                else:
+                    #execute a query to find the id where the name is the same as the passed name
+                    query = f"SELECT id FROM {self.configNames[index]} WHERE configName = '{currentConfigData["selected"]}'"
+                    
+                    if currentConfigData["selected"]=="":
+                        if index == 1:
+                            hasIMU=False
+                        else:
+                            hasTMU=False
+                        continue
+                    idBikeConfig.append(utils.exec_get_one(query, [0,])[0])
+       
         #establish sql commands for all non event, bike, and context configs
-        print(idBikeConfig)
-
         sqlEvent = "INSERT into Event (id, eventDate, eventType, location) VALUES (DEFAULT, %s, %s, %s) RETURNING id"
-        sqlBikeConfig = "INSERT into BikeConfig (id, platformName, tirePressure, coolantVolume, bmsConfigId, imuConfigId, tmuConfigId, tmsConfigId, pvcConfigId, mcConfigId) VALUES (DEFAULT, %s, %s, %s, %s," 
-        #set imu and tmu to default as needed
-        if hasIMU is True:
-            sqlBikeConfig+="%s, "
+
+        eventAndBikeId.append(utils.exec_commit_with_id(sqlEvent, self.DictToTuple(contextValue["Event"]))[0][0])
+
+        #if the bike isn't a saved value
+        if not "selected" in contextValue["BikeConfig"]:
+            #create a new one
+            sqlBikeConfig = "INSERT into BikeConfig (id, configName, platformName, tirePressure, coolantVolume, bmsConfigId, imuConfigId, tmuConfigId, tmsConfigId, pvcConfigId, mcConfigId) VALUES (DEFAULT, 'test', %s, %s, %s, %s," 
+            #set imu and tmu to default as needed
+            if hasIMU is True:
+                sqlBikeConfig+="%s, "
+            else:
+                sqlBikeConfig+="DEFAULT, "
+            if hasTMU is True:
+                sqlBikeConfig+="%s, "
+            else:
+                sqlBikeConfig+="DEFAULT, "
+            
+            sqlBikeConfig+="%s, %s, %s) RETURNING id"
+            eventAndBikeId.append(utils.exec_commit_with_id(sqlBikeConfig, self.DictToTuple(contextValue["BikeConfig"])+tuple(idBikeConfig))[0][0])
+
         else:
-            sqlBikeConfig+="DEFAULT, "
-        if hasTMU is True:
-            sqlBikeConfig+="%s, "
-        else:
-            sqlBikeConfig+="DEFAULT, "
-        
-        idBikeConfig+="%s, %s, %s) RETURNING id"
+            # if it is saved, get the id
+            sqlCommand= f"SELECT id from BikeConfig WHERE configName = '{contextValue["BikeConfig"]["selected"]}'"
+            eventAndBikeId.append(utils.exec_get_one(sqlCommand, [0,])[0])
 
         sqlContext = "INSERT into Context (id, airTemp, humidity, windSpeed, windAngle, riderName, riderWeight, driverFeedback, distanceCovered, startTime, eventId, bikeConfigId) VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id"
 
         #save the event and bike ids for to reference in the context db
-        eventAndBikeId.append(utils.exec_commit_with_id(sqlEvent, self.DictToTuple(contextValue["MainBody"]))[0][0])
-        eventAndBikeId.append(utils.exec_commit_with_id(sqlBikeConfig, self.DictToTuple(contextValue["Event"])+tuple(idBikeConfig))[0][0])
+        
+        print(self.DictToTuple(contextValue["BikeConfig"])+tuple(idBikeConfig))
 
-        utils.exec_commit_with_id(sqlContext, self.DictToTuple(contextValue["BikeConfig"])+tuple(eventAndBikeId))
+        utils.exec_commit_with_id(sqlContext, self.DictToTuple(contextValue["MainBody"])+tuple(eventAndBikeId))
 
         # Respond back to the client. 201 code for created
         return jsonify({"message": "Data received successfully", "received": data}), 201
@@ -104,7 +120,7 @@ class Context(MethodView):
     
     def delete(self):
 
-
+        
         return jsonify(["Delete Called"])
 
 

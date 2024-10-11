@@ -16,16 +16,20 @@ let BASE_URL = "http://127.0.0.1:5000";
  * @return {Dictionary} key: board name, value: saved names
  */
 const FetchConfigData = async () => {
+  await CheckData();
   try {
     const response = await fetch(BASE_URL + ServerCalls["context"]);
+
     if (!response.ok) {
-      throw new Error("Network response was not ok " + response.statusText);
+      throw new Error("Network response was not ok: " + response.statusText);
     }
-    const data = CleanInput(response).json();
-    return data;
+
+    const jsonResponse = await response.json(); // await here
+
+    return jsonResponse;
   } catch (error) {
     throw new Error(
-      "Error has occurred while fetching config data " + error.error
+      "Error has occurred while fetching config data: " + error.message
     );
   }
 };
@@ -36,7 +40,6 @@ const FetchConfigData = async () => {
  * @param {Object} postData - data to post to the backend. Formatted as an object
  */
 const PostContextData = async (postData) => {
-  console.log(postData);
   await CheckData();
 
   try {
