@@ -123,6 +123,7 @@ function ContextForm() {
    */
   const handleConfigFormChange = (event, configName) => {
     const value = event.target.value;
+    //handle the bike differently from the configs
     if (configName != "bike") {
       handleConfigSelectChange(configName, value);
       if (value === "Custom") {
@@ -244,7 +245,6 @@ function ContextForm() {
    * @param {Event} event - event of form submit
    */
   const SubmitData = (event) => {
-    console.log("submitting data");
     //prevent the form from clearing data
     event.preventDefault();
 
@@ -263,6 +263,7 @@ function ContextForm() {
       },
     };
     var bikeIsCustom = false;
+    var isADup = false;
     //get the needed json object
     const ConfigElements = ContextJSONIdValues.ConfigElements;
     if (document.getElementById("bikeSelect").value === "Custom") {
@@ -280,13 +281,28 @@ function ContextForm() {
               collectedData.Context[configName][id] = element.value; // Collect the value from the form element
             }
           });
-          collectedData.Context[configName]["savedName"] =
-            document.getElementById(configName + "SavedName").value;
+
+          const savedName = document.getElementById(
+            configName + "SavedName"
+          ).value;
+          collectedData.Context[configName]["savedName"] = savedName;
+          //check if the name is a duplicate
+          isADup = dropDownOptions[configName].some(
+            (element) => element[0] === savedName
+          );
+
+          if (isADup) {
+            console.error(`Duplicate save name detected in ${configName}`);
+          }
         } else {
           collectedData.Context[configName]["selected"] =
             document.getElementById(configName + "Select").value;
         }
       });
+    }
+    //don't send any data if there was a duplicate
+    if (isADup) {
+      return;
     }
     //handle the main, bike, and event
     const MainElements = ContextJSONIdValues.MainElements;
@@ -300,12 +316,13 @@ function ContextForm() {
             collectedData.Context[key][id] = element.value; // Collect the value from the form element
           }
         });
-      } else if (key === "BikeConfig") {
-        console.log();
+      } else {
+        //collect the config name and check for a duplicates
         const element = document.getElementById("bikeSelect").value;
-        console.log(element);
-
         collectedData.Context[key]["selected"] = element; // Collect the value from the form element
+        if (dropDownOptions["bike"].some((element) => element[0] === element)) {
+          console.error(`Duplicate save name detected in bike config`);
+        }
       }
     }
 
@@ -340,7 +357,9 @@ function ContextForm() {
 
     UpdateEventForm(GenerateFormElement("Event"));
   }, [dropDownOptions]);
-
+  /**
+   * Fetch all the saved configs on the first load
+   */
   useEffect(() => {
     FetchConfigOptions();
   }, []);

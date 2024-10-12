@@ -19,7 +19,8 @@
         "BikeConfig": [
             "platformName",
             "tirePressure",
-            "coolantVolume"
+            "coolantVolume",
+            "bikeConfigName"
         ]
     },
     "ConfigElements": {
