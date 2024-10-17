@@ -4,3 +4,4 @@
 *.env
 *.cpython-312.pyc
 /.vscode
+__pycache__/
