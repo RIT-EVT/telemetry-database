@@ -1,0 +1,55 @@
+.welcomeTitle {
+    font-family: Verdana;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 30px;
+
+    color: #100000;
+    padding-top: 9%;
+    padding-left: 19%;
+}
+
+.mfTitle {
+    margin-left: 25%;
+}
+
+.titleMain {
+    display: inline;
+    font-family: Verdana;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 72px;
+    color: #b1b1b1;
+}
+
+.titleAE {
+    display: inline;
+    font-family: Verdana;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 72px;
+    color: #005B9A;
+}
+
+.buttonReturn {
+    background: #dc5e14;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 35%;
+    margin-top: 10%;
+    width: 30%;
+    border: none;
+    padding: 15px 32px;
+    font-family: Verdana;
+    font-weight: bold;
+    color: white;
+    font-size: 30px;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.buttonSignIn:hover {
+    background: #6a7081;
+    cursor: pointer;
+}

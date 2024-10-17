@@ -3,4 +3,5 @@
 .idea/
 *.env
 *.cpython-312.pyc
-*.vscode
+/.vscode
+__pycache__/
