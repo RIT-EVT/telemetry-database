@@ -35,11 +35,11 @@ def MainContext():
         return jsonify({"error": "Error decoding JSON"}), 500
 
 if __name__ == '__main__':
+    #credential file exists two levels up
     two_up = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-   
     dotenv.load_dotenv(two_up+'/credentials.env')
     print("Starting flask")    
-    
+
     app.run(debug=True)  # Starts Flask
     
 
