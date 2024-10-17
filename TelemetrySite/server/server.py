@@ -38,10 +38,7 @@ if __name__ == '__main__':
     two_up = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
    
     dotenv.load_dotenv(two_up+'/credentials.env')
-    print("Starting flask")
-    sqlCommand = "Remove "
-    #print(utils.exec_get_all(sqlCommand, {0, }))
-    
+    print("Starting flask")    
     
     app.run(debug=True)  # Starts Flask
     
