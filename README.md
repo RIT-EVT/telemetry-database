@@ -104,7 +104,7 @@ In your terminal `cd` into the `~...\Telemetry-Database\TelemetrySite\server` fo
 
 In order to connect to the database, you must contact one of the database leads for the .env file.<br> 
 
-Once they have sent it to you, place it in the `~...\Telemetry-Database\TelemetrySite\server` in a file names **credentials.env**.
+Once they have sent it to you, place it in the `~...\Telemetry-Database` folder in a file names **credentials.env**.
 
 > **WARNING**
 

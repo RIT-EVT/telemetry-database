@@ -1,9 +1,13 @@
 from flask import Flask, jsonify
 from flask_restful import Api
 from flask_cors import CORS
+import utils
 import dotenv 
 import json
 from Context.context import Context
+
+import os
+
  
 
 app = Flask(__name__)  # Create Flask instance
@@ -31,9 +35,16 @@ def MainContext():
         return jsonify({"error": "Error decoding JSON"}), 500
 
 if __name__ == '__main__':
-    dotenv.load_dotenv('./credentials.env')
+    two_up = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+   
+    dotenv.load_dotenv(two_up+'/credentials.env')
     print("Starting flask")
+    sqlCommand = "Remove "
+    #print(utils.exec_get_all(sqlCommand, {0, }))
+    
+    
     app.run(debug=True)  # Starts Flask
+    
 
     
 
