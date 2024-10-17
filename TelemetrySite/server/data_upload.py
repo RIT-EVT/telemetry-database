@@ -61,11 +61,9 @@ def file_convert():
         file = file.strip(".mf4")
         mdf.export(fmt='csv', filename= file+'.csv')
         # This is the location of the hard coding of the files we care about. To change this remove the line below and uncomment the for loop.
-        files.append(file+'.ChannelGroup_' + str(7) + '.csv')
-        # for x in range (0, 8): 
-        #     files.append(file+'.ChannelGroup_' + str(x) + '.csv')
-        #     with open(file+'.ChannelGroup_' + str(x) + '.csv') as f:
-        #         first_line = f.readline()
+        # files.append(file+'.ChannelGroup_' + str(7) + '.csv')
+        for x in range (0, 8): 
+            files.append(file+'.ChannelGroup_' + str(x) + '.csv')
     else:
         print("You fool; thats not a valid file! The file must be an mf4")
     handle_data(files)
