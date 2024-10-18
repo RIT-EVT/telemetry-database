@@ -20,6 +20,7 @@ import "./ContextForm.css";
 import ContextJSONIdValues from "./jsonFiles/ContextForm.json";
 //all elements to have as input field and their properties
 import ContextJSONFormElements from "./jsonFiles/FormElementFormat.json";
+import { useNavigate } from "react-router-dom";
 
 /**
  * Create needed context forms. Return the configured elements
@@ -94,6 +95,7 @@ function ContextForm() {
 
   let FormId = "ContextForm";
 
+  let navigate = useNavigate();
   /* -------------------------------------------------------------------------- */
   /* ----------------------------- Const Functions ---------------------------- */
   /* -------------------------------------------------------------------------- */
@@ -326,6 +328,8 @@ function ContextForm() {
     PostContextData(collectedData).then((result) => {
       if (result) {
         document.getElementById(FormId).reset();
+        //switch to new screen
+        navigate("/DataUpload");
       } else {
         throw new Error("An error has occurred while submitting data");
       }

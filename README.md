@@ -57,7 +57,7 @@ As we do not have means to collect context data yet, we use a dummy context with
 
 This react-strap based website is responsible for gathering all context and data relating to the bikes and all events<br>
 
-Ideally, mechies will just download the files and run it on their computer. This includes running both the website and backend api that goes along with it.<br>
+Ideally, MECE's will just download the files and run it on their computer. This includes running both the website and backend api that goes along with it.<br>
 
 In the future, I hope to host at least the backend restful api, and eventually the website itself, on a web server, but that is not going to happen for a long time. To anyone that works on this in the future, if this message is still here, that means I never went back and fixed the mess I made, and for that I sincerely apologize for. This was meant to be quick and dirty, but I attempted to follow best practices and self document the code where I could. <br>
 

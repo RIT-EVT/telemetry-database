@@ -115,12 +115,12 @@ class Context(MethodView):
 
     def post(self):
 
-
+        #setup later to adjust data
         return jsonify(["Post Called"])
     
     def delete(self):
 
-        
+        #setup later to deactivate data
         return jsonify(["Delete Called"])
 
 
