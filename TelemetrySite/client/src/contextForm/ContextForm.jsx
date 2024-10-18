@@ -146,7 +146,6 @@ function ContextForm() {
    * Set them to the corresponding dropdown option
    */
   const FetchConfigOptions = () => {
-    //does not work yet
     //tables do not contain a name column
     //fetch names of config files to display for user to choose from
     FetchConfigData().then((data) => {
