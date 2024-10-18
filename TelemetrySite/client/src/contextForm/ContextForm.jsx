@@ -223,8 +223,9 @@ function ContextForm() {
         required={RequiredSelects[name]}
         className='ConfigDropdown'
         id={`${name}Select`}
+        defaultValue=''
       >
-        <option value='' disabled selected hidden>
+        <option value='' disabled hidden>
           Select an option
         </option>
         {displayValues.map((configNameValue) => (
@@ -403,7 +404,7 @@ function ContextForm() {
             {mainContextForm}
           </div>
         </div>
-        <div className='right-panel'>
+        <div className='right-panel' key='rightPanel'>
           <div className='top-right-panel'>
             <div className='panel-content'>
               <h3 className='panel-header'>Event Context</h3>
