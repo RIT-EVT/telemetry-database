@@ -55,7 +55,7 @@ As we do not have means to collect context data yet, we use a dummy context with
 
 ## Web UI 
 
-This react-strap based website is responsible for gathering all the context relating to the data we gather.<br>
+This react-strap based website is responsible for gathering all context and data relating to the bikes and all events<br>
 
 Ideally, mechies will just download the files and run it on their computer. This includes running both the website and backend api that goes along with it.<br>
 
@@ -96,7 +96,7 @@ After your sever is online, make sure you keep that terminal open. **Closing tha
 Open a new terminal and `cd` into the `~...\Telemetry-Database` folder. <br>
 Run the command `pip instal -r requirements.txt`. <br>
 
-If `pip` isn't being recognized, run `python -V`. If python isn't recognized, download the installer here [Python](https://www.python.org/downloads/) and make sure you click **Add as environment variable**.<br>
+If `pip` isn't being recognized, run `python -V`. If python isn't recognized, download the installer here [Python](https://www.python.org/downloads/). Python should add itself as environmental variable automatically, but you may need to click **Add As Environmental Variable** on the last page before you close the installer.<br>
 
 In your terminal `cd` into the `~...\Telemetry-Database\TelemetrySite\server` folder and run `python .\server.py`
 

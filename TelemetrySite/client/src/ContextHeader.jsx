@@ -11,33 +11,12 @@ function ContextHeader() {
   const [serverNotOnline, setServerOnlineStatus] = useState(true);
   const [ButtonsForSelect, updateButtons] = useState(null);
 
-  const [error, setError] = useState(null);
-
   const navigate = useNavigate(); // Move useNavigate here
 
   /* -------------------------------------------------------------------------- */
   /* ------------------------- Create Const Functions ------------------------- */
   /* -------------------------------------------------------------------------- */
 
-  /**
-   * Clear any errors
-   */
-  const clearError = () => {
-    setError(null);
-  };
-  /**
-   * Display the error message
-   */
-  const setErrorMessage = () => {
-    setError(
-      <center>
-        <div className='Error' color='danger'>
-          <center> Server appears to be offline</center>
-          <center>Turn on sever and wait for page to read the response</center>
-        </div>
-      </center>
-    );
-  };
   /**
    * Call to the backend server.
    * If it is active clear any error.
@@ -47,10 +26,6 @@ function ContextHeader() {
     CheckServerStatus().then((response) => {
       if (response) {
         setServerOnlineStatus(false);
-        clearError();
-      } else {
-        setServerOnlineStatus(true);
-        setErrorMessage();
       }
     });
   };
@@ -91,7 +66,7 @@ function ContextHeader() {
         </center>
       </div>
     );
-  }, [serverNotOnline, error]);
+  }, [serverNotOnline]);
 
   /* -------------------------------------------------------------------------- */
   /* --------------------------- Return Final Object -------------------------- */
@@ -108,7 +83,6 @@ function ContextHeader() {
 
         {ButtonsForSelect}
       </div>
-      {error}
     </div>
   );
 }

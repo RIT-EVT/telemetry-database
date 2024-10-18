@@ -69,13 +69,15 @@ const PostContextData = async (postData) => {
  */
 const CheckServerStatus = async () => {
   try {
-    await fetch(BASE_URL + "/")
+    return await fetch(BASE_URL + "/")
       .then((response) => response.json())
       .then((data) => {
         ServerCalls = data;
+        return true;
+      })
+      .catch(() => {
+        return false;
       });
-    //if there is no error
-    return true;
   } catch {
     //if there is an error
     return false;
