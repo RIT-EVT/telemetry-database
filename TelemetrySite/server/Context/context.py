@@ -19,7 +19,6 @@ class Context(MethodView):
         #can't use the %s for table names
        
         for i in range(0, len(self.configNames)):
-            #TODO remove the NOT LIkE. Test data went a bit far
             sqlCommand = f"SELECT configName FROM {self.configNames[i]}"
             configData[self.configShort[i]] = utils.exec_get_all(sqlCommand, [0,])  
 
@@ -76,7 +75,6 @@ class Context(MethodView):
                             hasTMU=False
                         continue
                     idBikeConfig.append(utils.exec_get_one(query, [0,])[0])
-       # TODO something wrong with imu/tmu submissions 
         #establish sql commands for all non event, bike, and context configs
         #save the event and bike ids for to reference in the context db
 

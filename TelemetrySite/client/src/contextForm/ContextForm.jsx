@@ -23,7 +23,6 @@ import ContextJSONFormElements from "./jsonFiles/FormElementFormat.json";
 
 //url to call to
 const BASE_URL = "http://127.0.0.1:5000";
-//TODO Verify config names to avoid duplicates
 /**
  * Create needed context forms. Return the configured elements
  *
