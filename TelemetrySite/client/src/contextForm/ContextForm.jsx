@@ -21,8 +21,6 @@ import ContextJSONIdValues from "./jsonFiles/ContextForm.json";
 //all elements to have as input field and their properties
 import ContextJSONFormElements from "./jsonFiles/FormElementFormat.json";
 
-//url to call to
-const BASE_URL = "http://127.0.0.1:5000";
 /**
  * Create needed context forms. Return the configured elements
  *
