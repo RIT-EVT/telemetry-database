@@ -5,3 +5,7 @@ class data_upload(MethodView):
     def get(self):
         
         return
+    
+    def put(self):
+
+        return

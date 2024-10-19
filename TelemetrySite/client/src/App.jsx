@@ -1,5 +1,5 @@
 import { Route, Routes, BrowserRouter as Router } from "react-router-dom";
-import ContextForm from "./contextForm/ContextForm"; // Import other components
+import ContextForm from "./ContextForm/ContextForm"; // Import other components
 import DataUpload from "./DataUpload/DataUpload";
 import "./App.css";
 import Page404 from "./404/404";
@@ -47,7 +47,7 @@ function App() {
         {ServerStatus ? (
           <Routes>
             <Route path='/' element={<ContextForm />} />
-
+            <Route path='/DataUpload' element={<DataUpload />} />
             <Route path='*' element={<Page404 />} />
           </Routes>
         ) : null}
