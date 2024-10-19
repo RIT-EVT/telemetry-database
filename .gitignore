@@ -5,3 +5,4 @@
 *.cpython-312.pyc
 /.vscode
 __pycache__/
+data_upload_file/
