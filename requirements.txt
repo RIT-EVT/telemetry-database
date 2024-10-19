@@ -4,3 +4,4 @@ Flask_Cors==5.0.0
 Flask_RESTful==0.3.10
 psycopg2==2.9.9
 python-dotenv==1.0.1
+werkzeug==3.0.4
