@@ -1,7 +1,6 @@
 from asammdf import MDF
 import re
 import psycopg2
-import dotenv
 import json
 import os
 from tqdm import tqdm
@@ -123,10 +122,6 @@ def format_data_bytes(bytes):
     return(closeBracket)
 
 
-## Main function to complete file conversion
-def main():
-    dotenv.load_dotenv("./credentials.env")
-    file_convert()
 
-if __name__ == '__main__':
-    main()
+
+

@@ -178,12 +178,3 @@ def organize_can_from_db(context_id):
     sql = "SELECT id, busId, frameid, databytes, receivetime, contextid FROM CANMESSAGE WHERE contextid = %s"
     can_data = utils.exec_get_all(sql, (context_id,))
     handle_data(can_data)
-
-
-def main():
-    dotenv.load_dotenv("./credentials.env")
-    organize_can_from_db(context_id)
-
-
-if __name__ == '__main__':
-    main()

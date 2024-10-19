@@ -1,3 +1,4 @@
 {
-    "context": "/Context"
+    "context": "/Context",
+    "data_upload": "/DataUpload"
 }

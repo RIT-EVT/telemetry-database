@@ -5,6 +5,7 @@ import utils
 import dotenv 
 import json
 from Context.context import Context
+from data_upload.data_upload_api import data_upload
 
 import os
 
@@ -18,6 +19,8 @@ CORS(app)
 #create views for url rules
 user_view = Context.as_view('context_api')
 app.add_url_rule('/Context', view_func=user_view, methods=['GET', 'PUT', 'DELETE', 'POST'])
+user_view=Context.as_view('data_upload_api')
+app.add_url_rule('DataUpload', view_func=user_view, methods=['GET', 'PUT', 'DELETE', 'POST'])
 
 ## Get all the url paths
 #
