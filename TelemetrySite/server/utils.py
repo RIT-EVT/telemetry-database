@@ -1,7 +1,6 @@
 import psycopg2
 import os
 
-
 ## Use to connect to the database using the .env file
 def connect():
     return psycopg2.connect(
@@ -81,4 +80,3 @@ def exec_commit_with_id(sql, args={}):
     conn.commit()
     conn.close()
     return result
-
