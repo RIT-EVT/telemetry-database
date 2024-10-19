@@ -26,7 +26,7 @@ class Context(MethodView):
      
         return jsonify(configData).get_data(as_text=True), 200
 
-    def put(self):
+    def post(self):
         # Get JSON data from the request
         data = request.get_json()
         sqlCommands = [
@@ -113,10 +113,10 @@ class Context(MethodView):
         return jsonify({"message": "Data received successfully", "received": data}), 201
     
 
-    def post(self):
+    def put(self):
 
         #setup later to adjust data
-        return jsonify(["Post Called"])
+        return jsonify(["Put Called"])
     
     def delete(self):
 

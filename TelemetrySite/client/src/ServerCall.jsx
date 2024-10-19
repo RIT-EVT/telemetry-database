@@ -45,7 +45,7 @@ const PostContextData = async (postData) => {
   try {
     const response = await fetch(BASE_URL + ServerCalls["context"], {
       //post data to the server
-      method: "PUT",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
