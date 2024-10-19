@@ -1,0 +1,20 @@
+.DataUploadForm {
+    margin-left: 10px;
+    margin-right: 10px;
+    height: 100%;
+    padding: 20px;
+    border: solid;
+}
+
+.FileInputBox {
+
+    background-color: #504A43;
+}
+
+.FormGroup {
+    padding: 12px;
+}
+
+.FileInput {
+    padding: 5px;
+}

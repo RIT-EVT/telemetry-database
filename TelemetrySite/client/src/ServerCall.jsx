@@ -10,6 +10,10 @@ var ServerCalls = {};
 
 let BASE_URL = "http://127.0.0.1:5000";
 
+/* -------------------------------------------------------------------------- */
+/* --------------------------- Context Data Calls --------------------------- */
+/* -------------------------------------------------------------------------- */
+
 /**
  * Fetch the saved config names
  *
@@ -60,6 +64,25 @@ const PostContextData = async (postData) => {
   }
 };
 
+/* -------------------------------------------------------------------------- */
+/* ---------------------------- Data Upload Calls --------------------------- */
+/* -------------------------------------------------------------------------- */
+
+const PostDataFile = async (file) => {
+  await CheckData();
+
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await fetch(BASE_URL + ServerCalls["data_upload"], {
+    method: "POST",
+    body: formData, // Don't set Content-Type
+  });
+};
+
+/* -------------------------------------------------------------------------- */
+/* -------------------------- Server Status Checks -------------------------- */
+/* -------------------------------------------------------------------------- */
+
 /**
  * Check the status of the server.
  * If the server is active, also get the
@@ -84,6 +107,11 @@ const CheckServerStatus = async () => {
   }
 };
 
+/**
+ * Check if the server us active
+ *
+ * @return {Boolean} If the server is online
+ */
 const CheckData = async () => {
   if (!ServerCalls) {
     return CheckServerStatus().then(() => {
@@ -93,11 +121,4 @@ const CheckData = async () => {
   return false;
 };
 
-/**
- * Clean while(1); from json input
- * @param {string} input - stringified json object with while(1);
- * @return {string} stringified json object without while(1);
- */
-const CleanInput = (input) => input.slice(9);
-
-export { FetchConfigData, PostContextData, CheckServerStatus };
+export { FetchConfigData, PostContextData, PostDataFile, CheckServerStatus };
