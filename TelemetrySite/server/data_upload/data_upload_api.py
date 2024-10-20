@@ -30,6 +30,14 @@ class data_upload(MethodView):
         if self.file_type_check(file.filename):
             #Secure name for best practice
             filename = secure_filename(file.filename)
+
+            temp_file_name = filename
+            file_number = 1
+            #prevent files of same name
+            while(os.path.isfile(os.path.join(self.UPLOAD_FOLDER, temp_file_name))):     
+                temp_file_name = f"({file_number}) {filename}"
+                file_number+=1
+            filename=temp_file_name
             file.save(os.path.join(self.UPLOAD_FOLDER, filename))
             return jsonify({"message": "Data received successfully"}), 201
         else:

@@ -1,7 +1,16 @@
-import { Form, Input, Label, FormGroup, Button } from "reactstrap";
 import { useState } from "react";
 import "./DataUpload.css";
 import { PostDataFile } from "../ServerCall";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  CardBody,
+  Input,
+  Button,
+  Form,
+} from "reactstrap";
 
 function DataUpload() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -25,21 +34,25 @@ function DataUpload() {
       onSubmit={SubmitFile}
       encType='multipart/form-data'
     >
-      <center>
-        <div className='FileInputBox'>
-          <FormGroup className='FormGroup'>
-            <Label for='exampleFile'>File</Label>
-            <Input
-              className='FileInput'
-              id='dataFile'
-              name='file'
-              type='file'
-              onChange={HandleFileChange}
-            />
-          </FormGroup>
-        </div>
-      </center>
-      <Button type='submit'>Upload</Button>
+      <Container fluid className='outer-container'>
+        <Row className='inner-row'>
+          <Col md='6' lg='4'>
+            <Card className='upload-card'>
+              <CardBody className='text-center'>
+                <h4 className='mb-3'>Upload File</h4>
+                <Input
+                  type='file'
+                  className='file-input'
+                  onChange={HandleFileChange}
+                />
+                <Button color='primary' className='submit-btn'>
+                  Submit
+                </Button>
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
+      </Container>
     </Form>
   );
 }
