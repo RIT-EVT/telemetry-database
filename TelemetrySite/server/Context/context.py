@@ -26,6 +26,9 @@ class Context(MethodView):
      
         return jsonify(configData).get_data(as_text=True), 200
 
+    ## Post new context value to the db
+    #
+    #@return id value of context
     def post(self):
         # Get JSON data from the request
         data = request.get_json()
@@ -85,7 +88,8 @@ class Context(MethodView):
         #if the bike isn't a saved value
         if not bikeSaved:
             #create a new one
-            sqlBikeConfig = "INSERT into BikeConfig (id,  platformName, tirePressure, coolantVolume, configName, bmsConfigId, imuConfigId, tmuConfigId, tmsConfigId, pvcConfigId, mcConfigId) VALUES (DEFAULT,  %s, %s, %s, %s, %s," 
+            sqlBikeConfig = "INSERT into BikeConfig (id,  platformName, tirePressure, coolantVolume, configName,"
+            +"bmsConfigId, imuConfigId, tmuConfigId, tmsConfigId, pvcConfigId, mcConfigId) VALUES (DEFAULT,  %s, %s, %s, %s, %s," 
             #set imu and tmu to default as needed
             if hasIMU is True:
                 sqlBikeConfig+="%s, "
@@ -107,10 +111,10 @@ class Context(MethodView):
 
         sqlContext = "INSERT into Context (id, airTemp, humidity, windSpeed, windAngle, riderName, riderWeight, driverFeedback, distanceCovered, startTime, eventId, bikeConfigId) VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id"        
 
-        utils.exec_commit_with_id(sqlContext, self.DictToTuple(contextValue["MainBody"])+tuple(eventAndBikeId))
+        contextId=utils.exec_commit_with_id(sqlContext, self.DictToTuple(contextValue["MainBody"])+tuple(eventAndBikeId))
 
         # Respond back to the client. 201 code for created
-        return jsonify({"message": "Data received successfully", "received": data}), 201
+        return jsonify({"success": True, "contextID":contextId}), 201
     
 
     def put(self):

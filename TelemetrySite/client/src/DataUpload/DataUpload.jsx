@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./DataUpload.css";
-import { PostDataFile } from "../ServerCall";
+import { PostDataFile, FetchData } from "../ServerCall";
 import {
   Container,
   Row,
@@ -11,9 +11,11 @@ import {
   Button,
   Form,
 } from "reactstrap";
+import { useParams } from "react-router-dom";
 
 function DataUpload() {
   const [selectedFile, setSelectedFile] = useState(null);
+  const { contextID } = useParams();
 
   const HandleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
@@ -21,8 +23,9 @@ function DataUpload() {
 
   const SubmitFile = (event) => {
     event.preventDefault(); // Prevent page reload
+
     if (selectedFile) {
-      PostDataFile(selectedFile);
+      PostDataFile(selectedFile, contextID);
     } else {
       console.error("No file selected.");
     }

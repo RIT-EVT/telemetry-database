@@ -42,6 +42,7 @@ const FetchConfigData = async () => {
  * Send the given data to the backend
  *
  * @param {Object} postData - data to post to the backend. Formatted as an object
+ * @return {Object} - response from server
  */
 const PostContextData = async (postData) => {
   await CheckData();
@@ -58,7 +59,9 @@ const PostContextData = async (postData) => {
     if (!response.ok) {
       return false;
     }
-    return true;
+    const jsonResponse = await response.json();
+
+    return jsonResponse;
   } catch (error) {
     return false;
   }
@@ -68,14 +71,22 @@ const PostContextData = async (postData) => {
 /* ---------------------------- Data Upload Calls --------------------------- */
 /* -------------------------------------------------------------------------- */
 
-const PostDataFile = async (file) => {
+const PostDataFile = async (file, contextID) => {
   await CheckData();
 
   const formData = new FormData();
   formData.append("file", file);
-  const response = await fetch(BASE_URL + ServerCalls["data_upload"], {
+  formData.append("contextID", contextID);
+
+  fetch(BASE_URL + ServerCalls["data_upload"], {
     method: "POST",
-    body: formData, // Don't set Content-Type
+    body: formData,
+  });
+};
+
+const FetchData = async () => {
+  await fetch(BASE_URL + ServerCalls["data_upload"], {
+    method: "GET",
   });
 };
 
@@ -121,4 +132,10 @@ const CheckData = async () => {
   return false;
 };
 
-export { FetchConfigData, PostContextData, PostDataFile, CheckServerStatus };
+export {
+  FetchConfigData,
+  PostContextData,
+  PostDataFile,
+  FetchData,
+  CheckServerStatus,
+};

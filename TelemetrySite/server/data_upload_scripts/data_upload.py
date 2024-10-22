@@ -4,13 +4,13 @@ import psycopg2
 import json
 import os
 from tqdm import tqdm
-import utils
+from utils import connect, exec_commit_many
+
 
 """@package docstring
 This file converts .mf4 files to .csv files and then uploads them to the database
 """
 configFilePath = "boardConfig.json"
-expectedIdIndex = 1
 
 tpdoDictionary = {
     "TPDO0"     : 0x180,
@@ -51,35 +51,36 @@ nodeIDDictionary = {
 
 ##Converts .mf4 files to .csv files. There are 7 channel groups created in this conversion. We currently only use number 7.
 #This fact will be hard coded into this process as I do not forsee a world where our Mech-E team ever uses another channel.
-def file_convert():
-    print("MF4 file path:")
-    file = input().lower()
+def file_convert(file, config_id):
+    
+    file=file.lower()
     files = []
     if(bool(re.search(".mf4$", file))):
         mdf = MDF(file)
         file = file.strip(".mf4")
         mdf.export(fmt='csv', filename= file+'.csv')
         # This is the location of the hard coding of the files we care about. To change this remove the line below and uncomment the for loop.
-        files.append(file+'.ChannelGroup_' + str(7) + '.csv')
-        # for x in range (0, 8): 
-        #     files.append(file+'.ChannelGroup_' + str(x) + '.csv')
-        #     with open(file+'.ChannelGroup_' + str(x) + '.csv') as f:
-        #         first_line = f.readline()
+        #files.append(file+'.ChannelGroup_' + str(7) + '.csv')
+        for x in range (0, 9): 
+            files.append(file+'.ChannelGroup_' + str(x) + '.csv')
+            with open(file+'.ChannelGroup_' + str(x) + '.csv') as f:
+                first_line = f.readline()
     else:
         print("You fool; thats not a valid file! The file must be an mf4")
-    handle_data(files)
+    handle_data(files, config_id)
 
 
 ## Streams data into the DB 
 #
 # @param files The paths to the array of files being processed
-def handle_data(files):
-    conn = utils.connect()
+def handle_data(files, config_id):
+    conn = connect()
     cur = conn.cursor()
     for file in files:
         dataToExecuteMany = []
         with open(file) as open_file:
             # Used to skip the first line of the file which is string values to indicate the values in the can message
+            print(open_file)
             firstLine = open_file.readline()
             counter = 0
             # Creates the loading bar. Value displayed represents the number of lines handled
@@ -87,12 +88,11 @@ def handle_data(files):
                 counter += 1
                 canMessageArr = line.split(',')
                 formattedArray = format_data_bytes(canMessageArr[6])
-                dataToExecuteMany.append((canMessageArr[1], canMessageArr[2], formattedArray, canMessageArr[0], expectedIdIndex))
-                # Currently hard coding the contextId input because there is only one (dummy) contextId
+                dataToExecuteMany.append((canMessageArr[1], canMessageArr[2], formattedArray, canMessageArr[0], config_id))
                 if(counter % 1000 == 0):
                     sql = "INSERT into canmessage (ID, busId, frameId, dataBytes, receiveTime, contextId) VALUES (DEFAULT, %s, %s, %s, %s, %s)"
                     try:
-                        utils.exec_commit_many(sql, dataToExecuteMany)
+                        exec_commit_many(sql, dataToExecuteMany)
                         dataToExecuteMany = []
                     except(TimeoutError):
                         print(len(dataToExecuteMany))
@@ -101,8 +101,18 @@ def handle_data(files):
                 cur.executemany(sql, dataToExecuteMany)
             except(TimeoutError):
                 print(len(dataToExecuteMany))
+        
+
+            
     conn.commit()
     conn.close()
+    print(files)
+    for file in files:
+        try:
+            os.remove(file)
+        except:
+            print("where tf did Group_7 go")
+        
 
 
 ## Formats the data bytes into a format the DB can handle as an array
@@ -120,8 +130,3 @@ def format_data_bytes(bytes):
     closeBracket = re.sub('\]+', '}', openBracket)
     # Sample data after regex: {6,0,0,0,32,161,7,0}
     return(closeBracket)
-
-
-
-
-

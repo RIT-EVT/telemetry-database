@@ -2,7 +2,7 @@ import psycopg2
 import dotenv
 import json
 import os
-import utils
+from ..utils import connect, exec_get_all
 from tqdm import tqdm
 from psycopg2.sql import Identifier, SQL
 
@@ -91,7 +91,7 @@ def handle_data(can_data):
 # @param recieveTime the timestamp of the data as a decimal value
 # @param context_id the context in which the data is being recorded
 def upload_organized(tpdo_config, data_bytes, receive_time, context_id):
-    conn = utils.connect()
+    conn = connect()
     cur = conn.cursor()
     binary_data_string = ""
     # Convert the bytes into a binary string (This makes it 8x biigger than before!)
@@ -176,5 +176,5 @@ def handle_bms_config(config, board_owner, cob_id):
 # @context_id The context shared by the data which needs to be organized
 def organize_can_from_db(context_id):
     sql = "SELECT id, busId, frameid, databytes, receivetime, contextid FROM CANMESSAGE WHERE contextid = %s"
-    can_data = utils.exec_get_all(sql, (context_id,))
+    can_data = exec_get_all(sql, (context_id,))
     handle_data(can_data)

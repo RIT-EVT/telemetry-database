@@ -326,10 +326,10 @@ function ContextForm() {
     }
 
     PostContextData(collectedData).then((result) => {
-      if (result) {
+      if (result["success"]) {
         document.getElementById(FormId).reset();
         //switch to new screen
-        navigate("/DataUpload");
+        navigate("/DataUpload/" + result["contextID"]);
       } else {
         throw new Error("An error has occurred while submitting data");
       }
