@@ -68,6 +68,8 @@ def file_convert(file, config_id):
     else:
         print("You fool; thats not a valid file! The file must be an mf4")
     handle_data(files, config_id)
+    #remove the mf4 file
+    os.remove(file)
 
 
 ## Streams data into the DB 
@@ -107,11 +109,11 @@ def handle_data(files, config_id):
     conn.commit()
     conn.close()
     print(files)
+    #remove csv files from folder
     for file in files:
-        try:
-            os.remove(file)
-        except:
-            print("where tf did Group_7 go")
+        os.remove(file)
+
+        
         
 
 
