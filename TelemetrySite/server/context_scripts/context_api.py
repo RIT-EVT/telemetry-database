@@ -3,7 +3,7 @@ from flask.views import MethodView
 import utils
 
 
-class Context(MethodView):
+class context_api(MethodView):
     configNames = ("bmsConfig", "imuConfig", "tmuConfig", "tmsConfig", "pvcConfig", "mcConfig")
     configShort = ("bms", "imu", "tmu", "tms", "pvc", "mc")
 
@@ -46,6 +46,8 @@ class Context(MethodView):
         # Check if data was received
         if not data:
             return jsonify({"error": "No data provided"}), 400
+        elif not "Context" in data:
+            return jsonify({"error": "No context data passed"}), 400
         #Get the important piece of the data
         contextValue = data["Context"]
 

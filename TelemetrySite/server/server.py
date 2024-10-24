@@ -4,7 +4,7 @@ from flask_cors import CORS
 import utils
 import dotenv 
 import json
-from Context.context import Context
+from TelemetrySite.server.context_scripts.context_api import context_api
 from data_upload_scripts.data_upload_api import data_upload_api
 
 import os
@@ -17,7 +17,7 @@ api = Api(app)  # API router
 CORS(app)
     
 #create views for url rules
-user_view = Context.as_view('context_api')
+user_view = context_api.as_view('context_api')
 app.add_url_rule('/Context', view_func=user_view, methods=['GET', 'PUT', 'DELETE', 'POST'])
 user_view=data_upload_api.as_view('data_upload_api')
 app.add_url_rule('/DataUpload', view_func=user_view, methods=['GET', 'PUT', 'DELETE', 'POST'])

@@ -16,8 +16,7 @@ class data_upload_api(MethodView):
                 os.makedirs(self.UPLOAD_FOLDER)
 
     def get(self):
-        sql = "select contextid from canmessage"
-        print(exec_get_all(sql))
+        
         return jsonify(["Reading data"]), 200
     
     def post(self):
