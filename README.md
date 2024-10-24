@@ -55,7 +55,7 @@ As we do not have means to collect context data yet, we use a dummy context with
 
 ## Web UI 
 
-This react-strap based website is responsible for gathering all context and data relating to the bikes and all events<br>
+This react-strap-based website allows users to input context and configuration information and to upload CAN data files.<br>
 
 Ideally, MECE's will just download the files and run it on their computer. This includes running both the website and backend api that goes along with it.<br>
 
@@ -63,7 +63,7 @@ In the future, I hope to host at least the backend restful api, and eventually t
 
 ## RESTful API
 
-The RESTful API is built off python using Flask. <br>
+The RESTful API is built with Python using Flask. <br>
 
 Someday, this will be hosted on a central server, but for now it runs locally. To run this application, see directions below under **Running the Server**. <br>
 
@@ -87,7 +87,7 @@ Also run `npm install react` and `npm install reactstrap`
 In the terminal, `cd` into the `~...\Telemetry-Database\TelemetrySite\client` folder and run the command `npm install`. <br>
 
 Once that has finished running, run the command `npm start`. <br>
- If your website didn't start, check that you are in the correct folder and you installed Node JS. <br>
+If your website didn't start, check that you are in the correct folder and you installed Node JS. <br>
 
 After your sever is online, make sure you keep that terminal open. **Closing that terminal for any reason will kill your website**.<br>
 
