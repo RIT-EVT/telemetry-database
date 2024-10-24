@@ -55,7 +55,7 @@ As we do not have means to collect context data yet, we use a dummy context with
 
 ## Web UI 
 
-This react-strap based website is responsible for gathering all context and data relating to the bikes and all events<br>
+This react-strap-based website allows users to input context and configuration information and to upload CAN data files.<br>
 
 Ideally, MECE's will just download the files and run it on their computer. This includes running both the website and backend api that goes along with it.<br>
 
