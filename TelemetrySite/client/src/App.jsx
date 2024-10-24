@@ -1,6 +1,5 @@
 import { Route, Routes, BrowserRouter as Router } from "react-router-dom";
-import ContextForm from "./contextForm/ContextForm"; // Import other components
-import DataUpload from "./DataUpload/DataUpload";
+import ContextForm from "./ContextForm/ContextForm"; // Import other components
 import "./App.css";
 import Page404 from "./404/404";
 import { CheckServerStatus } from "./ServerCall";
