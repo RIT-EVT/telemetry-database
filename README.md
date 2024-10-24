@@ -87,7 +87,7 @@ Also run `npm install react` and `npm install reactstrap`
 In the terminal, `cd` into the `~...\Telemetry-Database\TelemetrySite\client` folder and run the command `npm install`. <br>
 
 Once that has finished running, run the command `npm start`. <br>
- If your website didn't start, check that you are in the correct folder and you installed Node JS. <br>
+If your website didn't start, check that you are in the correct folder and you installed Node JS. <br>
 
 After your sever is online, make sure you keep that terminal open. **Closing that terminal for any reason will kill your website**.<br>
 
