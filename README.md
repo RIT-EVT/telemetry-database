@@ -63,7 +63,7 @@ In the future, I hope to host at least the backend restful api, and eventually t
 
 ## RESTful API
 
-The RESTful API is built off python using Flask. <br>
+The RESTful API is built with Python using Flask. <br>
 
 Someday, this will be hosted on a central server, but for now it runs locally. To run this application, see directions below under **Running the Server**. <br>
 
