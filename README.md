@@ -78,15 +78,23 @@ The first step is to install Node JS if you do not already have it installed.<br
 1. Follow the download instructions found here [Node JS](https://nodejs.org/en/download/package-manager)
 2. Verify download by running `npm --version` or `node -v`<br>
 
-After Node JS has been installed, clone this repo onto your computer. If you have installed, open the project in VS Code. If you don't have in installed, just follow along in the command window. <br>
+After Node JS has been installed, clone this repo onto your computer. <br>
 
-Also run `npm install react` and `npm install reactstrap`
+Open your command terminal and 'cd' into the desired folder location and run the following commands <br>
+
+`git clone https://github.com/RIT-EVT/telemetry-database.git` <br>
+`npm install react`<br>
+`npm install reactstrap` <br>
+
+If you have it installed, you can use VS Code to open the project. If you don't have it installed, just follow along in the command window. <br>
 
 #### **Running the Website**
 
-In the terminal, `cd` into the `~...\Telemetry-Database\TelemetrySite\client` folder and run the command `npm install`. <br>
+In the terminal, `cd` into the `~...\Telemetry-Database\TelemetrySite\client` folder. Once there, run the following commands: <br>
 
-Once that has finished running, run the command `npm start`. <br>
+`npm install`<br>
+`npm start` <br>
+
 If your website didn't start, check that you are in the correct folder and you installed Node JS. <br>
 
 After your sever is online, make sure you keep that terminal open. **Closing that terminal for any reason will kill your website**.<br>
@@ -94,7 +102,7 @@ After your sever is online, make sure you keep that terminal open. **Closing tha
 #### **Running the Server**
 
 Open a new terminal and `cd` into the `~...\Telemetry-Database` folder. <br>
-Run the command `pip instal -r requirements.txt`. <br>
+Run the command `pip install -r requirements.txt`. <br>
 
 If `pip` isn't being recognized, run `python -V`. If python isn't recognized, download the installer here [Python](https://www.python.org/downloads/). Python should add itself as environmental variable automatically, but you may need to click **Add As Environmental Variable** on the last page before you close the installer.<br>
 
@@ -108,10 +116,5 @@ Once they have sent it to you, place it in the `~...\Telemetry-Database` folder 
 
 > **WARNING**
 
->**.env files should never be shared or the contents sent anywhere without the Firmware Team's permission**
-
-
-
-
-
-
+>**.env files should never be shared or the contents sent anywhere without the Firmware Team's permission** <br>
+>**DO NOT ADD credentials.env TO GIT**

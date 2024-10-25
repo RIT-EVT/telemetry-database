@@ -93,11 +93,4 @@ const CheckData = async () => {
   return false;
 };
 
-/**
- * Clean while(1); from json input
- * @param {string} input - stringified json object with while(1);
- * @return {string} stringified json object without while(1);
- */
-const CleanInput = (input) => input.slice(9);
-
 export { FetchConfigData, PostContextData, CheckServerStatus };
