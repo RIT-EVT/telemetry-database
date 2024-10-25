@@ -1,4 +1,5 @@
 {
     "context": "/Context",
-    "data_upload": "/DataUpload"
+    "data_upload": "/DataUpload",
+    "event_data": "/Event"
 }

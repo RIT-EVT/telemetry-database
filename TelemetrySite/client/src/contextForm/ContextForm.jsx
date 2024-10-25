@@ -10,7 +10,7 @@
 import { Form, FormGroup, Label, Input, Button } from "reactstrap";
 import { useEffect, useState } from "react";
 
-import { FetchConfigData, PostContextData } from "ServerCall.jsx";
+import { FetchConfigData, PostContextData } from "ServerCall/ServerCall.jsx";
 
 import "./ContextForm.css";
 

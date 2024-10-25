@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./DataUpload.css";
-import { PostDataFile, FetchData } from "../ServerCall";
+import { PostDataFile, FetchData } from "../ServerCall/ServerCall";
 import {
   Container,
   Row,

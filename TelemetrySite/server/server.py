@@ -6,6 +6,7 @@ import dotenv
 import json
 from context_scripts.context_api import context_api
 from data_upload_scripts.data_upload_api import data_upload_api
+from event_api_scripts.event_api import event_api
 
 import os
 
@@ -22,6 +23,8 @@ user_view = data_upload_api.as_view("data_upload_api")
 app.add_url_rule(
     "/DataUpload", view_func=user_view, methods=["GET", "PUT", "DELETE", "POST"]
 )
+user_view = event_api.as_view("event_api")
+app.add_url_rule("/Event", view_func=user_view, methods=["GET"])
 
 
 ## Get all the url paths

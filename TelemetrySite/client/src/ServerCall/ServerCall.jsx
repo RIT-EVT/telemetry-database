@@ -68,6 +68,31 @@ const PostContextData = async (postData) => {
 };
 
 /* -------------------------------------------------------------------------- */
+/* ---------------------------- Event Data Calls ---------------------------- */
+/* -------------------------------------------------------------------------- */
+
+const FetchEventData = async (searchContextId) => {
+  await CheckData();
+  const contextIdJson = { contextId: searchContextId };
+  try {
+    const response = await fetch(BASE_URL + ServerCalls["event_data"], {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(contextIdJson), // Convert the data to JSON
+    });
+
+    const jsonResponse = await response.json(); // await here
+
+    return jsonResponse;
+  } catch (error) {
+    throw new Error(
+      "Error has occurred while fetching config data: " + error.message
+    );
+  }
+};
+
+/* -------------------------------------------------------------------------- */
 /* ---------------------------- Data Upload Calls --------------------------- */
 /* -------------------------------------------------------------------------- */
 
@@ -129,7 +154,7 @@ const CheckData = async () => {
       return true;
     });
   }
-  return false;
+  return true;
 };
 
 export {
@@ -138,4 +163,5 @@ export {
   PostDataFile,
   FetchData,
   CheckServerStatus,
+  FetchEventData,
 };

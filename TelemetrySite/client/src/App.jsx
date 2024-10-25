@@ -3,7 +3,7 @@ import ContextForm from "./ContextForm/ContextForm"; // Import other components
 import DataUpload from "./DataUpload/DataUpload";
 import "./App.css";
 import Page404 from "./404/404";
-import { CheckServerStatus } from "./ServerCall";
+import { CheckServerStatus } from "./ServerCall/ServerCall";
 import { useEffect, useState } from "react";
 
 function App() {
