@@ -1,18 +1,16 @@
 /**
- * EHughes
- * 2024
  *
- * Create form elements for each of the needed context
- * forms
+ * Create form elements for each of the needed context forms
  *
- * Submit data entered by user to the backend
- * server
+ * Submit data entered by user to the backend server
+ *
+ * Forward user to data upload page with context id
  */
 
 import { Form, FormGroup, Label, Input, Button } from "reactstrap";
 import { useEffect, useState } from "react";
 
-import { FetchConfigData, PostContextData } from "../ServerCall";
+import { FetchConfigData, PostContextData } from "ServerCall.jsx";
 
 import "./ContextForm.css";
 
@@ -86,13 +84,12 @@ function ContextForm() {
   //which config selects are optional
   let RequiredSelects = {
     bmsConfig: true,
-    tmsConfig: false,
+    tmsConfig: true,
     imuConfig: false,
-    tmuConfig: true,
+    tmuConfig: false,
     pvcConfig: true,
     mcConfig: true,
   };
-
   let FormId = "ContextForm";
 
   let navigate = useNavigate();
@@ -101,9 +98,9 @@ function ContextForm() {
   /* -------------------------------------------------------------------------- */
 
   /**
-   * When a select field for the config forms updates
-   * Call here and assign update the UseState hook to
-   * the new value
+   * When a select field for the config forms updates,
+   * pass the new value here to update the useState hook
+   * and rerender effected components
    *
    * @param {string} configName - Name of config to update
    * @param {string} value - New value of select field
@@ -114,16 +111,16 @@ function ContextForm() {
 
   /**
    * Whenever the select field on a config form changes
-   * check if it is Custom. If its is display form elements.
-   * Else set form object to null
+   * check if it is Custom. If it is, display form elements.
+   * Else, set form object to null
    *
-   * @param {Event} event - Event that occurred
-   * @param {string} configName - Name of the config to update
+   * @param {formElement.event} event - event that occurred to the select element
+   * @param {string} configName - name of config being updated
    */
   const handleConfigFormChange = (event, configName) => {
     const value = event.target.value;
     //handle the bike differently from the configs
-    if (configName != "bike") {
+    if (configName !== "bike") {
       handleConfigSelectChange(configName, value);
       if (value === "Custom") {
         const formElement = GenerateFormElement(`${configName}Config`);
@@ -316,11 +313,13 @@ function ContextForm() {
           }
         });
       } else {
-        //collect the config name and check for a duplicates
+        //collect the config name and check for a duplicate
         const element = document.getElementById("bikeSelect").value;
         collectedData.Context[key]["selected"] = element; // Collect the value from the form element
+
         if (dropDownOptions["bike"].some((element) => element[0] === element)) {
           console.error(`Duplicate save name detected in bike config`);
+          return;
         }
       }
     }
@@ -357,7 +356,7 @@ function ContextForm() {
     setDropDowns((prev) => ({ ...prev, ["bike"]: bikeDrop }));
 
     UpdateEventForm(GenerateFormElement("Event"));
-  }, [dropDownOptions]);
+  }, [dropDownOptions, ConfigName]);
   /**
    * Fetch all the saved configs on the first load
    */
@@ -382,7 +381,7 @@ function ContextForm() {
         setFormElements((prev) => ({ ...prev, [configName]: null }));
       }
     });
-  }, [configSelects]);
+  }, [configSelects, ConfigName]);
 
   /* -------------------------------------------------------------------------- */
   /* ---------------------------- Return Final Form --------------------------- */

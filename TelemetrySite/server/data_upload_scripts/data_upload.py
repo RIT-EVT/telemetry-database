@@ -13,66 +13,66 @@ This file converts .mf4 files to .csv files and then uploads them to the databas
 configFilePath = "boardConfig.json"
 
 tpdoDictionary = {
-    "TPDO0"     : 0x180,
+    "TPDO0": 0x180,
     "DEADZONE_1": 0x200,
-    "TPDO1"     : 0x280,
+    "TPDO1": 0x280,
     "DEADZONE_2": 0x300,
-    "TPDO2"     : 0x380,
+    "TPDO2": 0x380,
     "DEADZONE_3": 0x400,
-    "TPDO3"     : 0x480,
+    "TPDO3": 0x480,
     "DEADZONE_4": 0x500,
-    "MAX_VAL"   : 0x580 
+    "MAX_VAL": 0x580,
 }
 
 nodeIDDictionary = {
-    "1" : "Motor Controller",
-    "7" : "TMU",
-    "8" : "TMS",
-    "9" : "IMU",
-    "10" : "PVC",
-    "11" : "HUDL",
-    "12" : "TPMS",
-    "13" : "APM",
-    "16" : "Charge Controller",
-    "20" : "BMS1A",
-    "21" : "BMS1B",
-    "22" : "BMS2A",
-    "23" : "BMS2B",
-    "24" : "BMS3A",
-    "25" : "BMS3B",
-    "30" : "BMS1AV",
-    "31" : "BMS1BV",
-    "32" : "BMS2AV",
-    "33" : "BMS2BV",
-    "34" : "BMS3AV",
-    "35" : "BMS3BV",
+    "1": "Motor Controller",
+    "7": "TMU",
+    "8": "TMS",
+    "9": "IMU",
+    "10": "PVC",
+    "11": "HUDL",
+    "12": "TPMS",
+    "13": "APM",
+    "16": "Charge Controller",
+    "20": "BMS1A",
+    "21": "BMS1B",
+    "22": "BMS2A",
+    "23": "BMS2B",
+    "24": "BMS3A",
+    "25": "BMS3B",
+    "30": "BMS1AV",
+    "31": "BMS1BV",
+    "32": "BMS2AV",
+    "33": "BMS2BV",
+    "34": "BMS3AV",
+    "35": "BMS3BV",
 }
 
 
 ##Converts .mf4 files to .csv files. There are 7 channel groups created in this conversion. We currently only use number 7.
-#This fact will be hard coded into this process as I do not forsee a world where our Mech-E team ever uses another channel.
+# This fact will be hard coded into this process as I do not forsee a world where our Mech-E team ever uses another channel.
 def file_convert(file, config_id):
-    
-    file=file.lower()
+
+    file = file.lower()
     files = []
-    if(bool(re.search(".mf4$", file))):
+    if bool(re.search(".mf4$", file)):
         mdf = MDF(file)
         file = file.strip(".mf4")
-        mdf.export(fmt='csv', filename= file+'.csv')
+        mdf.export(fmt="csv", filename=file + ".csv")
         # This is the location of the hard coding of the files we care about. To change this remove the line below and uncomment the for loop.
-        #files.append(file+'.ChannelGroup_' + str(7) + '.csv')
-        for x in range (0, 9): 
-            files.append(file+'.ChannelGroup_' + str(x) + '.csv')
-            with open(file+'.ChannelGroup_' + str(x) + '.csv') as f:
+        # files.append(file+'.ChannelGroup_' + str(7) + '.csv')
+        for x in range(0, 9):
+            files.append(file + ".ChannelGroup_" + str(x) + ".csv")
+            with open(file + ".ChannelGroup_" + str(x) + ".csv") as f:
                 first_line = f.readline()
     else:
         print("You fool; thats not a valid file! The file must be an mf4")
     handle_data(files, config_id)
-    #remove the mf4 file
+    # remove the mf4 file
     os.remove(file)
 
 
-## Streams data into the DB 
+## Streams data into the DB
 #
 # @param files The paths to the array of files being processed
 def handle_data(files, config_id):
@@ -88,33 +88,36 @@ def handle_data(files, config_id):
             # Creates the loading bar. Value displayed represents the number of lines handled
             for line in tqdm(open_file):
                 counter += 1
-                canMessageArr = line.split(',')
+                canMessageArr = line.split(",")
                 formattedArray = format_data_bytes(canMessageArr[6])
-                dataToExecuteMany.append((canMessageArr[1], canMessageArr[2], formattedArray, canMessageArr[0], config_id))
-                if(counter % 1000 == 0):
+                dataToExecuteMany.append(
+                    (
+                        canMessageArr[1],
+                        canMessageArr[2],
+                        formattedArray,
+                        canMessageArr[0],
+                        config_id,
+                    )
+                )
+                if counter % 1000 == 0:
                     sql = "INSERT into canmessage (ID, busId, frameId, dataBytes, receiveTime, contextId) VALUES (DEFAULT, %s, %s, %s, %s, %s)"
                     try:
                         exec_commit_many(sql, dataToExecuteMany)
                         dataToExecuteMany = []
-                    except(TimeoutError):
+                    except TimeoutError:
                         print(len(dataToExecuteMany))
             sql = "INSERT into canmessage (ID, busId, frameId, dataBytes, receiveTime, contextId) VALUES (DEFAULT, %s, %s, %s, %s, %s)"
             try:
                 cur.executemany(sql, dataToExecuteMany)
-            except(TimeoutError):
+            except TimeoutError:
                 print(len(dataToExecuteMany))
-        
 
-            
     conn.commit()
     conn.close()
     print(files)
-    #remove csv files from folder
+    # remove csv files from folder
     for file in files:
         os.remove(file)
-
-        
-        
 
 
 ## Formats the data bytes into a format the DB can handle as an array
@@ -123,12 +126,12 @@ def handle_data(files, config_id):
 def format_data_bytes(bytes):
     # Sample data before regex: [  6   0   0   0  32 161   7   0]
     # Match and replace all characters until the first digit
-    exposedDigit = re.sub('^[\[\s]*', "", bytes)
+    exposedDigit = re.sub("^[\[\s]*", "", bytes)
     # Replace all spaces with commas
-    spaceless = re.sub('\s+', ',', exposedDigit)
+    spaceless = re.sub("\s+", ",", exposedDigit)
     # Add the '{'
     openBracket = "{" + spaceless
     # Replace all ']' with '}' (Should only be one)
-    closeBracket = re.sub('\]+', '}', openBracket)
+    closeBracket = re.sub("\]+", "}", openBracket)
     # Sample data after regex: {6,0,0,0,32,161,7,0}
-    return(closeBracket)
+    return closeBracket
