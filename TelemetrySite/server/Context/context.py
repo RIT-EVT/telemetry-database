@@ -89,7 +89,7 @@ class Context(MethodView):
                     )
                 else:
                     # execute a query to find the id where the name is the same as the passed name
-                    query = f"SELECT id FROM {self.configNames[index]} WHERE configName = '{currentConfigData["selected"]}'"
+                    query = f"SELECT id FROM {self.configNames[index]} WHERE configName = %s"
 
                     if currentConfigData["selected"] == "":
                         if index == 1:
@@ -101,7 +101,7 @@ class Context(MethodView):
                         utils.exec_get_one(
                             query,
                             [
-                                0,
+                                currentConfigData["selected"],
                             ],
                         )[0]
                     )

@@ -21,7 +21,7 @@ const FetchConfigData = async () => {
     const response = await fetch(BASE_URL + ServerCalls["context"]);
 
     if (!response.ok) {
-      throw new Error("Network response was not ok: " + response.statusText);
+      console.error("Network response was not ok: " + response.statusText);
     }
 
     const jsonResponse = await response.json(); // await here
