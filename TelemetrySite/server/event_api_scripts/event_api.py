@@ -6,17 +6,21 @@ import utils
 
 class event_api(MethodView):
 
-    def get(self):
-        jsonData = request.get_json()
+    def get(self, contextId):
 
-        if not jsonData:
-            return jsonify({"error": "No data"}), 400
-        elif not "contextId" in jsonData:
-            return jsonify({"error": "No context id"}), 400
+        sql_getEventId = "SELECT eventID FROM Context WHERE id = %s"
 
-        contextId = jsonData["contextId"]
-        sqlCommand = "SELECT eventID FROM Context WHERE id = %s"
+        eventId = utils.exec_get_one(sql_getEventId, (contextId,))[0]
 
-        print(utils.exec_get_one(sqlCommand, (contextId,)))
+        sql_getEventData = "SELECT * FROM event WHERE id = %s"
 
-        return jsonify({"Data": ""})
+        eventData = utils.exec_get_one(sql_getEventData, (eventId,))
+
+        return jsonify(
+            {
+                "id": eventData[0],
+                "date": eventData[1],
+                "eventType": eventData[2],
+                "location": eventData[3],
+            }
+        )

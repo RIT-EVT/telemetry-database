@@ -1,6 +1,7 @@
 from flask import request, jsonify
 from flask.views import MethodView
 import utils
+from psycopg2.sql import Identifier, SQL
 
 
 class context_api(MethodView):
@@ -36,13 +37,16 @@ class context_api(MethodView):
         # can't use the %s for table names
 
         for i in range(0, len(self.savedConfigs)):
-            sqlCommand = f"SELECT configName FROM {self.savedConfigs[i]}"
-            configData[self.savedConfigsShort[i]] = utils.exec_get_all(
-                sqlCommand,
-                [
-                    0,
-                ],
-            )
+            format_array = [Identifier(self.savedConfigs[i].lower())]
+
+            conn = utils.connect()
+            cur = conn.cursor()
+            # manually search and select all configNames
+            cur.execute(SQL("SELECT configName FROM {}").format(*format_array))
+            # Fetch all results and store them in configData
+            configData[self.savedConfigsShort[i]] = [row[0] for row in cur.fetchall()]
+            conn.commit()
+            conn.close()
 
         return jsonify(configData).get_data(as_text=True), 200
 
@@ -93,8 +97,6 @@ class context_api(MethodView):
                         )[0][0]
                     )
                 else:
-                    # execute a query to find the id where the name is the same as the passed name
-                    query = f"SELECT id FROM {self.configNames[index]} WHERE configName = '{currentConfigData["selected"]}'"
 
                     if currentConfigData["selected"] == "":
                         if index == 1:
@@ -102,30 +104,43 @@ class context_api(MethodView):
                         else:
                             hasTMU = False
                         continue
-                    idBikeConfig.append(
-                        utils.exec_get_one(
-                            query,
-                            [
-                                0,
-                            ],
-                        )[0]
+
+                    # execute a query to find the id where the name is the same as the passed name
+                    format_array = [Identifier(self.configNames[index].lower())]
+                    conn = utils.connect()
+                    cur = conn.cursor()
+                    config_name = [currentConfigData["selected"]]
+
+                    cur.execute(
+                        SQL("SELECT id FROM {} WHERE configName = %s").format(
+                            *format_array
+                        ),
+                        (*config_name,),
                     )
+                    idBikeConfig.append(cur.fetchone()[0])
+
+                    conn.commit()
+                    conn.close()
+
         # establish sql commands for all non event, bike, and context configs
         # save the event and bike ids for to reference in the context db
+        if not "eventID" in contextValue["Event"]:
+            sqlEvent = "INSERT into Event (id, eventDate, eventType, location) VALUES (DEFAULT, %s, %s, %s) RETURNING id"
 
-        sqlEvent = "INSERT into Event (id, eventDate, eventType, location) VALUES (DEFAULT, %s, %s, %s) RETURNING id"
+            eventAndBikeId.append(
+                utils.exec_commit_with_id(
+                    sqlEvent, self.DictToTuple(contextValue["Event"])
+                )[0][0]
+            )
+        else:
 
-        eventAndBikeId.append(
-            utils.exec_commit_with_id(
-                sqlEvent, self.DictToTuple(contextValue["Event"])
-            )[0][0]
-        )
+            eventAndBikeId.append(contextValue["Event"]["eventID"])
 
         # if the bike isn't a saved value
         if not bikeSaved:
             # create a new one
-            sqlBikeConfig = "INSERT into BikeConfig (id,  platformName, tirePressure, coolantVolume, configName,"
-            +"bmsConfigId, imuConfigId, tmuConfigId, tmsConfigId, pvcConfigId, mcConfigId) VALUES (DEFAULT,  %s, %s, %s, %s, %s,"
+            sqlBikeConfig = """INSERT into BikeConfig (id,  platformName, tirePressure, coolantVolume, configName,
+            bmsConfigId, imuConfigId, tmuConfigId, tmsConfigId, pvcConfigId, mcConfigId) VALUES (DEFAULT,  %s, %s, %s, %s, %s,"""
             # set imu and tmu to default as needed
             if hasIMU is True:
                 sqlBikeConfig += "%s, "
@@ -147,12 +162,12 @@ class context_api(MethodView):
 
         else:
             # if it is saved, get the id
-            sqlCommand = f"SELECT id from BikeConfig WHERE configName = '{contextValue["BikeConfig"]["selected"]}'"
+            sqlCommand = "SELECT id from BikeConfig WHERE configName = %s"
             eventAndBikeId.append(
                 utils.exec_get_one(
                     sqlCommand,
                     [
-                        0,
+                        contextValue["BikeConfig"]["selected"],
                     ],
                 )[0]
             )
@@ -169,7 +184,10 @@ class context_api(MethodView):
         )
 
         # Respond back to the client. 201 code for created
-        return jsonify({"message": "Data received successfully", "received": data}), 201
+        return (
+            jsonify({"success": True, "contextID": contextId}),
+            201,
+        )
 
     def put(self):
 

@@ -24,7 +24,7 @@ app.add_url_rule(
     "/DataUpload", view_func=user_view, methods=["GET", "PUT", "DELETE", "POST"]
 )
 user_view = event_api.as_view("event_api")
-app.add_url_rule("/Event", view_func=user_view, methods=["GET"])
+app.add_url_rule("/Event/<contextId>", view_func=user_view, methods=["GET"])
 
 
 ## Get all the url paths

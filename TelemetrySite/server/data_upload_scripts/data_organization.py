@@ -2,7 +2,7 @@ import psycopg2
 import dotenv
 import json
 import os
-from ..utils import connect, exec_get_all
+from utils import connect, exec_get_all
 from tqdm import tqdm
 from psycopg2.sql import Identifier, SQL
 

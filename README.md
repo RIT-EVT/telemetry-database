@@ -75,10 +75,25 @@ For any future developers, standard practices should be followed when building t
 #### Node JS
 The first step is to install Node JS if you do not already have it installed.<br>
 
-1. Follow the download instructions found here [Node JS](https://nodejs.org/en/download/package-manager)
-2. Verify download by running `npm --version` or `node -v`<br>
+For Windows computers, execute the following commands:
 
-After Node JS has been installed, clone this repo onto your computer. <br>
+`winget install Schniz.fnm`<br>
+You will need to close and reopen your terminal before executing the rest<br>
+`fnm env --use-on-cd | Out-String | Invoke-Expression`<br>
+`fnm use --install-if-missing 20`<br>
+
+For Mac and Linux, execute the following commands:
+
+`curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash`<br>
+You will need to close and reopen your terminal before executing the rest<br>
+`nvm install 20`<br>
+<br>
+<br>
+Verify your install on any platform by running:<br>
+`node -v`<br>
+`npm -v`<br>
+
+After Node JS has been installed, the next step is to clone the repo and all needed components. <br>
 
 Open your command terminal and 'cd' into the desired folder location and run the following commands <br>
 
@@ -98,6 +113,7 @@ In the terminal, `cd` into the `~...\Telemetry-Database\TelemetrySite\client` fo
 If your website didn't start, check that you are in the correct folder and you installed Node JS. <br>
 
 After your sever is online, make sure you keep that terminal open. **Closing that terminal for any reason will kill your website**.<br>
+
 
 #### **Running the Server**
 

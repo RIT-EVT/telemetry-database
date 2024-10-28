@@ -25,7 +25,7 @@ const FetchConfigData = async () => {
     const response = await fetch(BASE_URL + ServerCalls["context"]);
 
     if (!response.ok) {
-      throw new Error("Network response was not ok: " + response.statusText);
+      console.error("Network response was not ok: " + response.statusText);
     }
 
     const jsonResponse = await response.json(); // await here
@@ -71,16 +71,12 @@ const PostContextData = async (postData) => {
 /* ---------------------------- Event Data Calls ---------------------------- */
 /* -------------------------------------------------------------------------- */
 
-const FetchEventData = async (searchContextId) => {
+const FetchEventDataCall = async (searchContextId) => {
   await CheckData();
-  const contextIdJson = { contextId: searchContextId };
   try {
-    const response = await fetch(BASE_URL + ServerCalls["event_data"], {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(contextIdJson), // Convert the data to JSON
-    });
+    const response = await fetch(
+      BASE_URL + ServerCalls["event_data"] + "/" + searchContextId
+    );
 
     const jsonResponse = await response.json(); // await here
 
@@ -103,10 +99,19 @@ const PostDataFile = async (file, contextID) => {
   formData.append("file", file);
   formData.append("contextID", contextID);
 
-  fetch(BASE_URL + ServerCalls["data_upload"], {
+  const response = await fetch(BASE_URL + ServerCalls["data_upload"], {
     method: "POST",
     body: formData,
   });
+  if (!response.ok) {
+    const jsonResponse = await response.json(); // await here
+    console.error(
+      "Error occurred on server side. Error message:" + jsonResponse.error
+    );
+    return false;
+  } else {
+    return true;
+  }
 };
 
 const FetchData = async () => {
@@ -163,5 +168,5 @@ export {
   PostDataFile,
   FetchData,
   CheckServerStatus,
-  FetchEventData,
+  FetchEventDataCall,
 };

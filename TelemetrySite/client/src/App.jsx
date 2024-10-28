@@ -46,7 +46,7 @@ function App() {
 
         {ServerStatus ? (
           <Routes>
-            <Route path='/' element={<ContextForm />} />
+            <Route path='/:contextID?' element={<ContextForm />} />
             <Route path='/DataUpload/:contextID' element={<DataUpload />} />
             <Route path='*' element={<Page404 />} />
           </Routes>
