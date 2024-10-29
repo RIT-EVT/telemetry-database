@@ -349,14 +349,14 @@ function ContextForm() {
       const dropDown = SelectCreator(dropDownOptions[name], name);
       setDropDowns((prev) => ({ ...prev, [name]: dropDown }));
     });
-
+    console.log("ran");
     UpdateContext(GenerateFormElement("MainBody"));
 
     const bikeDrop = SelectCreator(dropDownOptions["bike"], "bike");
     setDropDowns((prev) => ({ ...prev, ["bike"]: bikeDrop }));
 
     UpdateEventForm(GenerateFormElement("Event"));
-  }, [dropDownOptions, ConfigName]);
+  }, [dropDownOptions]);
   /**
    * Fetch all the saved configs on the first load
    */
