@@ -50,28 +50,23 @@ class context_api(MethodView):
 
         return jsonify(configData).get_data(as_text=True), 200
 
-    ## Post new context value to the db
-    #
-    # @return id value of context
     def post(self):
         # Get JSON data from the request
         data = request.get_json()
         sqlCommands = [
             "INSERT into BmsConfig (id, hardwareRevision, softwareCommitHash, totalVoltageUnits, batteryVoltageUnits, currentUnits, packTempUnits,"
-            + "bqTempUnits, cellVoltageUnits, configName) VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id",
+            + "bqTempUnits, cellVoltageUnits, configName) VALUES (DEFAULT",
             "INSERT into ImuConfig (id, hardwareRevision, softwareCommitHash, eulerUnits, gyroUnits, linearAccelerationUnits, accelerometerUnits, configName)"
-            + "VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s) RETURNING id",
-            "INSERT into TmuConfig (id, hardwareRevision, softwareCommitHash, thermUnits, configName) VALUES (DEFAULT, %s, %s, %s, %s) RETURNING id",
+            + "VALUES (DEFAULT",
+            "INSERT into TmuConfig (id, hardwareRevision, softwareCommitHash, thermUnits, configName) VALUES (DEFAULT",
             "INSERT into TmsConfig (id, hardwareRevision, softwareCommitHash, tempUnits, pumpSpeedUnits, fanSpeedUnits, configName) VALUES "
-            + "(DEFAULT, %s, %s, %s, %s, %s, %s) RETURNING id",
-            "INSERT into PvcConfig (id, hardwareRevision, softwareCommitHash, configName) VALUES (DEFAULT, %s, %s, %s) RETURNING id",
-            "INSERT into McConfig (id, model, firmwareVersion, configName) VALUES (DEFAULT, %s, %s, %s) RETURNING id",
+            + "(DEFAULT",
+            "INSERT into PvcConfig (id, hardwareRevision, softwareCommitHash, configName) VALUES (DEFAULT",
+            "INSERT into McConfig (id, model, firmwareVersion, configName) VALUES (DEFAULT",
         ]
         # Check if data was received
         if not data:
             return jsonify({"error": "No data provided"}), 400
-        elif not "Context" in data:
-            return jsonify({"error": "No context data passed"}), 400
         # Get the important piece of the data
         contextValue = data["Context"]
 
@@ -91,12 +86,24 @@ class context_api(MethodView):
             for index in range(0, len(self.configShort)):
                 currentConfigData = contextValue[self.configShort[index]]
                 if not "selected" in currentConfigData:
+                    contextBodyValues = []
+                    sqlCommand = sqlCommands[index]
+                    for value in self.DictToTuple(currentConfigData):
+                        sqlCommand += ", "
+                        if not value == "":
+                            contextBodyValues.append(value)
+                            sqlCommand += "%s"
+                        else:
+                            sqlCommand += "DEFAULT"
+                    sqlCommand += ") RETURNING id"
+
                     idBikeConfig.append(
-                        utils.exec_commit_with_id(
-                            sqlCommands[index], self.DictToTuple(currentConfigData)
-                        )[0][0]
+                        utils.exec_commit_with_id(sqlCommand, tuple(contextBodyValues))[
+                            0
+                        ][0]
                     )
                 else:
+                    # execute a query to find the id where the name is the same as the passed name
 
                     if currentConfigData["selected"] == "":
                         if index == 1:
@@ -104,8 +111,6 @@ class context_api(MethodView):
                         else:
                             hasTMU = False
                         continue
-
-                    # execute a query to find the id where the name is the same as the passed name
                     format_array = [Identifier(self.configNames[index].lower())]
                     conn = utils.connect()
                     cur = conn.cursor()
@@ -124,23 +129,34 @@ class context_api(MethodView):
 
         # establish sql commands for all non event, bike, and context configs
         # save the event and bike ids for to reference in the context db
-        if not "eventID" in contextValue["Event"]:
-            sqlEvent = "INSERT into Event (id, eventDate, eventType, location) VALUES (DEFAULT, %s, %s, %s) RETURNING id"
 
-            eventAndBikeId.append(
-                utils.exec_commit_with_id(
-                    sqlEvent, self.DictToTuple(contextValue["Event"])
-                )[0][0]
-            )
-        else:
+        sqlEvent = "INSERT into Event (id, eventDate, eventType, location) VALUES (DEFAULT, %s, %s, %s) RETURNING id"
 
-            eventAndBikeId.append(contextValue["Event"]["eventID"])
+        eventAndBikeId.append(
+            utils.exec_commit_with_id(
+                sqlEvent, self.DictToTuple(contextValue["Event"])
+            )[0][0]
+        )
 
         # if the bike isn't a saved value
         if not bikeSaved:
             # create a new one
-            sqlBikeConfig = """INSERT into BikeConfig (id,  platformName, tirePressure, coolantVolume, configName,
-            bmsConfigId, imuConfigId, tmuConfigId, tmsConfigId, pvcConfigId, mcConfigId) VALUES (DEFAULT,  %s, %s, %s, %s, %s,"""
+            sqlBikeConfig = """INSERT into BikeConfig (id,  platformName, tirePressure, 
+            coolantVolume, configName, bmsConfigId, imuConfigId, tmuConfigId, tmsConfigId, 
+            pvcConfigId, mcConfigId) VALUES (DEFAULT,  """
+
+            contextBodyValues = []
+            # loop to see if tirePressure and coolantVolume are null
+            for value in self.DictToTuple(contextValue["BikeConfig"]):
+                if not value == "":
+                    contextBodyValues.append(value)
+                    sqlBikeConfig += "%s, "
+                else:
+                    sqlBikeConfig += "DEFAULT, "
+
+            # config name and bmsConfig format
+            sqlBikeConfig += "%s, "
+
             # set imu and tmu to default as needed
             if hasIMU is True:
                 sqlBikeConfig += "%s, "
@@ -151,43 +167,49 @@ class context_api(MethodView):
                 sqlBikeConfig += "%s, "
             else:
                 sqlBikeConfig += "DEFAULT, "
-
+            # add tms, pvc, and mc
             sqlBikeConfig += "%s, %s, %s) RETURNING id"
+            print(sqlBikeConfig)
+            print(tuple(contextBodyValues) + tuple(idBikeConfig))
             eventAndBikeId.append(
                 utils.exec_commit_with_id(
                     sqlBikeConfig,
-                    self.DictToTuple(contextValue["BikeConfig"]) + tuple(idBikeConfig),
+                    tuple(contextBodyValues) + tuple(idBikeConfig),
                 )[0][0]
             )
 
         else:
             # if it is saved, get the id
-            sqlCommand = "SELECT id from BikeConfig WHERE configName = %s"
+            sqlCommand = f"SELECT id from BikeConfig WHERE configName = '{contextValue["BikeConfig"]["selected"]}'"
             eventAndBikeId.append(
                 utils.exec_get_one(
                     sqlCommand,
                     [
-                        contextValue["BikeConfig"]["selected"],
+                        0,
                     ],
                 )[0]
             )
 
-        sqlContext = "INSERT into Context (id, airTemp, humidity, windSpeed, windAngle, riderName, riderWeight, driverFeedback, distanceCovered, startTime, eventId, bikeConfigId) VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id"
+        sqlContext = """INSERT into Context (id, airTemp, humidity, windSpeed, windAngle,
+        riderName, riderWeight, driverFeedback, distanceCovered, startTime, eventId, bikeConfigId) 
+        VALUES (DEFAULT, """
 
+        contextBodyValues = []
+        for value in self.DictToTuple(contextValue["MainBody"]):
+            if not value == "":
+                contextBodyValues.append(value)
+                sqlContext += "%s, "
+            else:
+                sqlContext += "DEFAULT, "
+        sqlContext += "%s, %s) RETURNING id"
+        print(sqlContext)
         utils.exec_commit_with_id(
             sqlContext,
-            self.DictToTuple(contextValue["MainBody"]) + tuple(eventAndBikeId),
-        )
-        contextId = utils.exec_commit_with_id(
-            sqlContext,
-            self.DictToTuple(contextValue["MainBody"]) + tuple(eventAndBikeId),
+            tuple(contextBodyValues) + tuple(eventAndBikeId),
         )
 
         # Respond back to the client. 201 code for created
-        return (
-            jsonify({"success": True, "contextID": contextId}),
-            201,
-        )
+        return jsonify({"message": "Data received successfully", "received": data}), 201
 
     def put(self):
 
