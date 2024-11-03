@@ -226,6 +226,7 @@ function ContextForm() {
                     placeholder={formElement["placeHolder"]}
                     required={formElement["required"]}
                     readOnly={formElement["readOnly"]}
+                    className='formInput'
                   >
                     {formElement["type"] === "select"
                       ? formElement["selectValues"].map((value) => (
