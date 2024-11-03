@@ -1,5 +1,4 @@
 /**
- *
  * Create form elements for each of the needed context forms
  *
  * Submit data entered by user to the backend server
@@ -349,7 +348,7 @@ function ContextForm() {
       const dropDown = SelectCreator(dropDownOptions[name], name);
       setDropDowns((prev) => ({ ...prev, [name]: dropDown }));
     });
-    console.log("ran");
+
     UpdateContext(GenerateFormElement("MainBody"));
 
     const bikeDrop = SelectCreator(dropDownOptions["bike"], "bike");

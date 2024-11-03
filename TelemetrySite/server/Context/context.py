@@ -180,12 +180,12 @@ class Context(MethodView):
 
         else:
             # if it is saved, get the id
-            sqlCommand = f"SELECT id from BikeConfig WHERE configName = '{contextValue["BikeConfig"]["selected"]}'"
+            sqlCommand = "SELECT id from BikeConfig WHERE configName = %s"
             eventAndBikeId.append(
                 utils.exec_get_one(
                     sqlCommand,
                     [
-                        0,
+                        contextValue["BikeConfig"]["selected"],
                     ],
                 )[0]
             )
