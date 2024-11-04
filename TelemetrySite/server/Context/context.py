@@ -169,8 +169,7 @@ class Context(MethodView):
                 sqlBikeConfig += "DEFAULT, "
             # add tms, pvc, and mc
             sqlBikeConfig += "%s, %s, %s) RETURNING id"
-            print(sqlBikeConfig)
-            print(tuple(contextBodyValues) + tuple(idBikeConfig))
+
             eventAndBikeId.append(
                 utils.exec_commit_with_id(
                     sqlBikeConfig,
@@ -202,7 +201,7 @@ class Context(MethodView):
             else:
                 sqlContext += "DEFAULT, "
         sqlContext += "%s, %s) RETURNING id"
-        print(sqlContext)
+
         utils.exec_commit_with_id(
             sqlContext,
             tuple(contextBodyValues) + tuple(eventAndBikeId),
