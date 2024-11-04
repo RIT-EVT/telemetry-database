@@ -169,8 +169,7 @@ class context_api(MethodView):
                 sqlBikeConfig += "DEFAULT, "
             # add tms, pvc, and mc
             sqlBikeConfig += "%s, %s, %s) RETURNING id"
-            print(sqlBikeConfig)
-            print(tuple(contextBodyValues) + tuple(idBikeConfig))
+
             eventAndBikeId.append(
                 utils.exec_commit_with_id(
                     sqlBikeConfig,
@@ -180,12 +179,12 @@ class context_api(MethodView):
 
         else:
             # if it is saved, get the id
-            sqlCommand = f"SELECT id from BikeConfig WHERE configName = '{contextValue["BikeConfig"]["selected"]}'"
+            sqlCommand = "SELECT id from BikeConfig WHERE configName = %s"
             eventAndBikeId.append(
                 utils.exec_get_one(
                     sqlCommand,
                     [
-                        0,
+                        contextValue["BikeConfig"]["selected"],
                     ],
                 )[0]
             )
@@ -202,7 +201,7 @@ class context_api(MethodView):
             else:
                 sqlContext += "DEFAULT, "
         sqlContext += "%s, %s) RETURNING id"
-        print(sqlContext)
+
         utils.exec_commit_with_id(
             sqlContext,
             tuple(contextBodyValues) + tuple(eventAndBikeId),

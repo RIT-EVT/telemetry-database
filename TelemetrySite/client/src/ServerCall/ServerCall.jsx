@@ -1,10 +1,10 @@
 /**
  * All fetch calls should appear in this file.
  *
- * Use SeverCalls to hold the url path to the needed
+ * Use ServerCalls to hold the url path to the needed
  * backend calls as a dictionary. This allows for
  * the url paths to change on the backend without
- * effecting the front end
+ * effecting the frontend
  */
 var ServerCalls = {};
 

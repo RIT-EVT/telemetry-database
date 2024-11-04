@@ -1,5 +1,4 @@
 /**
- *
  * Create form elements for each of the needed context forms
  *
  * Submit data entered by user to the backend server
