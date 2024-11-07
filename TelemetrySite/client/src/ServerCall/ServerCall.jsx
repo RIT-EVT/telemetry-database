@@ -96,13 +96,17 @@ const PostDataFile = async (file, contextID) => {
   await CheckData();
 
   const formData = new FormData();
+  console.log(file);
   formData.append("file", file);
   formData.append("contextID", contextID);
 
-  const response = await fetch(BASE_URL + ServerCalls["data_upload"], {
-    method: "POST",
-    body: formData,
-  });
+  const response = await fetch(
+    BASE_URL + ServerCalls["data_upload"] + "/" + contextID,
+    {
+      method: "POST",
+      body: formData,
+    }
+  );
   if (!response.ok) {
     const jsonResponse = await response.json(); // await here
     console.error(
@@ -114,8 +118,8 @@ const PostDataFile = async (file, contextID) => {
   }
 };
 
-const FetchData = async () => {
-  await fetch(BASE_URL + ServerCalls["data_upload"], {
+const FetchProgress = async (contextId) => {
+  return await fetch(BASE_URL + ServerCalls["data_upload"] + "/" + contextId, {
     method: "GET",
   });
 };
@@ -166,7 +170,7 @@ export {
   FetchConfigData,
   PostContextData,
   PostDataFile,
-  FetchData,
+  FetchProgress,
   CheckServerStatus,
   FetchEventDataCall,
 };

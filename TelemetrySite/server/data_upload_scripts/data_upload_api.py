@@ -2,7 +2,7 @@ from flask.views import MethodView
 from flask import request, jsonify
 from werkzeug.utils import secure_filename
 import os
-from data_upload_scripts.data_upload import file_convert
+from data_upload_scripts.data_upload import file_convert, get_progress
 from utils import exec_get_one, exec_get_all
 
 
@@ -15,16 +15,13 @@ class data_upload_api(MethodView):
         if not os.path.exists(self.UPLOAD_FOLDER):
             os.makedirs(self.UPLOAD_FOLDER)
 
-    def get(self):
-        if not "contextID" in request.form:
-            return jsonify({"error": "No id passed"}), 400
+    def get(self, contextId):
 
-        sql_get_data = "SELECT * FROM canmessage WHERE contextId = %s"
-        data = exec_get_all(sql_get_data, [request.form["contextID"]])
-        return jsonify({"Data": data}), 200
+        return jsonify({"Data": get_progress(contextId)}), 200
 
-    def post(self):
+    def post(self, contextId):
         # Check if the post request has the file part
+        print(request.files)
         if "file" not in request.files:
             return jsonify({"error": "No file uploaded"}), 400
         elif "contextID" not in request.form:
@@ -67,7 +64,7 @@ class data_upload_api(MethodView):
         if self.file_type_check(file.filename):
             # Secure name for best practice
             filename = secure_filename(file.filename)
-
+            print(filename)
             temp_file_name = filename
             file_number = 1
             # prevent files of same name

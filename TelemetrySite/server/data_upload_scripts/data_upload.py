@@ -48,6 +48,8 @@ nodeIDDictionary = {
     "35": "BMS3BV",
 }
 
+progress_data = {}
+
 
 ##Converts .mf4 files to .csv files. There are 7 channel groups created in this conversion. We currently only use number 7.
 # This fact will be hard coded into this process as I do not forsee a world where our Mech-E team ever uses another channel.
@@ -68,23 +70,26 @@ def file_convert(file, config_id):
     else:
         print("You fool; thats not a valid file! The file must be an mf4")
     handle_data(files, config_id)
-    # remove the mf4 file
-    os.remove(file)
 
 
 ## Streams data into the DB
 #
 # @param files The paths to the array of files being processed
 def handle_data(files, config_id):
+    progress_data[config_id] = 0
     conn = connect()
     cur = conn.cursor()
     for file in files:
         dataToExecuteMany = []
+        num_lines = 0
+        with open(file) as f:
+            num_lines = sum(1 for _ in f)
+
         with open(file) as open_file:
             # Used to skip the first line of the file which is string values to indicate the values in the can message
-            print(open_file)
             firstLine = open_file.readline()
             counter = 0
+            num_lines -= 1
             # Creates the loading bar. Value displayed represents the number of lines handled
             for line in tqdm(open_file):
                 counter += 1
@@ -99,7 +104,9 @@ def handle_data(files, config_id):
                         config_id,
                     )
                 )
+                progress_data[config_id] = counter / num_lines
                 if counter % 1000 == 0:
+
                     sql = "INSERT into canmessage (ID, busId, frameId, dataBytes, receiveTime, contextId) VALUES (DEFAULT, %s, %s, %s, %s, %s)"
                     try:
                         exec_commit_many(sql, dataToExecuteMany)
@@ -114,7 +121,6 @@ def handle_data(files, config_id):
 
     conn.commit()
     conn.close()
-    print(files)
     # remove csv files from folder
     for file in files:
         os.remove(file)
@@ -135,3 +141,9 @@ def format_data_bytes(bytes):
     closeBracket = re.sub("\]+", "}", openBracket)
     # Sample data after regex: {6,0,0,0,32,161,7,0}
     return closeBracket
+
+
+def get_progress(config_id):
+    if not config_id in progress_data:
+        return 0
+    return progress_data[config_id]

@@ -202,13 +202,16 @@ class context_api(MethodView):
                 sqlContext += "DEFAULT, "
         sqlContext += "%s, %s) RETURNING id"
 
-        utils.exec_commit_with_id(
+        contextId = utils.exec_commit_with_id(
             sqlContext,
             tuple(contextBodyValues) + tuple(eventAndBikeId),
         )
 
         # Respond back to the client. 201 code for created
-        return jsonify({"message": "Data received successfully", "received": data}), 201
+        return (
+            jsonify({"success": True, "contextID": contextId}),
+            201,
+        )
 
     def put(self):
 

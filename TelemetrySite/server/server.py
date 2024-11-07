@@ -16,12 +16,15 @@ CORS(app)
 
 # create views for url rules
 user_view = context_api.as_view("context_api")
+
 app.add_url_rule(
     "/Context", view_func=user_view, methods=["GET", "PUT", "DELETE", "POST"]
 )
 user_view = data_upload_api.as_view("data_upload_api")
 app.add_url_rule(
-    "/DataUpload", view_func=user_view, methods=["GET", "PUT", "DELETE", "POST"]
+    "/DataUpload/<contextId>",
+    view_func=user_view,
+    methods=["GET", "POST"],
 )
 user_view = event_api.as_view("event_api")
 app.add_url_rule("/Event/<contextId>", view_func=user_view, methods=["GET"])
