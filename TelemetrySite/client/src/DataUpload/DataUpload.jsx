@@ -48,6 +48,9 @@ function DataUpload() {
 
     /**
      * Helper function to convert seconds to hours and minutes
+     *
+     * @param {int} seconds - seconds to convert
+     * @return {string} formatted data
      */
     const formatTime = (seconds) => {
       const hrs = Math.floor(seconds / 3600);

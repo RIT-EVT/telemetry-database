@@ -116,10 +116,14 @@ const PostDataFile = async (file, contextID) => {
     return true;
   }
 };
-
+/**
+ * Fetch the progress of the current upload
+ *
+ * @param {int} contextId - id to get progress off of
+ * @return {int} decimal of how much has been uploaded
+ */
 const FetchProgress = async (contextId) => {
   try {
-    const startTime = Date.now(); // Start time
     const response = await fetch(
       BASE_URL + ServerCalls["data_upload"] + "/" + contextId,
       {
@@ -131,11 +135,7 @@ const FetchProgress = async (contextId) => {
       throw new Error(`Error ${response.status}: ${response.statusText}`);
     }
 
-    const data = await response.json();
-    const endTime = Date.now(); // End time
-
-    const elapsedTime = (endTime - startTime) / 1000; // Convert to seconds
-    return { ...data, elapsedTime };
+    return data;
   } catch (error) {
     console.error("Failed to fetch progress:", error);
     return { error: error.message };
