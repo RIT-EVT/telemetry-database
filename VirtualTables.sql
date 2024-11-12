@@ -109,6 +109,30 @@ WHERE xComponent.axis = 'x'
 ORDER BY xComponent.receivetime
     );
 
+CREATE VIEW BMS_Thermistor_Temp_Frame AS
+    (SELECT
+        array(
+            SELECT val
+            FROM
+                bmsthermistortemp
+            WHERE
+                firstTerm.contextId = contextid
+            AND firstTerm.packid = packid
+            AND firstTerm.receivetime = receivetime
+            ORDER BY thermid
+        ) AS aggOne,
+       firstTerm.contextId,
+       firstTerm.receiveTime AS firstPacketRecieveTime,
+       firstTerm.packid
+FROM bmsthermistortemp AS firstTerm
+GROUP BY (
+          firstTerm.contextId,
+          firstTerm.receiveTime,
+          firstTerm.packid
+         )
+ORDER BY (firstTerm.receiveTime)
+);
+
 CREATE VIEW Imu_Euler_Frame AS
 (
 SELECT
@@ -158,4 +182,4 @@ FROM bmscellvoltage AS firstCell
          FULL JOIN (SELECT val, receiveTime, contextId, packid FROM bmscellvoltage WHERE cellid = 9) AS ninthCell
                    ON ninthCell.receivetime between firstCell.receivetime AND firstCell.receivetime + 1 AND firstCell.contextid = ninthCell.contextId AND firstCell.packid = ninthCell.packid
 WHERE cellid = 1
-)
+);

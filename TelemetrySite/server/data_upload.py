@@ -91,7 +91,7 @@ def handle_data(files):
                 if(counter % 1000 == 0):
                     sql = "INSERT into canmessage (ID, busId, frameId, dataBytes, receiveTime, contextId) VALUES (DEFAULT, %s, %s, %s, %s, %s)"
                     try:
-                        utils.exec_commit_many(sql, dataToExecuteMany)
+                        cur.executemany(sql, dataToExecuteMany)
                         dataToExecuteMany = []
                     except(TimeoutError):
                         print(len(dataToExecuteMany))

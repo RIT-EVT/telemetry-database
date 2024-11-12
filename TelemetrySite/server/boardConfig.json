@@ -198,9 +198,9 @@
                 "size": 8
             },
             {
-                "table": "BmsThermistorTemp",
-                "thermId": 1,
+                "table": "BmsBqTemp",
                 "packId": "UNKNOWN",
+                "tempid": 1,
                 "size": 8
             },
             {
@@ -302,25 +302,25 @@
                 "table": "BmsCellVoltage",
                 "packId": "UNKNOWN",
                 "cellId": 1,
-                "size": 8
+                "size": 16
             },
             {
                 "table": "BmsCellVoltage",
                 "packId": "UNKNOWN",
                 "cellId": 2,
-                "size": 8
+                "size": 16
             },
             {
                 "table": "BmsCellVoltage",
                 "packId": "UNKNOWN",
                 "cellId": 3,
-                "size": 8
+                "size": 16
             },
             {
                 "table": "BmsCellVoltage",
                 "packId": "UNKNOWN",
                 "cellId": 4,
-                "size": 8
+                "size": 16
             }
         ],
         "0x280": [
@@ -328,25 +328,25 @@
                 "table": "BmsCellVoltage",
                 "packId": "UNKNOWN",
                 "cellId": 5,
-                "size": 8
+                "size": 16
             },
             {
                 "table": "BmsCellVoltage",
                 "packId": "UNKNOWN",
                 "cellId": 6,
-                "size": 8
+                "size": 16
             },
             {
                 "table": "BmsCellVoltage",
                 "packId": "UNKNOWN",
                 "cellId": 7,
-                "size": 8
+                "size": 16
             },
             {
                 "table": "BmsCellVoltage",
                 "packId": "UNKNOWN",
                 "cellId": 8,
-                "size": 8
+                "size": 16
             }
         ],
         "0x380": [
@@ -354,25 +354,25 @@
                 "table": "BmsCellVoltage",
                 "packId": "UNKNOWN",
                 "cellId": 9,
-                "size": 8
+                "size": 16
             },
             {
                 "table": "BmsCellVoltage",
                 "packId": "UNKNOWN",
                 "cellId": 10,
-                "size": 8
+                "size": 16
             },
             {
                 "table": "BmsCellVoltage",
                 "packId": "UNKNOWN",
                 "cellId": 11,
-                "size": 8
+                "size": 16
             },
             {
                 "table": "BmsCellVoltage",
                 "packId": "UNKNOWN",
                 "cellId": 12,
-                "size": 8
+                "size": 16
             }
         ]
     },

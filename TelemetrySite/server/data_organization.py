@@ -96,7 +96,7 @@ def upload_organized(tpdo_config, data_bytes, receive_time, context_id):
     binary_data_string = ""
     # Convert the bytes into a binary string (This makes it 8x biigger than before!)
     for data in data_bytes:
-        binary_data_string = binary_data_string + bin(data)[2:].zfill(8)
+        binary_data_string = bin(data)[2:].zfill(8) + binary_data_string
     # Here we are extracting the information from the config file to figure out what our sql statement will look like
     for data_package in tpdo_config:
         insert_columns = []
