@@ -26,7 +26,6 @@ function DataUpload() {
 
   const { contextID } = useParams();
 
-  const [progress, setProgress] = useState(0);
   const [progressBar, setProgressBar] = useState(null);
 
   let navigate = useNavigate();
@@ -59,7 +58,7 @@ function DataUpload() {
         mins > 0 ? mins + "m " : ""
       }${secs}s remaining`;
     };
-
+    //call to the server every second for upload status
     const interval = setInterval(async () => {
       const data = await FetchProgress(contextID);
 
@@ -67,16 +66,16 @@ function DataUpload() {
         console.error("Error fetching progress:", data.error);
         return;
       }
-
+      //get the progress and the current time
       const currentProgress = data.progress;
       const currentTime = Date.now();
-
+      //get how much progress was made and how ling it took
       const progressDelta = currentProgress - lastProgress;
       const timeDelta = (currentTime - lastTimestamp) / 1000;
-      //calculate an estimate to how much time is left in upload
+
       lastProgress = currentProgress;
       lastTimestamp = currentTime;
-
+      //calculate an estimate to how much time is left in upload
       const progressRate = progressDelta / timeDelta;
       const remainingProgress = 1 - currentProgress;
       const estimatedTimeRemaining =
@@ -89,7 +88,6 @@ function DataUpload() {
           <div>{formatTime(estimatedTimeRemaining)}</div>
         </div>
       );
-      setProgress(currentProgress);
 
       if (currentProgress >= 1 || currentProgress < 0) {
         //stop calling to the backend

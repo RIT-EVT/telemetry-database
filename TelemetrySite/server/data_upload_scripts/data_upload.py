@@ -104,6 +104,7 @@ def handle_data(files, config_id):
                         config_id,
                     )
                 )
+                # update progress of the file upload
                 progress_data[config_id] = counter / num_lines
                 if counter % 1000 == 0:
 
@@ -143,6 +144,7 @@ def format_data_bytes(bytes):
     return closeBracket
 
 
+# get the current progress of the file upload
 def get_progress(config_id):
     if not config_id in progress_data:
         return -1
