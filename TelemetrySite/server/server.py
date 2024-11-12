@@ -1,7 +1,6 @@
 from flask import Flask, jsonify
 from flask_restful import Api
 from flask_cors import CORS
-import utils
 import dotenv
 import json
 from context_scripts.context_api import context_api
@@ -21,6 +20,10 @@ app.add_url_rule(
     "/Context", view_func=user_view, methods=["GET", "PUT", "DELETE", "POST"]
 )
 user_view = data_upload_api.as_view("data_upload_api")
+# TODO Look at refactoring this later. I don't love
+# that data upload has the context takes in contextID
+# via the path. Need to keep it this way for now for
+# the get call, but look at changing this later
 app.add_url_rule(
     "/DataUpload/<contextId>",
     view_func=user_view,
@@ -48,7 +51,7 @@ def MainContext():
 
 if __name__ == "__main__":
     # credential file exists two levels up
-
+    # from the current file
     two_up = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
     dotenv.load_dotenv(two_up + "/credentials.env")
     print("Starting flask")

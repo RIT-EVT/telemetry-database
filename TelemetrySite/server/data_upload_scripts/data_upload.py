@@ -145,5 +145,10 @@ def format_data_bytes(bytes):
 
 def get_progress(config_id):
     if not config_id in progress_data:
-        return 0
-    return progress_data[config_id]
+        return -1
+
+    dataValue = progress_data[config_id]
+    # remove value if data has been fully uploaded
+    if dataValue == 1:
+        progress_data.pop(config_id)
+    return dataValue

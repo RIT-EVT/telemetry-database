@@ -96,7 +96,6 @@ const PostDataFile = async (file, contextID) => {
   await CheckData();
 
   const formData = new FormData();
-  console.log(file);
   formData.append("file", file);
   formData.append("contextID", contextID);
 
@@ -119,9 +118,28 @@ const PostDataFile = async (file, contextID) => {
 };
 
 const FetchProgress = async (contextId) => {
-  return await fetch(BASE_URL + ServerCalls["data_upload"] + "/" + contextId, {
-    method: "GET",
-  });
+  try {
+    const startTime = Date.now(); // Start time
+    const response = await fetch(
+      BASE_URL + ServerCalls["data_upload"] + "/" + contextId,
+      {
+        method: "GET",
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Error ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const endTime = Date.now(); // End time
+
+    const elapsedTime = (endTime - startTime) / 1000; // Convert to seconds
+    return { ...data, elapsedTime };
+  } catch (error) {
+    console.error("Failed to fetch progress:", error);
+    return { error: error.message };
+  }
 };
 
 /* -------------------------------------------------------------------------- */

@@ -416,10 +416,18 @@ function ContextForm() {
    * Fetch all the saved configs on the first load
    */
   useEffect(() => {
-    FetchConfigOptions();
+    //check if contextID exists and is a number
+    //if it exists but isn't a number, redirect to
+    //404 error page
+    //TODO change when home page is included
     if (contextID) {
-      FetchEventData();
+      if (isNaN(contextID)) {
+        navigate("/404Page");
+      } else {
+        FetchEventData();
+      }
     }
+    FetchConfigOptions();
   }, []);
   /**
    * Check all config select value. If it is == Custom

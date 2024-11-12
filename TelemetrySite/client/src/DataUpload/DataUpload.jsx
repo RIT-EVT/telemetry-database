@@ -20,15 +20,14 @@ import {
   Form,
 } from "reactstrap";
 import { useParams, useNavigate } from "react-router-dom";
-import ProgressBar from "progressbar.js";
 
 function DataUpload() {
   const [bodyDisplay, setBodyDisplay] = useState(null);
 
   const { contextID } = useParams();
-  const [isLoading, setIsLoading] = useState(false);
+
   const [progress, setProgress] = useState(0);
-  const progressBarRef = useRef(null);
+  const [progressBar, setProgressBar] = useState(null);
 
   let navigate = useNavigate();
 
@@ -45,22 +44,62 @@ function DataUpload() {
     const file = document.getElementById("fileUpload").files[0];
     const response = PostDataFile(file, contextID);
     //TODO progress bar
-    //setIsLoading(true);
-    // const interval = setInterval(async () => {
-    //   const response = await FetchProgress(contextID);
-    //   const data = await response.json();
-    //   setProgress(data.progress);
+    let lastProgress = 0; // Store previous progress percentage
+    let lastTimestamp = Date.now(); // Store previous timestamp
 
-    //   // Stop polling when progress reaches 100%
-    //   if (data.progress >= 1) {
-    //     clearInterval(interval);
-    //     setIsLoading(false);
-    //   }
-    // }, 1000); // Poll every second
+    /**
+     * Helper function to convert seconds to hours and minutes
+     */
+    const formatTime = (seconds) => {
+      const hrs = Math.floor(seconds / 3600);
+      const mins = Math.floor((seconds % 3600) / 60);
+      const secs = Math.floor(seconds % 60);
+
+      return `${hrs > 0 ? hrs + "h " : ""}${
+        mins > 0 ? mins + "m " : ""
+      }${secs}s remaining`;
+    };
+
+    const interval = setInterval(async () => {
+      const data = await FetchProgress(contextID);
+
+      if (data.error) {
+        console.error("Error fetching progress:", data.error);
+        return;
+      }
+
+      const currentProgress = data.progress;
+      const currentTime = Date.now();
+
+      const progressDelta = currentProgress - lastProgress;
+      const timeDelta = (currentTime - lastTimestamp) / 1000;
+      //calculate an estimate to how much time is left in upload
+      lastProgress = currentProgress;
+      lastTimestamp = currentTime;
+
+      const progressRate = progressDelta / timeDelta;
+      const remainingProgress = 1 - currentProgress;
+      const estimatedTimeRemaining =
+        progressRate > 0 ? remainingProgress / progressRate : Infinity;
+
+      // Update the UI with the formatted estimated time remaining
+      setProgressBar(
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <progress value={currentProgress} style={{ marginRight: "10px" }} />
+          <div>{formatTime(estimatedTimeRemaining)}</div>
+        </div>
+      );
+      setProgress(currentProgress);
+
+      if (currentProgress >= 1 || currentProgress < 0) {
+        //stop calling to the backend
+        clearInterval(interval);
+      }
+    }, 1000);
 
     response.then((responseValue) => {
       if (responseValue === true) {
-        setIsLoading(false);
+        setProgressBar(null);
         setBodyDisplay(
           <div>
             <Button
@@ -107,46 +146,6 @@ function DataUpload() {
     );
   }, []);
 
-  useEffect(() => {
-    let bar;
-    if (isLoading) {
-      // Initialize the progress bar
-      bar = new ProgressBar.Line(progressBarRef.current, {
-        strokeWidth: 4,
-        color: "#4A90E2",
-        trailColor: "#eee",
-        trailWidth: 1,
-        svgStyle: { width: "100%", height: "100%" },
-        text: {
-          style: {
-            color: "#999",
-            position: "absolute",
-            right: "0",
-            top: "30px",
-          },
-          autoStyleContainer: false,
-        },
-        from: { color: "#FFEA82" },
-        to: { color: "#ED6A5A" },
-        step: (state, bar) => {
-          bar.setText(Math.round(bar.value() * 100) + " %");
-        },
-      });
-    }
-
-    return () => {
-      if (bar) bar.destroy();
-    };
-  }, [isLoading]);
-
-  useEffect(() => {
-    if (isLoading) {
-      // Update the bar's value based on progress
-      if (progressBarRef.current) {
-        progressBarRef.current.animate(progress); // Convert percentage to 0-1 range
-      }
-    }
-  }, [progress]);
   return (
     <Container fluid className='outer-container'>
       <Row className='inner-row'>
@@ -154,12 +153,7 @@ function DataUpload() {
           <Card className='upload-card'>
             <CardBody className='text-center'>
               {bodyDisplay}
-              {isLoading ? (
-                <div
-                  ref={progressBarRef}
-                  style={{ height: "10px", marginBottom: "20px" }}
-                ></div>
-              ) : null}
+              {progressBar}
             </CardBody>
           </Card>
         </Col>

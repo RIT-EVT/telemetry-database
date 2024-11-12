@@ -33,8 +33,7 @@ class context_api(MethodView):
         # declare dictionary for returning data
         configData = {}
         # loop through each table and pull the names
-        # 0 used as a place holder, no args needed
-        # can't use the %s for table names
+        # of the saved configs
 
         for i in range(0, len(self.savedConfigs)):
             format_array = [Identifier(self.savedConfigs[i].lower())]
@@ -86,6 +85,8 @@ class context_api(MethodView):
             for index in range(0, len(self.configShort)):
                 currentConfigData = contextValue[self.configShort[index]]
                 if not "selected" in currentConfigData:
+                    # if it isn't a selected config
+                    # then generate the new config
                     contextBodyValues = []
                     sqlCommand = sqlCommands[index]
                     for value in self.DictToTuple(currentConfigData):
@@ -103,7 +104,8 @@ class context_api(MethodView):
                         ][0]
                     )
                 else:
-                    # execute a query to find the id where the name is the same as the passed name
+                    # execute a query to find the id where
+                    # the name is the same as the passed name
 
                     if currentConfigData["selected"] == "":
                         if index == 1:
@@ -130,13 +132,18 @@ class context_api(MethodView):
         # establish sql commands for all non event, bike, and context configs
         # save the event and bike ids for to reference in the context db
 
-        sqlEvent = "INSERT into Event (id, eventDate, eventType, location) VALUES (DEFAULT, %s, %s, %s) RETURNING id"
+        # if the id has been passed from the front end, save the id for the bike
+        if "eventID" in contextValue["Event"]:
+            eventAndBikeId.append(contextValue["Event"]["eventID"])
+        else:
+            # else create a new event instance in the db with passed values
+            sqlEvent = "INSERT into Event (id, eventDate, eventType, location) VALUES (DEFAULT, %s, %s, %s) RETURNING id"
 
-        eventAndBikeId.append(
-            utils.exec_commit_with_id(
-                sqlEvent, self.DictToTuple(contextValue["Event"])
-            )[0][0]
-        )
+            eventAndBikeId.append(
+                utils.exec_commit_with_id(
+                    sqlEvent, self.DictToTuple(contextValue["Event"])
+                )[0][0]
+            )
 
         # if the bike isn't a saved value
         if not bikeSaved:
@@ -183,9 +190,7 @@ class context_api(MethodView):
             eventAndBikeId.append(
                 utils.exec_get_one(
                     sqlCommand,
-                    [
-                        contextValue["BikeConfig"]["selected"],
-                    ],
+                    [contextValue["BikeConfig"]["selected"]],
                 )[0]
             )
 
@@ -200,6 +205,8 @@ class context_api(MethodView):
                 sqlContext += "%s, "
             else:
                 sqlContext += "DEFAULT, "
+
+        # add event and bike ids to the end and return the idea
         sqlContext += "%s, %s) RETURNING id"
 
         contextId = utils.exec_commit_with_id(

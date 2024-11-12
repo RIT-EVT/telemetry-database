@@ -7,6 +7,7 @@ from utils import exec_get_one, exec_get_all
 
 
 class data_upload_api(MethodView):
+
     ALLOWED_EXTENSIONS = {"mf4"}
     UPLOAD_FOLDER = os.path.dirname(__file__) + "/data_upload_file"
 
@@ -15,13 +16,16 @@ class data_upload_api(MethodView):
         if not os.path.exists(self.UPLOAD_FOLDER):
             os.makedirs(self.UPLOAD_FOLDER)
 
+    ## Get the current progress of the
+    #  current data upload action
+    #  TODO revisit this. Not quite happy with where this call is
     def get(self, contextId):
 
-        return jsonify({"Data": get_progress(contextId)}), 200
+        return jsonify({"progress": get_progress(contextId)}), 200
 
     def post(self, contextId):
         # Check if the post request has the file part
-        print(request.files)
+
         if "file" not in request.files:
             return jsonify({"error": "No file uploaded"}), 400
         elif "contextID" not in request.form:
@@ -31,14 +35,12 @@ class data_upload_api(MethodView):
         file = request.files["file"]
 
         # check for a duplicate context id value
-        sql_check_unique = "SELECT 1 FROM canmessage WHERE contextId = %s"
+        sql_check_unique = "SELECT 1 FROM canMessage WHERE contextId = %s"
         sql_check_result = exec_get_one(
             sql_check_unique,
-            [
-                config_id,
-            ],
+            [config_id],
         )
-        print(sql_check_result)
+
         if not sql_check_result is None:
             return jsonify({"error": "Attempt to upload duplicate context id"}), 400
 
@@ -46,11 +48,9 @@ class data_upload_api(MethodView):
         sql_check_exists = "SELECT 1 FROM context WHERE id = %s"
         sql_check_result = exec_get_one(
             sql_check_exists,
-            [
-                config_id,
-            ],
+            [config_id],
         )
-
+        # return an error if id doesn't exists
         if sql_check_result is None:
             return (
                 jsonify({"error": "Passed context id does not exits in database"}),
@@ -64,7 +64,7 @@ class data_upload_api(MethodView):
         if self.file_type_check(file.filename):
             # Secure name for best practice
             filename = secure_filename(file.filename)
-            print(filename)
+
             temp_file_name = filename
             file_number = 1
             # prevent files of same name
@@ -74,9 +74,10 @@ class data_upload_api(MethodView):
             # save file path and file
             filename = temp_file_name
             file_path = os.path.join(self.UPLOAD_FOLDER, filename)
-            file.save(os.path.join(self.UPLOAD_FOLDER, filename))
+            file.save(file_path)
             file_convert(file_path, config_id)
-
+            # remove mf4 file from local storage
+            os.remove(file_path)
             return jsonify({"message": "Data received successfully"}), 201
         else:
             return (
