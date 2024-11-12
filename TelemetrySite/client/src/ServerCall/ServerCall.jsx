@@ -119,7 +119,7 @@ const PostDataFile = async (file, contextID) => {
 /**
  * Fetch the progress of the current upload
  *
- * @param {int} contextId - id to get progress off of
+ * @param {int} contextId - id to get progress off
  * @return {int} decimal of how much has been uploaded
  */
 const FetchProgress = async (contextId) => {
@@ -134,6 +134,8 @@ const FetchProgress = async (contextId) => {
     if (!response.ok) {
       throw new Error(`Error ${response.status}: ${response.statusText}`);
     }
+
+    const data = await response.json();
 
     return data;
   } catch (error) {
