@@ -52,3 +52,85 @@ The script which is responsible for streaming the raw CAN data into the database
 Currently to use the script run main and when prompted input the path to the .mf4 file you want to have uploaded.<br>
 
 As we do not have means to collect context data yet, we use a dummy context with an id of 1. This is gross and bad. We will be removing that as soon as we have a way to query the user for context data.<br>
+
+## Web UI 
+
+This react-strap-based website allows users to input context and configuration information and to upload CAN data files.<br>
+
+Ideally, MECE's will just download the files and run it on their computer. This includes running both the website and backend api that goes along with it.<br>
+
+In the future, I hope to host at least the backend restful api, and eventually the website itself, on a web server, but that is not going to happen for a long time. To anyone that works on this in the future, if this message is still here, that means I never went back and fixed the mess I made, and for that I sincerely apologize for. This was meant to be quick and dirty, but I attempted to follow best practices and self document the code where I could. <br>
+
+## RESTful API
+
+The RESTful API is built with Python using Flask. <br>
+
+Someday, this will be hosted on a central server, but for now it runs locally. To run this application, see directions below under **Running the Server**. <br>
+
+For any future developers, standard practices should be followed when building this API. This includes separating calls into different classes and using the `GET`, `PUT`, `POST`, and `DELETE` calls correctly. Additionally, any changes to the url path for a call should be updated in the ServerPath.json file.
+
+### Download Instructions
+
+
+#### Node JS
+The first step is to install Node JS if you do not already have it installed.<br>
+
+For Windows computers, execute the following commands:
+
+`winget install Schniz.fnm`<br>
+You will need to close and reopen your terminal before executing the rest<br>
+`fnm env --use-on-cd | Out-String | Invoke-Expression`<br>
+`fnm use --install-if-missing 20`<br>
+
+For Mac and Linux, execute the following commands:
+
+`curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash`<br>
+You will need to close and reopen your terminal before executing the rest<br>
+`nvm install 20`<br>
+<br>
+<br>
+Verify your install on any platform by running:<br>
+`node -v`<br>
+`npm -v`<br>
+
+After Node JS has been installed, the next step is to clone the repo and all needed components. <br>
+
+Open your command terminal and 'cd' into the desired folder location and run the following commands <br>
+
+`git clone https://github.com/RIT-EVT/telemetry-database.git` <br>
+`npm install react`<br>
+`npm install reactstrap` <br>
+
+If you have it installed, you can use VS Code to open the project. If you don't have it installed, just follow along in the command window. <br>
+
+#### **Running the Website**
+
+In the terminal, `cd` into the `~...\Telemetry-Database\TelemetrySite\client` folder. Once there, run the following commands: <br>
+
+`npm install`<br>
+`npm start` <br>
+
+If your website didn't start, check that you are in the correct folder and you installed Node JS. <br>
+
+After your sever is online, make sure you keep that terminal open. **Closing that terminal for any reason will kill your website**.<br>
+
+
+#### **Running the Server**
+
+Open a new terminal and `cd` into the `~...\Telemetry-Database` folder. <br>
+Run the command `pip install -r requirements.txt`. <br>
+
+If `pip` isn't being recognized, run `python -V`. If python isn't recognized, download the installer here [Python](https://www.python.org/downloads/). Python should add itself as environmental variable automatically, but you may need to click **Add As Environmental Variable** on the last page before you close the installer.<br>
+
+In your terminal `cd` into the `~...\Telemetry-Database\TelemetrySite\server` folder and run `python .\server.py`
+
+#### **.env File**
+
+In order to connect to the database, you must contact one of the database leads for the .env file.<br> 
+
+Once they have sent it to you, place it in the `~...\Telemetry-Database` folder in a file names **credentials.env**.
+
+> **WARNING**
+
+>**.env files should never be shared or the contents sent anywhere without the Firmware Team's permission** <br>
+>**DO NOT ADD credentials.env TO GIT**
