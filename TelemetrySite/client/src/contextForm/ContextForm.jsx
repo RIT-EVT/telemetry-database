@@ -156,7 +156,6 @@ function ContextForm() {
       if (!data) {
         return;
       }
-      console.log(data);
       setDropdownOptions(data);
     });
   };
