@@ -42,7 +42,7 @@ function DataUpload() {
     event.preventDefault(); // Prevent page reload
     const file = document.getElementById("fileUpload").files[0];
     const response = PostDataFile(file, contextID);
-    //TODO progress bar
+
     let lastProgress = 0; // Store previous progress percentage
     let lastTimestamp = Date.now(); // Store previous timestamp
 
