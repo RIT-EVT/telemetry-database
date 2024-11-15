@@ -156,6 +156,7 @@ function ContextForm() {
       if (!data) {
         return;
       }
+      console.log(data);
       setDropdownOptions(data);
     });
   };
@@ -183,6 +184,8 @@ function ContextForm() {
    * @return {HTMLFormElement} Form group of all the input elements on the json file
    */
   const GenerateFormElement = (jsonValue) => {
+    //if the event has been loaded based on a past event file
+    //load that data and use it to create a read only form
     if (eventData && jsonValue === "Event") {
       return (
         <FormGroup>
@@ -328,7 +331,7 @@ function ContextForm() {
           collectedData.Context[configName]["savedName"] = savedName;
           //check if the name is a duplicate
           isADup = dropDownOptions[configName].some(
-            (element) => element[0] === savedName
+            (configElement) => configElement === savedName
           );
 
           if (isADup) {
@@ -348,11 +351,24 @@ function ContextForm() {
     const MainElements = ContextJSONIdValues.MainElements;
 
     for (const key in MainElements) {
+      if (key == "BikeConfig") {
+        if (
+          dropDownOptions["bike"].some(
+            (contextElement) =>
+              contextElement === document.getElementById("bikeConfigName").value
+          )
+        ) {
+          console.error(`Duplicate save name detected in bike config`);
+          return;
+        }
+      }
+
       if (key === "Event" && eventData) {
         collectedData.Context.Event.eventID = eventData.id;
       } else if (key !== "BikeConfig" || bikeIsCustom) {
         MainElements[key].forEach((id) => {
           //get the item and make sure it exists
+
           const element = document.getElementById(id);
           if (element) {
             // Collect the value from the form element
@@ -364,11 +380,6 @@ function ContextForm() {
         const element = document.getElementById("bikeSelect").value;
         // Collect the value from the form element
         collectedData.Context[key]["selected"] = element;
-
-        if (dropDownOptions["bike"].some((element) => element[0] === element)) {
-          console.error(`Duplicate save name detected in bike config`);
-          return;
-        }
       }
     }
 
