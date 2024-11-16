@@ -95,6 +95,7 @@ def upload_organized(tpdo_config, data_bytes, receive_time, context_id):
     cur = conn.cursor()
     binary_data_string = ""
     # Convert the bytes into a binary string (This makes it 8x bigger than before!)
+    # This also fully reverses the string so we can handle the endian-ness of our data
     for data in data_bytes:
         binary_data_string = bin(data)[2:].zfill(8) + binary_data_string
     # Here we are extracting the information from the config file to figure out what our sql statement will look like
@@ -140,7 +141,7 @@ def upload_organized(tpdo_config, data_bytes, receive_time, context_id):
 def signed_bin_convert(x, size):
     return (x & ((1<<size-1) - 1)) - (x & (1<<size-1))
 
-## Take the given binary number string and remove values from the front of that string. Return the digit that was removed
+## Take the given binary number string and remove values from the end of that string. Return the digit that was removed
 #
 # @param binary_data_string a string representation of a binary number.
 # @param data_size The number of bits to be taken from the front of the binary_data_string
