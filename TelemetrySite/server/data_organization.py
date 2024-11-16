@@ -41,7 +41,7 @@ def determine_board_owner_and_cob(id, config):
     """Values based on the CAN Open standard. Each hex value relates to a TPDO message"""
     if(id < tpdo_dictionary["TPDO0"]):
         return(UNKNOWN_COB_STRING, 0)
-    if(id <= tpdo_dictionary["DEADZONE_1"]):
+    elif(id <= tpdo_dictionary["DEADZONE_1"]):
         default_COB_ID = tpdo_dictionary["TPDO0"]
     elif(id <= tpdo_dictionary["TPDO1"]):
         return(UNKNOWN_COB_STRING, tpdo_dictionary["DEADZONE_1"])
@@ -94,7 +94,7 @@ def upload_organized(tpdo_config, data_bytes, receive_time, context_id):
     conn = utils.connect()
     cur = conn.cursor()
     binary_data_string = ""
-    # Convert the bytes into a binary string (This makes it 8x biigger than before!)
+    # Convert the bytes into a binary string (This makes it 8x bigger than before!)
     for data in data_bytes:
         binary_data_string = bin(data)[2:].zfill(8) + binary_data_string
     # Here we are extracting the information from the config file to figure out what our sql statement will look like
@@ -139,8 +139,8 @@ def upload_organized(tpdo_config, data_bytes, receive_time, context_id):
 # @param binary_data_string a string representation of a binary number.
 # @param data_size The number of bits to be taken from the front of the binary_data_string
 def extract_data_bytes_by_size(data_size, binary_data_string):
-    data_string = binary_data_string[:data_size]
-    binary_data_string = binary_data_string[data_size:]
+    data_string = binary_data_string[len(binary_data_string)-data_size:]
+    binary_data_string = binary_data_string[:len(binary_data_string)-data_size]
     return binary_data_string, data_string
 
 

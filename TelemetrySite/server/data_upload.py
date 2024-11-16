@@ -11,7 +11,7 @@ import utils
 This file converts .mf4 files to .csv files and then uploads them to the database
 """
 configFilePath = "boardConfig.json"
-expectedIdIndex = 1
+expectedIdIndex =  1
 
 tpdoDictionary = {
     "TPDO0"     : 0x180,
@@ -80,25 +80,22 @@ def handle_data(files):
         with open(file) as open_file:
             # Used to skip the first line of the file which is string values to indicate the values in the can message
             firstLine = open_file.readline()
-            counter = 0
+            row_count = sum(1 for row in open_file)
+            sql = "INSERT into canmessage (ID, busId, frameId, dataBytes, receiveTime, contextId) VALUES (DEFAULT, %s, %s, %s, %s, %s)"
             # Creates the loading bar. Value displayed represents the number of lines handled
-            for line in tqdm(open_file):
-                counter += 1
-                canMessageArr = line.split(',')
-                formattedArray = format_data_bytes(canMessageArr[6])
-                dataToExecuteMany.append((canMessageArr[1], canMessageArr[2], formattedArray, canMessageArr[0], expectedIdIndex))
+            for lineNum in tqdm(range(1, len(row_count)), ncols= 80):
+                canMessageArr = open_file.readline().split(',')
+                dataToExecuteMany.append((canMessageArr[1], canMessageArr[2], re.findall(r'\d+', canMessageArr[6]), canMessageArr[0], expectedIdIndex))
                 # Currently hard coding the contextId input because there is only one (dummy) contextId
-                if(counter % 1000 == 0):
-                    sql = "INSERT into canmessage (ID, busId, frameId, dataBytes, receiveTime, contextId) VALUES (DEFAULT, %s, %s, %s, %s, %s)"
+                if(lineNum % 1000 == 0):
                     try:
                         cur.executemany(sql, dataToExecuteMany)
                         dataToExecuteMany = []
-                    except(TimeoutError):
+                    except:
                         print(len(dataToExecuteMany))
-            sql = "INSERT into canmessage (ID, busId, frameId, dataBytes, receiveTime, contextId) VALUES (DEFAULT, %s, %s, %s, %s, %s)"
             try:
                 cur.executemany(sql, dataToExecuteMany)
-            except(TimeoutError):
+            except:
                 print(len(dataToExecuteMany))
     conn.commit()
     conn.close()

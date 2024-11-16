@@ -72,66 +72,78 @@
             {
                 "table": "ImuEulerComponent",
                 "axis": "x",
-                "size": 16
+                "size": 16,
+                "signage": "signed"
             },
             {
                 "table": "ImuGyroComponent",
                 "axis": "x",
-                "size": 16
+                "size": 16,
+                "signage": "signed"
             },
             {
                 "table": "ImuLinearAccelerationComponent",
                 "axis": "x",
-                "size": 16
+                "size": 16,
+                "signage": "signed"
             },
             {
                 "table": "ImuAccelerometerComponent",
                 "axis": "x",
-                "size": 16
+                "size": 16,
+                "signage": "signed"
             }
         ],
         "0x280": [
             {
                 "table": "ImuEulerComponent",
                 "axis": "y",
-                "size": 16
+                "size": 16,
+                "signage": "signed"
             },
             {
                 "table": "ImuGyroComponent",
                 "axis": "y",
-                "size": 16
+                "size": 16,
+                "signage": "signed"
             },
             {
                 "table": "ImuLinearAccelerationComponent",
                 "axis": "y",
-                "size": 16
+                "size": 16,
+                "signage": "signed"
             },
             {
                 "table": "ImuAccelerometerComponent",
                 "axis": "y",
-                "size": 16
+                "size": 16,
+                "signage": "signed"
             }
         ],
         "0x380": [
             {
                 "table": "ImuEulerComponent",
                 "axis": "z",
-                "size": 16
+                "size": 16,
+                "signage": "signed"
             },
             {
                 "table": "ImuGyroComponent",
                 "axis": "z",
-                "size": 16
+                "size": 16,
+                "signage": "signed"
             },
             {
                 "table": "ImuLinearAccelerationComponent",
                 "axis": "z",
-                "size": 16
+                "size": 16,
+                "signage": "signed"
             },
             {
                 "table": "ImuAccelerometerComponent",
                 "axis": "z",
-                "size": 16
+                "size": 16,
+                "signage": "signed"
             }
         ]
     },
@@ -175,7 +187,8 @@
             {
                 "table": "BmsCurrent",
                 "packId": "UNKNOWN",
-                "size": 16
+                "size": 16,
+                "signage": "signed"
             },
             {
                 "table": "THROW_AWAY",
