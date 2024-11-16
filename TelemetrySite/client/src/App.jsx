@@ -1,9 +1,9 @@
 import { Route, Routes } from "react-router-dom";
-import ContextForm from "./ContextForm/ContextForm"; // Import other components
-import DataUpload from "./DataUpload/DataUpload";
+import ContextForm from "./ContextForm/ContextForm.jsx"; // Import other components
+import DataUpload from "./DataUpload/DataUpload.jsx";
 import "./App.css";
-import Page404 from "./404/404";
-import { CheckServerStatus } from "./ServerCall/ServerCall";
+import Page404 from "./404/404.jsx";
+import { CheckServerStatus } from "./ServerCall/ServerCall.jsx";
 import { useEffect, useState } from "react";
 
 function App() {
