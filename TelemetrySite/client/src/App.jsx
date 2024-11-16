@@ -9,12 +9,9 @@ import { useEffect, useState } from "react";
 function App() {
   const [ServerStatus, setStatus] = useState(false);
 
-  useEffect(() => {
-    CheckServerStatus().then((response) => {
-      setStatus(response);
-    });
-  }, []);
-
+  /**
+   * Call to the backend and ensure the server is online
+   */
   const CheckBackendConnection = () => {
     CheckServerStatus().then((response) => {
       setStatus(response);

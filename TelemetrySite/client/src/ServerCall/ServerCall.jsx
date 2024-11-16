@@ -32,9 +32,7 @@ const FetchConfigData = async () => {
 
     return jsonResponse;
   } catch (error) {
-    throw new Error(
-      "Error has occurred while fetching config data: " + error.message
-    );
+    return { error: error.message };
   }
 };
 
@@ -71,6 +69,12 @@ const PostContextData = async (postData) => {
 /* ---------------------------- Event Data Calls ---------------------------- */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * Call to the backend to fetch data from an event based off the context id
+ *
+ * @param {int} searchContextId - context id to find the event id for
+ * @return {JSON} object containing data
+ */
 const FetchEventDataCall = async (searchContextId) => {
   await CheckData();
   try {
@@ -82,9 +86,7 @@ const FetchEventDataCall = async (searchContextId) => {
 
     return jsonResponse;
   } catch (error) {
-    throw new Error(
-      "Error has occurred while fetching config data: " + error.message
-    );
+    return { error: error.message };
   }
 };
 
@@ -132,7 +134,7 @@ const FetchProgress = async (contextId) => {
     );
 
     if (!response.ok) {
-      throw new Error(`Error ${response.status}: ${response.statusText}`);
+      console.error("Network response was not ok: " + response.statusText);
     }
 
     const data = await response.json();
