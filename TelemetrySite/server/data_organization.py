@@ -110,7 +110,10 @@ def upload_organized(tpdo_config, data_bytes, receive_time, context_id):
             # Pop off the bits of size data_size from the front of binary_data_string
             binary_data_string, insert_data_string = extract_data_bytes_by_size(data_size, binary_data_string)
             # Convert the string version of the binary value into an actual numeric binary value
-            insert_data_int = int(insert_data_string, 2)
+            if(data_package["signage"] == "signed"):
+                insert_data_int = signed_bin_convert(insert_data_string, data_size)
+            else:
+                insert_data_int = int(insert_data_string, 2)
             # Find all of the keys in the data_package which arent table or size we want to make that a part of our sql insert
             for index in data_package.keys():
                 if(index != "table" and index != "size"):
@@ -133,6 +136,9 @@ def upload_organized(tpdo_config, data_bytes, receive_time, context_id):
     conn.commit()
     conn.close()
             
+## Convert a signed binary value to the signed int
+def signed_bin_convert(x, size):
+    return (x & ((1<<size-1) - 1)) - (x & (1<<size-1))
 
 ## Take the given binary number string and remove values from the front of that string. Return the digit that was removed
 #
