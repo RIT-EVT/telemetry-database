@@ -6,7 +6,19 @@
  * Forward user to data upload page with context id
  */
 
-import { Form, FormGroup, Label, Input, Button } from "reactstrap";
+import {
+  Form,
+  FormGroup,
+  Label,
+  Input,
+  Button,
+  Card,
+  Col,
+  Row,
+  CardTitle,
+  CardBody,
+  Container,
+} from "reactstrap";
 import { useEffect, useState } from "react";
 
 import {
@@ -350,7 +362,7 @@ function ContextForm() {
     const MainElements = ContextJSONIdValues.MainElements;
 
     for (const key in MainElements) {
-      if (key == "BikeConfig") {
+      if (key == "BikeConfig" && bikeIsCustom) {
         if (
           dropDownOptions["bike"].some(
             (contextElement) =>
@@ -473,30 +485,36 @@ function ContextForm() {
       }}
     >
       {/*TODO change to reactstrap */}
-      <div className='container'>
-        <div className='left-panel'>
-          <div className='panel-content'>
-            <h3 className='panel-header'>Main Context</h3>
-            {mainContextForm}
-          </div>
-        </div>
-        <div className='right-panel' key='rightPanel'>
-          <div className='top-right-panel'>
-            <div className='panel-content'>
-              <h3 className='panel-header'>Event Context</h3>
-              {eventContextForm}
-            </div>
-          </div>
-          <div className='bottom-right-panel'>
-            <div className='panel-content'>
-              <h3 className='panel-header'>
-                Bike Context: {dropDowns["bike"]}
-              </h3>
-              {bikeContextForm}
-            </div>
-          </div>
-        </div>
-      </div>
+      <Container className='container'>
+        {/* Left Panel */}
+        <Col className='left-panel'>
+          <Card className='panel-content'>
+            <CardTitle className='panel-header'>Main Context</CardTitle>
+            <CardBody>{mainContextForm}</CardBody>
+          </Card>
+        </Col>
+
+        {/* Right Panels */}
+        <Col className='right-panel'>
+          <Row>
+            <Col className='top-right-panel'>
+              <Card className='panel-content'>
+                <CardTitle className='panel-header'>Event Context</CardTitle>
+                <CardBody>{eventContextForm}</CardBody>
+              </Card>
+            </Col>
+            <Col className='bottom-right-panel'>
+              <Card className='panel-content'>
+                <CardTitle className='panel-header'>
+                  Bike Context: {dropDowns["bike"]}
+                </CardTitle>
+                <CardBody>{bikeContextForm}</CardBody>
+              </Card>
+            </Col>
+          </Row>
+        </Col>
+      </Container>
+
       {bikeSelected ? (
         <div className='grid-container'>
           {ConfigName.map((name) => {

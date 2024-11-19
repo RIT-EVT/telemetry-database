@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 
 import "./DataUpload.css";
 import { PostDataFile, FetchProgress } from "../ServerCall/ServerCall";
