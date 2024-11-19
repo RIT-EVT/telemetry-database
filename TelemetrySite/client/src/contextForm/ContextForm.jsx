@@ -350,7 +350,9 @@ function ContextForm() {
     const MainElements = ContextJSONIdValues.MainElements;
 
     for (const key in MainElements) {
-      if (key == "BikeConfig") {
+      //if the bike is custom, make sure saved name
+      //isn't a duplicate name
+      if (key == "BikeConfig" && bikeIsCustom) {
         if (
           dropDownOptions["bike"].some(
             (contextElement) =>
