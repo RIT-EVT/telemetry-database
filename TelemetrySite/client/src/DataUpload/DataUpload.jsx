@@ -1,10 +1,3 @@
-/**
- * Upload a mf4 file to the backend sever
- * as well as the context id passed through
- * the url. All file authentications are
- * conducted on the backend
- */
-
 import { useEffect, useState, useRef } from "react";
 
 import "./DataUpload.css";
@@ -21,6 +14,11 @@ import {
 } from "reactstrap";
 import { useParams, useNavigate } from "react-router-dom";
 
+/**
+ * Upload a mf4 file to the backend sever as
+ * well as the context id passed through the url.
+ * All file authentications are conducted on the backend
+ */
 function DataUpload() {
   const [bodyDisplay, setBodyDisplay] = useState(null);
 
@@ -30,6 +28,12 @@ function DataUpload() {
 
   let navigate = useNavigate();
 
+  /**
+   * Set the new path back to the context creation
+   * page. Send back to basic page if id is null
+   *
+   * @param {id} id - context id to get the event data
+   */
   const RedirectToContext = (id) => {
     if (!id) {
       navigate("/");
@@ -38,6 +42,14 @@ function DataUpload() {
     }
   };
 
+  /**
+   * Submit the current file selected by the user.
+   * Send the context id with the file to the back
+   * end, then start the progress bar and wait for
+   * the response from the backend
+   *
+   * @param {Event} event -Event details from the form
+   */
   const SubmitFile = async (event) => {
     event.preventDefault(); // Prevent page reload
     const file = document.getElementById("fileUpload").files[0];
@@ -61,7 +73,11 @@ function DataUpload() {
         mins > 0 ? mins + "m " : ""
       }${secs}s remaining`;
     };
-    //call to the server every second for upload status
+    /**
+     * Create an interval to update the progress bar every
+     * second. Call to the backend and fetch the value
+     * based off the context id and update the
+     */
     const interval = setInterval(async () => {
       const data = await FetchProgress(contextID);
 
@@ -98,6 +114,11 @@ function DataUpload() {
       }
     }, 1000);
 
+    /**
+     * When the backend responds, display buttons
+     * to bring the user back to the context page
+     * with the option of keeping the same event data
+     */
     response.then((responseValue) => {
       if (responseValue === true) {
         setProgressBar(null);

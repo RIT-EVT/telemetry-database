@@ -4,7 +4,7 @@ from flask import request, jsonify
 import utils
 
 
-class event_api(MethodView):
+class EventApi(MethodView):
 
     def get(self, contextId):
 

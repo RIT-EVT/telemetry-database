@@ -4,7 +4,7 @@ import utils
 from psycopg2.sql import Identifier, SQL
 
 
-class context_api(MethodView):
+class ContextApi(MethodView):
     savedConfigs = (
         "bmsConfig",
         "imuConfig",

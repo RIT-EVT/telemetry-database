@@ -6,7 +6,7 @@ from data_upload_scripts.data_upload import file_convert, get_progress
 from utils import exec_get_one, exec_get_all
 
 
-class data_upload_api(MethodView):
+class DateUploadApi(MethodView):
 
     ALLOWED_EXTENSIONS = {"mf4"}
     UPLOAD_FOLDER = os.path.dirname(__file__) + "/data_upload_file"
@@ -63,6 +63,10 @@ class data_upload_api(MethodView):
 
         if self.file_type_check(file.filename):
             # Secure name for best practice
+            # Prevent any special characters such
+            # as / or . from affecting the path of
+            # the file being saved by the server
+
             filename = secure_filename(file.filename)
 
             temp_file_name = filename

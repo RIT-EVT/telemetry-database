@@ -364,7 +364,12 @@ function ContextForm() {
 
       if (key === "Event" && eventData) {
         collectedData.Context.Event.eventID = eventData.id;
-      } else if (key !== "BikeConfig" || bikeIsCustom) {
+      } else if (key == "BikeConfig" && !bikeIsCustom) {
+        //collect the config name and check for a duplicate
+        const element = document.getElementById("bikeSelect").value;
+        // Collect the value from the form element
+        collectedData.Context[key]["selected"] = element;
+      } else {
         MainElements[key].forEach((id) => {
           //get the item and make sure it exists
 
@@ -374,11 +379,6 @@ function ContextForm() {
             collectedData.Context[key][id] = element.value;
           }
         });
-      } else {
-        //collect the config name and check for a duplicate
-        const element = document.getElementById("bikeSelect").value;
-        // Collect the value from the form element
-        collectedData.Context[key]["selected"] = element;
       }
     }
 
@@ -472,6 +472,7 @@ function ContextForm() {
         SubmitData(e);
       }}
     >
+      {/*TODO change to reactstrap */}
       <div className='container'>
         <div className='left-panel'>
           <div className='panel-content'>

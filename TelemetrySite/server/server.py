@@ -3,9 +3,9 @@ from flask_restful import Api
 from flask_cors import CORS
 import dotenv
 import json
-from context_scripts.context_api import context_api
-from data_upload_scripts.data_upload_api import data_upload_api
-from event_api_scripts.event_api import event_api
+from context_scripts.context_api import ContextApi
+from data_upload_scripts.data_upload_api import DateUploadApi
+from event_api_scripts.event_api import EventApi
 
 import os
 
@@ -14,14 +14,14 @@ api = Api(app)  # API router
 CORS(app)
 
 # create views for url rules
-user_view = context_api.as_view("context_api")
+user_view = ContextApi.as_view("ContextApi")
 
 app.add_url_rule(
     "/Context", view_func=user_view, methods=["GET", "PUT", "DELETE", "POST"]
 )
-user_view = data_upload_api.as_view("data_upload_api")
+user_view = DateUploadApi.as_view("DateUploadApi")
 # TODO Look at refactoring this later. I don't love
-# that data upload has the context takes in contextID
+# that data upload takes in contextID
 # via the path. Need to keep it this way for now for
 # the get call, but look at changing this later
 app.add_url_rule(
@@ -29,7 +29,7 @@ app.add_url_rule(
     view_func=user_view,
     methods=["GET", "POST"],
 )
-user_view = event_api.as_view("event_api")
+user_view = EventApi.as_view("EventApi")
 app.add_url_rule("/Event/<contextId>", view_func=user_view, methods=["GET"])
 
 
