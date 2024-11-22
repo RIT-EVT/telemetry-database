@@ -123,24 +123,26 @@ function DataUpload() {
       if (responseValue === true) {
         setProgressBar(null);
         setBodyDisplay(
-          <div>
-            <Button
-              className='newContext'
-              onClick={() => {
-                RedirectToContext(contextID);
-              }}
-            >
-              Same Event
-            </Button>
-            <Button
-              className='newContext'
-              onClick={() => {
-                RedirectToContext(null);
-              }}
-            >
-              New Context
-            </Button>
-          </div>
+          <Container className='button-container'>
+            <Col xs='6' md='3' className='d-flex justify-content-end'>
+              <Button
+                className='newContext'
+                color='primary'
+                onClick={() => RedirectToContext(contextID)}
+              >
+                Same Event
+              </Button>
+            </Col>
+            <Col xs='6' md='3' className='d-flex justify-content-start'>
+              <Button
+                className='newContext'
+                color='success'
+                onClick={() => RedirectToContext(null)}
+              >
+                New Context
+              </Button>
+            </Col>
+          </Container>
         );
       }
     });
@@ -173,7 +175,7 @@ function DataUpload() {
       <Row className='inner-row'>
         <Col md='6' lg='4'>
           <Card className='upload-card'>
-            <CardBody className='text-center'>
+            <CardBody fluid className='text-center'>
               {bodyDisplay}
               {progressBar}
             </CardBody>

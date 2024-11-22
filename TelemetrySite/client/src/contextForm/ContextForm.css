@@ -14,37 +14,35 @@
 Label {
   padding-right: 20px;
   font-size: 1.3em;
-}
-
-Input {
-  height: 24px;
-  /* Change this value to your desired height */
-  font-size: 20px;
-  /* Optional: Adjust font size */
-  border-radius: 5px;
 
 }
 
-/* Container with left and right panels */
+
+
+.formInput {
+  margin-left: 20px;
+
+}
+
 .container {
   display: flex;
+  /* Optional, can rely on Bootstrap's grid */
+  flex-wrap: wrap;
   gap: 20px;
-  /* Add space between the panels */
+  /* Space between panels */
 }
 
-/* Left Panel */
 .left-panel, .right-panel {
-  flex: 1;
-  /* Take up equal width */
   display: flex;
   flex-direction: column;
+  flex: 1;
+
+  /* Equal width */
 }
 
-/* Right Panel has two sections stacked vertically */
-.right-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+.right-panel .top-right-panel, .right-panel {
+  margin-bottom: 20px;
+  /* Ensure spacing between the stacked cards */
 }
 
 .panel-header {
@@ -54,12 +52,13 @@ Input {
 }
 
 .panel-content {
-  flex-grow: 1;
-  padding: 10px;
-  background-color: #504A43;
-  border: 1px solid #181617;
-  color: #ffffff;
+  flex-grow: 1 !important;
+  padding: 10px !important;
+  background-color: #504A43 !important;
+  border: 1px solid #181617 !important;
+  color: #ffffff !important;
 }
+
 
 /* Grid layout for configuration forms */
 .grid-container {
@@ -71,10 +70,10 @@ Input {
 }
 
 .grid-item {
-  padding: 15px;
-  background-color: #504A43;
-  border: 1px solid #211e1f;
-  color: #ffffff;
+  padding: 15px !important;
+  background-color: #504A43 !important;
+  border: 1px solid #211e1f !important;
+  color: #ffffff !important;
 }
 
 /* Grid Header Styling */

@@ -9,7 +9,6 @@
 import {
   Form,
   FormGroup,
-  Label,
   Input,
   Button,
   Card,
@@ -18,8 +17,10 @@ import {
   CardTitle,
   CardBody,
   Container,
+  InputGroup,
+  InputGroupText,
 } from "reactstrap";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   FetchConfigData,
@@ -27,14 +28,13 @@ import {
   FetchEventDataCall,
 } from "ServerCall/ServerCall.jsx";
 
-import "./ContextForm.css";
-
 //list of all id values to pass to backend
 import ContextJSONIdValues from "./jsonFiles/ContextForm.json";
 //all elements to have as input field and their properties
 import ContextJSONFormElements from "./jsonFiles/FormElementFormat.json";
 import { useNavigate, useParams } from "react-router-dom";
 
+import "./ContextForm.css";
 /**
  * Create needed context forms. Return the configured elements
  *
@@ -200,39 +200,41 @@ function ContextForm() {
     if (eventData && jsonValue === "Event") {
       return (
         <FormGroup>
-          <FormGroup key={"eventDate"} className='FormGroupElement'>
-            <Label for='eventDate'>Event Date</Label>
+          <InputGroup key={"eventDate"} className='FormGroupElement'>
+            <InputGroupText>Event Date</InputGroupText>
             <Input id='eventDate' type='date' readOnly value={eventData.date} />
-          </FormGroup>
-          <FormGroup key={"eventType"} className='FormGroupElement'>
-            <Label for='eventType'>Event Type</Label>
+          </InputGroup>
+          <InputGroup key={"eventType"} className='FormGroupElement'>
+            <InputGroupText>Event Type</InputGroupText>
             <Input
               id='eventType'
               type='text'
               readOnly
               value={eventData.eventType}
             />
-          </FormGroup>
-          <FormGroup key={"eventLocation"} className='FormGroupElement'>
-            <Label for='location'>Event location</Label>
+          </InputGroup>
+          <InputGroup key={"eventLocation"} className='FormGroupElement'>
+            <InputGroupText>Event location</InputGroupText>
             <Input
               id='location'
               type='text'
               readOnly
               value={eventData.location}
             />
-          </FormGroup>
+          </InputGroup>
         </FormGroup>
       );
     } else {
+      //loop through every json element for the current field and
+      //create a new reactstrap input element for it
       return (
         <FormGroup>
           {Object.values(ContextJSONFormElements[jsonValue]).map(
             (formElement) => {
               const idValue = formElement["id"];
               return (
-                <FormGroup key={idValue} className='FormGroupElement'>
-                  <Label for={idValue}>{formElement["label"]}</Label>
+                <InputGroup key={idValue} className='FormGroupElement'>
+                  <InputGroupText>{formElement["label"]}</InputGroupText>
                   <Input
                     id={idValue}
                     type={formElement["type"]}
@@ -249,7 +251,7 @@ function ContextForm() {
                         ))
                       : null}
                   </Input>
-                </FormGroup>
+                </InputGroup>
               );
             }
           )}
@@ -362,7 +364,9 @@ function ContextForm() {
     const MainElements = ContextJSONIdValues.MainElements;
 
     for (const key in MainElements) {
-      if (key == "BikeConfig" && bikeIsCustom) {
+      //if the bike is custom, make sure saved name
+      //isn't a duplicate name
+      if (key === "BikeConfig" && bikeIsCustom) {
         if (
           dropDownOptions["bike"].some(
             (contextElement) =>
@@ -376,7 +380,7 @@ function ContextForm() {
 
       if (key === "Event" && eventData) {
         collectedData.Context.Event.eventID = eventData.id;
-      } else if (key == "BikeConfig" && !bikeIsCustom) {
+      } else if (key === "BikeConfig" && !bikeIsCustom) {
         //collect the config name and check for a duplicate
         const element = document.getElementById("bikeSelect").value;
         // Collect the value from the form element
@@ -484,11 +488,10 @@ function ContextForm() {
         SubmitData(e);
       }}
     >
-      {/*TODO change to reactstrap */}
       <Container className='container'>
         {/* Left Panel */}
         <Col className='left-panel'>
-          <Card className='panel-content'>
+          <Card className='panel-content '>
             <CardTitle className='panel-header'>Main Context</CardTitle>
             <CardBody>{mainContextForm}</CardBody>
           </Card>
@@ -503,6 +506,8 @@ function ContextForm() {
                 <CardBody>{eventContextForm}</CardBody>
               </Card>
             </Col>
+          </Row>
+          <Row>
             <Col className='bottom-right-panel'>
               <Card className='panel-content'>
                 <CardTitle className='panel-header'>
@@ -516,11 +521,11 @@ function ContextForm() {
       </Container>
 
       {bikeSelected ? (
-        <div className='grid-container'>
+        <Container className='grid-container'>
           {ConfigName.map((name) => {
             return (
-              <div className='grid-item'>
-                <h3 className='grid-header'>
+              <Card className='grid-item'>
+                <CardTitle className='grid-header'>
                   {/*
                    *Create each element of the grid. Initially each has the name
                    *of the config and a dropdown. Dropdown is populated by past
@@ -528,12 +533,12 @@ function ContextForm() {
                    *create a new one with the option to save it with a name
                    */}
                   {name.toLocaleUpperCase()} Configuration: {dropDowns[name]}
-                </h3>
-                {configForm[name]}
-              </div>
+                </CardTitle>
+                <CardBody>{configForm[name]}</CardBody>
+              </Card>
             );
           })}
-        </div>
+        </Container>
       ) : null}
       {/*
        * Submitting data is handled in the
