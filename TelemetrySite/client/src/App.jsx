@@ -1,19 +1,17 @@
-import { Route, Routes, BrowserRouter as Router } from "react-router-dom";
-import ContextForm from "./ContextForm/ContextForm"; // Import other components
+import { Route, Routes } from "react-router-dom";
+import ContextForm from "./contextForm/ContextForm.jsx"; // Import other components
+import DataUpload from "./DataUpload/DataUpload.jsx";
 import "./App.css";
-import Page404 from "./404/404";
-import { CheckServerStatus } from "./ServerCall";
+import Page404 from "./404/404.jsx";
+import { CheckServerStatus } from "./ServerCall/ServerCall.jsx";
 import { useEffect, useState } from "react";
 
 function App() {
   const [ServerStatus, setStatus] = useState(false);
 
-  useEffect(() => {
-    CheckServerStatus().then((response) => {
-      setStatus(response);
-    });
-  }, []);
-
+  /**
+   * Call to the backend and ensure the server is online
+   */
   const CheckBackendConnection = () => {
     CheckServerStatus().then((response) => {
       setStatus(response);
@@ -45,8 +43,9 @@ function App() {
 
         {ServerStatus ? (
           <Routes>
-            <Route path='/' element={<ContextForm />} />
-
+            <Route path='404Page' element={<Page404 />} />
+            <Route path='/:contextID?' element={<ContextForm />} />
+            <Route path='/DataUpload/:contextID' element={<DataUpload />} />
             <Route path='*' element={<Page404 />} />
           </Routes>
         ) : null}

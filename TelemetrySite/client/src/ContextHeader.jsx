@@ -1,7 +1,7 @@
 import { Button } from "reactstrap";
 import React, { useEffect, useState } from "react";
 import "./ContextHeader.css";
-import { CheckServerStatus } from "./ServerCall.jsx";
+import { CheckServerStatus } from "./ServerCall/ServerCall.jsx";
 import { useNavigate } from "react-router-dom";
 
 function ContextHeader() {
