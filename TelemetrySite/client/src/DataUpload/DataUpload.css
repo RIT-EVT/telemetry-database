@@ -17,9 +17,10 @@
 /* Card Styling */
 .upload-card {
     padding: 2rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    background-color: #504A43;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+    border-radius: 8px !important;
+    background-color: #504A43 !important;
+    color: white !important;
 }
 
 /* File Input */
@@ -27,7 +28,7 @@
     margin-bottom: 1rem;
     width: 100%;
     padding: 0.5rem;
-    border: 1px solid #ced4da;
+    border: 1px solid #ced4da !important;
     border-radius: 4px;
 }
 
@@ -36,11 +37,7 @@
     width: 100%;
 }
 
-.newContext {
-    padding: 10px;
-    margin: 12px;
 
-}
 
 #container {
     margin: 20px;
@@ -49,11 +46,7 @@
     position: relative;
 }
 
-/* Container for the button row */
-.button-container {
-    margin: 20px;
-    /* Add spacing above the buttons */
-}
+
 
 /* General button styles */
 .newContext {
@@ -63,6 +56,8 @@
     /* Rounded corners */
     transition: background-color 0.3s ease, transform 0.2s ease;
     width: 100%;
+    background-color: #F36917;
+    border-color: black;
     /* Ensure buttons span the column width */
 }
 
@@ -74,11 +69,13 @@
 
 /* Success button hover effect */
 .newContext.btn-success:hover {
-    background-color: #F36917;
-    /* Darker green for hover */
+    background-color: #e45f11;
+    border: black;
+
 }
 
 .newContext.btn-primary:hover {
-    background-color: #F36917;
+    background-color: #e45f11;
+    border: black;
 
 }
