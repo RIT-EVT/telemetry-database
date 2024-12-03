@@ -3,6 +3,7 @@ from flask import request, jsonify
 from werkzeug.utils import secure_filename
 import os
 from data_upload_scripts.data_upload import file_convert, get_progress
+from data_upload_scripts.data_organization import organize_can_from_db
 from utils import exec_get_one, exec_get_all
 
 
@@ -82,6 +83,7 @@ class DateUploadApi(MethodView):
             file_convert(file_path, config_id)
             # remove mf4 file from local storage
             os.remove(file_path)
+            organize_can_from_db(contextId)
             return jsonify({"message": "Data received successfully"}), 201
         else:
             return (
