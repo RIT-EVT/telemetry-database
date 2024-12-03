@@ -10,7 +10,7 @@ from utils import connect, exec_commit_many
 """@package docstring
 This file converts .mf4 files to .csv files and then uploads them to the database
 """
-configFilePath = "boardConfig.json"
+configFilePath = "/data_upload_scripts/boardConfig.json"
 
 tpdoDictionary = {
     "TPDO0": 0x180,
