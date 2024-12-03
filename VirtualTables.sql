@@ -1,3 +1,4 @@
+-- This compiles all TMS temp frames of different sensor ids within the expected time frame for a full snapshot of the data
 CREATE VIEW Tms_TempFrame AS (
     SELECT firstTemp.val  AS TempSensorOne,
         secondTemp.val AS TempSensorTwo,
@@ -14,7 +15,7 @@ CREATE VIEW Tms_TempFrame AS (
             ON firstTemp.receivetime = fourthTemp.receivetime AND firstTemp.contextid = fourthTemp.contextId
     WHERE sensorId = 1
 );
-
+-- This compiles all TMS fan frames of different sensor ids within the expected time frame for a full snapshot of the data
 CREATE VIEW Tms_Fan_Frame AS
 (
 SELECT firstFan.val AS fanSensorOne, secondFan.val AS fanSensorTwo, firstFan.contextId, firstFan.receiveTime
@@ -24,6 +25,7 @@ FROM TmsFanSpeed AS firstFan
 WHERE fanId = 1
     );
 
+-- This compiles all IMU acceleration data in the x, y, and z directions within a single cycle after the first x
 CREATE VIEW Imu_Accel_Frame AS
 (
 SELECT
@@ -52,6 +54,7 @@ WHERE xComponent.axis = 'x'
 ORDER BY xComponent.receivetime
     );
 
+-- This compiles all IMU gyroscope data in the x, y, and z directions within a single cycle after the first x
 CREATE VIEW Imu_Gyro_Frame AS
 (
 SELECT
@@ -80,6 +83,7 @@ WHERE xComponent.axis = 'x'
 ORDER BY xComponent.receivetime
     );
 
+-- This compiles all IMU linear acceleration data in the x, y, and z directions within a single cycle after the first x
 CREATE VIEW Imu_Linear_Frame AS
 (
 SELECT
@@ -108,6 +112,7 @@ WHERE xComponent.axis = 'x'
 ORDER BY xComponent.receivetime
     );
 
+-- This compiles all BMS themister temp data into a list of all cell voltages in order
 CREATE VIEW BMS_Thermistor_Temp_Frame AS
     (SELECT
         array(
@@ -132,6 +137,7 @@ GROUP BY (
 ORDER BY (firstTerm.receiveTime)
 );
 
+-- This compiles all IMU euler data in the x, y, and z directions within a single cycle after the first x
 CREATE VIEW Imu_Euler_Frame AS
 (
 SELECT
@@ -160,6 +166,9 @@ WHERE xComponent.axis = 'x'
 ORDER BY xComponent.receivetime
     );
 
+--TODO make these not fail when the first packet is missing
+
+-- This compiles all BMS cell voltage data into a list of all cell voltages in order
 CREATE VIEW BMS_Cell_Voltage AS
     (SELECT
     array(
