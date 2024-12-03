@@ -20,10 +20,11 @@ app.add_url_rule(
     "/Context", view_func=user_view, methods=["GET", "PUT", "DELETE", "POST"]
 )
 user_view = DateUploadApi.as_view("DateUploadApi")
-# TODO Look at refactoring this later. I don't love
-# that data upload takes in contextID
-# via the path. Need to keep it this way for now for
-# the get call, but look at changing this later
+# TODO Look at refactoring this later
+# I don't love that data upload is in charge of
+# the progress, shift instead to its own call
+# and use data to return data from db based
+# off the context id
 app.add_url_rule(
     "/DataUpload/<contextId>",
     view_func=user_view,

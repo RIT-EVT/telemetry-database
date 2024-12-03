@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 
 import "./DataUpload.css";
 import { PostDataFile, FetchProgress } from "../ServerCall/ServerCall";
@@ -73,6 +73,8 @@ function DataUpload() {
         mins > 0 ? mins + "m " : ""
       }${secs}s remaining`;
     };
+    var fileUpload = false;
+
     /**
      * Create an interval to update the progress bar every
      * second. Call to the backend and fetch the value
@@ -108,9 +110,10 @@ function DataUpload() {
         </div>
       );
 
-      if (currentProgress >= 1 || currentProgress < 0) {
+      if (currentProgress >= 1 || currentProgress < 0 || fileUpload) {
         //stop calling to the backend
         clearInterval(interval);
+        setProgressBar(null);
       }
     }, 1000);
 
@@ -121,26 +124,29 @@ function DataUpload() {
      */
     response.then((responseValue) => {
       if (responseValue === true) {
+        fileUpload = true;
         setProgressBar(null);
         setBodyDisplay(
-          <div>
-            <Button
-              className='newContext'
-              onClick={() => {
-                RedirectToContext(contextID);
-              }}
-            >
-              Same Event
-            </Button>
-            <Button
-              className='newContext'
-              onClick={() => {
-                RedirectToContext(null);
-              }}
-            >
-              New Context
-            </Button>
-          </div>
+          <Container className='button-container'>
+            <Col>
+              <Button
+                className='newContext'
+                color='primary'
+                onClick={() => RedirectToContext(contextID)}
+              >
+                Same Event
+              </Button>
+            </Col>
+            <Col>
+              <Button
+                className='newContext'
+                color='success'
+                onClick={() => RedirectToContext(null)}
+              >
+                New Context
+              </Button>
+            </Col>
+          </Container>
         );
       }
     });
@@ -166,6 +172,28 @@ function DataUpload() {
         </Button>
       </Form>
     );
+    setBodyDisplay(
+      <Container>
+        <Col>
+          <Button
+            className='newContext'
+            color='primary'
+            onClick={() => RedirectToContext(contextID)}
+          >
+            Same Event
+          </Button>
+        </Col>
+        <Col>
+          <Button
+            className='newContext'
+            color='success'
+            onClick={() => RedirectToContext(null)}
+          >
+            New Context
+          </Button>
+        </Col>
+      </Container>
+    );
   }, []);
 
   return (
@@ -173,7 +201,7 @@ function DataUpload() {
       <Row className='inner-row'>
         <Col md='6' lg='4'>
           <Card className='upload-card'>
-            <CardBody className='text-center'>
+            <CardBody fluid className='text-center'>
               {bodyDisplay}
               {progressBar}
             </CardBody>

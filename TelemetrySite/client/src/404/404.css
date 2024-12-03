@@ -31,7 +31,7 @@
     color: #005B9A;
 }
 
-.buttonReturn {
+#buttonReturn {
     background: #dc5e14;
     display: flex;
     justify-content: center;
