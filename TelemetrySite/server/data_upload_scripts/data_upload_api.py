@@ -86,7 +86,6 @@ class DateUploadApi(MethodView):
             # remove mf4 file from local storage
             os.remove(file_path)
             organize_can_from_db(contextId)
-
             return jsonify({"message": "Data received successfully"}), 201
         else:
             return (

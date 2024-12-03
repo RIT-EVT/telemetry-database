@@ -6,7 +6,7 @@ from utils import connect, exec_get_all
 from tqdm import tqdm
 from psycopg2.sql import Identifier, SQL
 
-context_id = 1
+
 config_file_path = "./data_upload_scripts/boardConfig.json"
 
 UNKNOWN_COB_STRING = "Unknown COBID"
@@ -41,7 +41,7 @@ def determine_board_owner_and_cob(id, config):
     """Values based on the CAN Open standard. Each hex value relates to a TPDO message"""
     if id < tpdo_dictionary["TPDO0"]:
         return (UNKNOWN_COB_STRING, 0)
-    if id <= tpdo_dictionary["DEADZONE_1"]:
+    elif id <= tpdo_dictionary["DEADZONE_1"]:
         default_COB_ID = tpdo_dictionary["TPDO0"]
     elif id <= tpdo_dictionary["TPDO1"]:
         return (UNKNOWN_COB_STRING, tpdo_dictionary["DEADZONE_1"])
@@ -94,9 +94,10 @@ def upload_organized(tpdo_config, data_bytes, receive_time, context_id):
     conn = connect()
     cur = conn.cursor()
     binary_data_string = ""
-    # Convert the bytes into a binary string (This makes it 8x biigger than before!)
+    # Convert the bytes into a binary string (This makes it 8x bigger than before!)
+    # This also fully reverses the string so we can handle the endian-ness of our data
     for data in data_bytes:
-        binary_data_string = binary_data_string + bin(data)[2:].zfill(8)
+        binary_data_string = bin(data)[2:].zfill(8) + binary_data_string
     # Here we are extracting the information from the config file to figure out what our sql statement will look like
     for data_package in tpdo_config:
         insert_columns = []
@@ -112,10 +113,15 @@ def upload_organized(tpdo_config, data_bytes, receive_time, context_id):
                 data_size, binary_data_string
             )
             # Convert the string version of the binary value into an actual numeric binary value
-            insert_data_int = int(insert_data_string, 2)
+            if data_package["signage"] == "signed":
+                insert_data_int = signed_bin_convert(
+                    int(insert_data_string, 2), data_size
+                )
+            else:
+                insert_data_int = int(insert_data_string, 2)
             # Find all of the keys in the data_package which arent table or size we want to make that a part of our sql insert
             for index in data_package.keys():
-                if index != "table" and index != "size":
+                if index != "table" and index != "size" and index != "signage":
                     insert_string += "%s, "
                     column_string += "{}, "
                     insert_columns.append(index)
@@ -145,13 +151,18 @@ def upload_organized(tpdo_config, data_bytes, receive_time, context_id):
     conn.close()
 
 
-## Take the given binary number string and remove values from the front of that string. Return the digit that was removed
+## Convert a signed binary value to the signed int
+def signed_bin_convert(x, size):
+    return (x & ((1 << size - 1) - 1)) - (x & (1 << size - 1))
+
+
+## Take the given binary number string and remove values from the end of that string. Return the digit that was removed
 #
 # @param binary_data_string a string representation of a binary number.
 # @param data_size The number of bits to be taken from the front of the binary_data_string
 def extract_data_bytes_by_size(data_size, binary_data_string):
-    data_string = binary_data_string[:data_size]
-    binary_data_string = binary_data_string[data_size:]
+    data_string = binary_data_string[len(binary_data_string) - data_size :]
+    binary_data_string = binary_data_string[: len(binary_data_string) - data_size]
     return binary_data_string, data_string
 
 

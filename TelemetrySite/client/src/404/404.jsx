@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { Container, Row, Col, Button } from "reactstrap";
 import "./404.css";
 const Page404 = () => {
   let nav = useNavigate();
@@ -7,17 +8,23 @@ const Page404 = () => {
   };
 
   return (
-    <div className='wholeThing'>
-      <p className='welcomeTitle'>Welcome To The</p>
-
-      <div className='mfTitle'>
-        <h1 className='titleMain'>Context 404 Page</h1>
-      </div>
-
-      <button className='buttonReturn' onClick={ReturnToMainScreen}>
-        Return to Home
-      </button>
-    </div>
+    <Container>
+      <Col>
+        <Row>
+          <p className='welcomeTitle'>Welcome To The</p>
+        </Row>
+        <Row>
+          <div className='mfTitle'>
+            <h1 className='titleMain'>Context 404 Page</h1>
+          </div>
+        </Row>
+        <Row>
+          <Button onClick={ReturnToMainScreen} id='buttonReturn'>
+            Return to Context Page
+          </Button>
+        </Row>
+      </Col>
+    </Container>
   );
 };
 

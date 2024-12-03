@@ -5,6 +5,7 @@ import "./App.css";
 import Page404 from "./404/404.jsx";
 import { CheckServerStatus } from "./ServerCall/ServerCall.jsx";
 import { useEffect, useState } from "react";
+import { Container, Row, Col } from "reactstrap";
 
 function App() {
   const [ServerStatus, setStatus] = useState(false);
@@ -34,22 +35,26 @@ function App() {
 
   return (
     <div className='MainBody'>
-      <div className='ContextSelect'>
-        <header className='ContextHeader'>
+      <Container className='ContextSelect'>
+        <Row className='ContextHeader'>
           <center>
-            <div className='ContextHeaderText'>Context Creator</div>
+            <Col className='ContextHeaderText'>Context Creator</Col>
           </center>
-        </header>
+        </Row>
 
         {ServerStatus ? (
-          <Routes>
-            <Route path='404Page' element={<Page404 />} />
-            <Route path='/:contextID?' element={<ContextForm />} />
-            <Route path='/DataUpload/:contextID' element={<DataUpload />} />
-            <Route path='*' element={<Page404 />} />
-          </Routes>
+          <Row className='Components'>
+            <Col>
+              <Routes>
+                <Route path='404Page' element={<Page404 />} />
+                <Route path='/:contextID?' element={<ContextForm />} />
+                <Route path='/DataUpload/:contextID' element={<DataUpload />} />
+                <Route path='*' element={<Page404 />} />
+              </Routes>
+            </Col>
+          </Row>
         ) : null}
-      </div>
+      </Container>
     </div>
   );
 }
