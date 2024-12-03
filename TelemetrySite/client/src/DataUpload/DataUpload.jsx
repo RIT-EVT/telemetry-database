@@ -172,28 +172,6 @@ function DataUpload() {
         </Button>
       </Form>
     );
-    setBodyDisplay(
-      <Container>
-        <Col>
-          <Button
-            className='newContext'
-            color='primary'
-            onClick={() => RedirectToContext(contextID)}
-          >
-            Same Event
-          </Button>
-        </Col>
-        <Col>
-          <Button
-            className='newContext'
-            color='success'
-            onClick={() => RedirectToContext(null)}
-          >
-            New Context
-          </Button>
-        </Col>
-      </Container>
-    );
   }, []);
 
   return (
