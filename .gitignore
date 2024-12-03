@@ -3,4 +3,6 @@
 .idea/
 *.env
 *.cpython-312.pyc
-*.vscode
+/.vscode
+__pycache__/
+data_upload_file/

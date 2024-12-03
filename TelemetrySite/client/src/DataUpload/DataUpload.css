@@ -1,0 +1,50 @@
+/* Fullscreen Container */
+.outer-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+
+}
+
+/* Centered Row */
+.inner-row {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+/* Card Styling */
+.upload-card {
+    padding: 2rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background-color: #504A43;
+}
+
+/* File Input */
+.file-input {
+    margin-bottom: 1rem;
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+}
+
+/* Submit Button */
+.submit-btn {
+    width: 100%;
+}
+
+.newContext {
+    padding: 10px;
+    margin: 12px;
+
+}
+
+#container {
+    margin: 20px;
+    width: 400px;
+    height: 8px;
+    position: relative;
+}

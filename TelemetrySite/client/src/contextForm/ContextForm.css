@@ -1,0 +1,115 @@
+.MainFormGroups {
+  padding: 10px;
+}
+
+.ContextForm {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.FormGroupElement {
+  padding: 5px;
+}
+
+Label {
+  padding-right: 20px;
+  font-size: 1.3em;
+}
+
+Input {
+  height: 24px;
+  /* Change this value to your desired height */
+  font-size: 20px;
+  /* Optional: Adjust font size */
+  border-radius: 5px;
+
+}
+
+/* Container with left and right panels */
+.container {
+  display: flex;
+  gap: 20px;
+  /* Add space between the panels */
+}
+
+/* Left Panel */
+.left-panel, .right-panel {
+  flex: 1;
+  /* Take up equal width */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Right Panel has two sections stacked vertically */
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.panel-header {
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #F36917;
+}
+
+.panel-content {
+  flex-grow: 1;
+  padding: 10px;
+  background-color: #504A43;
+  border: 1px solid #181617;
+  color: #ffffff;
+}
+
+/* Grid layout for configuration forms */
+.grid-container {
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(200px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.grid-item {
+  padding: 15px;
+  background-color: #504A43;
+  border: 1px solid #211e1f;
+  color: #ffffff;
+}
+
+/* Grid Header Styling */
+.grid-header {
+  margin-bottom: 10px;
+  font-weight: bold;
+  font-size: 1.2em;
+  text-align: left;
+  color: #F36917;
+}
+
+/* Button styling */
+.submitButton {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #F36917;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  position: fixed;
+  display: block;
+  right: 10px;
+  bottom: 10px;
+  transition: 10ms;
+}
+
+.submitButton:hover {
+  background-color: #9d4614;
+  scale: 1.05;
+}
+
+.ConfigDropdown {
+  background-color: #ffffff;
+  color: #000000;
+  font-size: 1em;
+  border-radius: 10px;
+}
