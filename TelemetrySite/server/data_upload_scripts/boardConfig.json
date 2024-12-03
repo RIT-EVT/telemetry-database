@@ -7,22 +7,26 @@
             {
                 "table": "TmuThermistorTemp", 
                 "thermId": 1,
-                "size": 16
+                "size": 16,
+                "signage": "unsigned"
             },
             {
                 "table": "TmuThermistorTemp",
                 "thermId": 2,
-                "size": 16
+                "size": 16,
+                "signage": "unsigned"
             },
             {
                 "table": "TmuThermistorTemp",
                 "thermId": 3,
-                "size": 16
+                "size": 16,
+                "signage": "unsigned"
             },
             {
                 "table": "TmuThermistorTemp",
                 "thermId": 4,
-                "size": 16
+                "size": 16,
+                "signage": "unsigned"
             }
         ]
     },
@@ -31,39 +35,46 @@
             {
                 "table": "TmsSensorTemp",
                 "sensorId": 1,
-                "size": 16
+                "size": 16,
+                "signage": "unsigned"
             },
             {
                 "table": "TmsSensorTemp",
                 "sensorId": 2,
-                "size": 16
+                "size": 16,
+                "signage": "unsigned"
             },
             {
                 "table": "TmsSensorTemp",
                 "sensorId": 3,
-                "size": 16
+                "size": 16,
+                "signage": "unsigned"
             },
             {
                 "table": "TmsSensorTemp",
                 "sensorId": 4,
-                "size": 16
+                "size": 16,
+                "signage": "unsigned"
             }
         ],
         "0x280": [
             {
                 "table": "TmsPumpSpeed",
                 "pumpId": 1,
-                "size": 8
+                "size": 8,
+                "signage": "unsigned"
             },
             {
                 "table": "TmsFanSpeed",
                 "fanId": 1,
-                "size": 8
+                "size": 8,
+                "signage": "unsigned"
             },
             {
                 "table": "TmsFanSpeed",
                 "fanId": 2,
-                "size": 8
+                "size": 8,
+                "signage": "unsigned"
             }
         ]
     },
@@ -72,66 +83,78 @@
             {
                 "table": "ImuEulerComponent",
                 "axis": "x",
-                "size": 16
+                "size": 16,
+                "signage": "signed"
             },
             {
                 "table": "ImuGyroComponent",
                 "axis": "x",
-                "size": 16
+                "size": 16,
+                "signage": "signed"
             },
             {
                 "table": "ImuLinearAccelerationComponent",
                 "axis": "x",
-                "size": 16
+                "size": 16,
+                "signage": "signed"
             },
             {
                 "table": "ImuAccelerometerComponent",
                 "axis": "x",
-                "size": 16
+                "size": 16,
+                "signage": "signed"
             }
         ],
         "0x280": [
             {
                 "table": "ImuEulerComponent",
                 "axis": "y",
-                "size": 16
+                "size": 16,
+                "signage": "signed"
             },
             {
                 "table": "ImuGyroComponent",
                 "axis": "y",
-                "size": 16
+                "size": 16,
+                "signage": "signed"
             },
             {
                 "table": "ImuLinearAccelerationComponent",
                 "axis": "y",
-                "size": 16
+                "size": 16,
+                "signage": "signed"
             },
             {
                 "table": "ImuAccelerometerComponent",
                 "axis": "y",
-                "size": 16
+                "size": 16,
+                "signage": "signed"
             }
         ],
         "0x380": [
             {
                 "table": "ImuEulerComponent",
                 "axis": "z",
-                "size": 16
+                "size": 16,
+                "signage": "signed"
             },
             {
                 "table": "ImuGyroComponent",
                 "axis": "z",
-                "size": 16
+                "size": 16,
+                "signage": "signed"
             },
             {
                 "table": "ImuLinearAccelerationComponent",
                 "axis": "z",
-                "size": 16
+                "size": 16,
+                "signage": "signed"
             },
             {
                 "table": "ImuAccelerometerComponent",
                 "axis": "z",
-                "size": 16
+                "size": 16,
+                "signage": "signed"
             }
         ]
     },
@@ -139,7 +162,8 @@
         "0x180": [
             {
                 "table": "PvcState",
-                "size": 16
+                "size": 16,
+                "signage": "unsigned"
             }
         ]
     },
@@ -148,34 +172,40 @@
             {
                 "table": "BmsBatteryVoltage",
                 "packId": "UNKNOWN",
-                "size": 16
+                "size": 16,
+                "signage": "unsigned"
             },
             {
                 "table": "THROW_AWAY",
                 "packId": "UNKNOWN",
-                "size": 16
+                "size": 16,
+                "signage": "unsigned"
             },
             {
                 "table": "THROW_AWAY",
                 "packId": "UNKNOWN",
-                "size": 8
+                "size": 8,
+                "signage": "unsigned"
             },
             {
                 "table": "THROW_AWAY",
                 "packId": "UNKNOWN",
-                "size": 16
+                "size": 16,
+                "signage": "unsigned"
             },
             {
                 "table": "THROW_AWAY",
                 "packId": "UNKNOWN",
-                "size": 8
+                "size": 8,
+                "signage": "unsigned"
             }
         ],
         "0x280": [
             {
                 "table": "BmsCurrent",
                 "packId": "UNKNOWN",
-                "size": 16
+                "size": 16,
+                "signage": "signed"
             },
             {
                 "table": "THROW_AWAY",
@@ -198,101 +228,119 @@
                 "size": 8
             },
             {
-                "table": "BmsThermistorTemp",
-                "thermId": 1,
+                "table": "BmsBqTemp",
                 "packId": "UNKNOWN",
-                "size": 8
+                "tempid": 1,
+                "size": 8,
+                "signage": "unsigned"
             },
             {
                 "table": "BmsState",
                 "packId": "UNKNOWN",
-                "size": 8
+                "size": 8,
+                "signage": "unsigned"
             }
         ],
         "0x380": [
             {
                 "table": "BmsThermistorTemp",
                 "thermId": 1,
-                "size": 8
+                "size": 8,
+                "signage": "unsigned"
             },
             {
                 "table": "BmsThermistorTemp",
                 "thermId": 2,
-                "size": 8
+                "size": 8,
+                "signage": "unsigned"
             },
             {
                 "table": "BmsThermistorTemp",
                 "thermId": 3,
-                "size": 8
+                "size": 8,
+                "signage": "unsigned"
             },
             {
                 "table": "BmsThermistorTemp",
                 "thermId": 4,
-                "size": 8
+                "size": 8,
+                "signage": "unsigned"
             },
             {
                 "table": "BmsThermistorTemp",
                 "thermId": 5,
-                "size": 8
+                "size": 8,
+                "signage": "unsigned"
             },
             {
                 "table": "BmsThermistorTemp",
                 "thermId": 6,
-                "size": 8
+                "size": 8,
+                "signage": "unsigned"
             },
             {
                 "table": "BmsBqTemp",
                 "packId": "UNKNOWN",
                 "tempId": 2,
-                "size": 8
+                "size": 8,
+                "signage": "unsigned"
             },
             {
                 "table": "BmsBqTemp",
                 "packId": "UNKNOWN",
                 "tempId": 3,
-                "size": 8
+                "size": 8,
+                "signage": "unsigned"
             }
         ],
         "0x480": [
             {
                 "table": "BmsErrorRegister",
                 "packId": "UNKNOWN",
-                "size": 8
+                "size": 8,
+                "signage": "unsigned"
             },
             {
                 "table": "BmsBqStatus",
                 "packId": 1,
-                "size": 8
+                "size": 8,
+                "signage": "unsigned"
             },
             {
                 "table": "BmsBqStatus",
                 "packId": 2,
-                "size": 8
+                "size": 8,
+                "signage": "unsigned"
             },
             {
                 "table": "BmsBqStatus",
                 "packId": 3,
-                "size": 8
+                "size": 8,
+                "signage": "unsigned"
             },
             {
                 "table": "BmsBqStatus",
                 "packId": 4,
-                "size": 8
+                "size": 8,
+                "signage": "unsigned"
             },
             {
                 "table": "BmsBqStatus",
                 "packId": 5,
-                "size": 8
+                "size": 8,
+                "signage": "unsigned"
             },
             {
                 "table": "BmsBqStatus",
                 "packId": 6,
-                "size": 8
+                "size": 8,
+                "signage": "unsigned"
             },
             {
                 "table": "BmsBqStatus",
                 "packId": 7,
-                "size": 8
+                "size": 8,
+                "signage": "unsigned"
             }
         ]
     },
@@ -302,25 +350,29 @@
                 "table": "BmsCellVoltage",
                 "packId": "UNKNOWN",
                 "cellId": 1,
-                "size": 8
+                "size": 16,
+                "signage": "unsigned"
             },
             {
                 "table": "BmsCellVoltage",
                 "packId": "UNKNOWN",
                 "cellId": 2,
-                "size": 8
+                "size": 16,
+                "signage": "unsigned"
             },
             {
                 "table": "BmsCellVoltage",
                 "packId": "UNKNOWN",
                 "cellId": 3,
-                "size": 8
+                "size": 16,
+                "signage": "unsigned"
             },
             {
                 "table": "BmsCellVoltage",
                 "packId": "UNKNOWN",
                 "cellId": 4,
-                "size": 8
+                "size": 16,
+                "signage": "unsigned"
             }
         ],
         "0x280": [
@@ -328,25 +380,29 @@
                 "table": "BmsCellVoltage",
                 "packId": "UNKNOWN",
                 "cellId": 5,
-                "size": 8
+                "size": 16,
+                "signage": "unsigned"
             },
             {
                 "table": "BmsCellVoltage",
                 "packId": "UNKNOWN",
                 "cellId": 6,
-                "size": 8
+                "size": 16,
+                "signage": "unsigned"
             },
             {
                 "table": "BmsCellVoltage",
                 "packId": "UNKNOWN",
                 "cellId": 7,
-                "size": 8
+                "size": 16,
+                "signage": "unsigned"
             },
             {
                 "table": "BmsCellVoltage",
                 "packId": "UNKNOWN",
                 "cellId": 8,
-                "size": 8
+                "size": 16,
+                "signage": "unsigned"
             }
         ],
         "0x380": [
@@ -354,25 +410,29 @@
                 "table": "BmsCellVoltage",
                 "packId": "UNKNOWN",
                 "cellId": 9,
-                "size": 8
+                "size": 16,
+                "signage": "unsigned"
             },
             {
                 "table": "BmsCellVoltage",
                 "packId": "UNKNOWN",
                 "cellId": 10,
-                "size": 8
+                "size": 16,
+                "signage": "unsigned"
             },
             {
                 "table": "BmsCellVoltage",
                 "packId": "UNKNOWN",
                 "cellId": 11,
-                "size": 8
+                "size": 16,
+                "signage": "unsigned"
             },
             {
                 "table": "BmsCellVoltage",
                 "packId": "UNKNOWN",
                 "cellId": 12,
-                "size": 8
+                "size": 16,
+                "signage": "unsigned"
             }
         ]
     },

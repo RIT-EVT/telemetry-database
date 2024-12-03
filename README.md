@@ -53,6 +53,26 @@ Currently to use the script run main and when prompted input the path to the .mf
 
 As we do not have means to collect context data yet, we use a dummy context with an id of 1. This is gross and bad. We will be removing that as soon as we have a way to query the user for context data.<br>
 
+
+## Accessing Data
+
+Data access on Matlab is possible using the Database Explorer Application (found in the Apps subtab). This should come native with your Matlab installation but if not please add the toolbox.<br>
+
+Once in the Database Explorer, to set up a connection for the first time do the following:<br>
+1. Click the dropdown "Configure Data Source" in the top left.
+2. In the dropdown select "PostgreSQL"
+3. Now you will need to fill out the form that appears. Use the image below to do so:
+![image](MatlabDBSetup.png)
+4. You will need to set your credentials now. If you do not know them you will need to ask for them. Find the Database Lead and ask them.
+<br>
+Now that a config is established you will need to connect to the DB.<br>
+Select the "Connect" dropdown next to "Configure Data Source" in the top left of the Database Explorer<br>
+In the pop-up open the schema dropdown and select "public"<br>
+Congrats you are now connected to the DB!<br>
+<br>
+I recommend using the automatic Matlab export in order to start your queries as it will configure accessing the DB for you.
+
+
 ## Web UI 
 
 This react-strap-based website allows users to input context and configuration information and to upload CAN data files.<br>
