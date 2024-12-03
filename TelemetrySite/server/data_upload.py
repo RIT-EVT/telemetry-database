@@ -11,7 +11,7 @@ import utils
 This file converts .mf4 files to .csv files and then uploads them to the database
 """
 configFilePath = "boardConfig.json"
-expectedIdIndex =  1
+expectedIdIndex =  69
 
 tpdoDictionary = {
     "TPDO0"     : 0x180,
@@ -78,25 +78,28 @@ def handle_data(files):
     for file in files:
         dataToExecuteMany = []
         with open(file) as open_file:
+            row_count = sum(1 for row in open_file)
+        open_file.close()
+        with open(file) as open_file:
             # Used to skip the first line of the file which is string values to indicate the values in the can message
             firstLine = open_file.readline()
-            row_count = sum(1 for row in open_file)
-            sql = "INSERT into canmessage (ID, busId, frameId, dataBytes, receiveTime, contextId) VALUES (DEFAULT, %s, %s, %s, %s, %s)"
-            # Creates the loading bar. Value displayed represents the number of lines handled
-            for lineNum in tqdm(range(1, len(row_count)), ncols= 80):
-                canMessageArr = open_file.readline().split(',')
-                dataToExecuteMany.append((canMessageArr[1], canMessageArr[2], re.findall(r'\d+', canMessageArr[6]), canMessageArr[0], expectedIdIndex))
-                # Currently hard coding the contextId input because there is only one (dummy) contextId
-                if(lineNum % 1000 == 0):
-                    try:
+            if(row_count > 2):
+                sql = "INSERT into canmessage (ID, busId, frameId, dataBytes, receiveTime, contextId) VALUES (DEFAULT, %s, %s, %s, %s, %s)"
+                # Creates the loading bar. Value displayed represents the number of lines handled
+                for lineNum in tqdm(range(1, row_count), ncols= 80):
+                    canMessageArr = open_file.readline().split(',')
+                    dataToExecuteMany.append((canMessageArr[1], canMessageArr[2], format_data_bytes(canMessageArr[6]), canMessageArr[0], expectedIdIndex))
+                    # Currently hard coding the contextId input because there is only one (dummy) contextId
+                    if(lineNum % 1000 == 0):
+                        # try:
                         cur.executemany(sql, dataToExecuteMany)
                         dataToExecuteMany = []
-                    except:
-                        print(len(dataToExecuteMany))
-            try:
-                cur.executemany(sql, dataToExecuteMany)
-            except:
-                print(len(dataToExecuteMany))
+                        # except:
+                        #     print(len(dataToExecuteMany))
+                try:
+                    cur.executemany(sql, dataToExecuteMany)
+                except:
+                    print(len(dataToExecuteMany))
     conn.commit()
     conn.close()
 
