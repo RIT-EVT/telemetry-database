@@ -68,11 +68,13 @@ def handle_data(can_data):
         config = json.load(config_file)
         for x in tqdm(range(len(can_data)), ncols=80):
             data_tuple = can_data[x]
+
             frame_id = data_tuple[2]
             data_bytes = data_tuple[3]
             receive_time = data_tuple[4]
             context_id = data_tuple[5]
             board_owner, cob_id = determine_board_owner_and_cob(frame_id, config)
+
             if board_owner != UNKNOWN_COB_STRING and board_owner != "Motor Controller":
                 if board_owner[:3] != "BMS":
                     tpdo_config = config[board_owner][hex(cob_id)]
@@ -133,6 +135,7 @@ def upload_organized(tpdo_config, data_bytes, receive_time, context_id):
             data_insert_array += [insert_data_int, str(receive_time), context_id]
             # Format array will be unpacked in the format call for the SQL statement it will store the names of the table and columns being Inserted into
             format_array = [Identifier(table_to_insert.lower())]
+
             for value in insert_columns:
                 format_array.append(Identifier(value.lower()))
             # Run the SQL statement. There are a lot of weird python string things happening here. First we add the values for the table and columns
@@ -173,8 +176,8 @@ def extract_data_bytes_by_size(data_size, binary_data_string):
 # @param cob_id The TPDO number of the message
 def handle_bms_config(config, board_owner, cob_id):
     try:
-        temp_config = config
 
+        temp_config = config
         if board_owner[-1] == "1":
             # Set the packId in the config to the value stored at board_owner[3] which is the number value for the pack Id according to the nodeIDDictionary
             for message in temp_config[BMSX_1_TYPE_CONFIG][cob_id]:
