@@ -52,29 +52,12 @@ function DataUpload() {
    */
   const SubmitFile = async (event) => {
     event.preventDefault(); // Prevent page reload
-    const file = document.getElementById("fileUpload").files[0];
-    const response = PostDataFile(file, contextID);
+    const mf4File = document.getElementById("fileUploadMF4").files[0];
+    const dbcFile = document.getElementById("fileUploadDBC").files[0];
+    const response = PostDataFile(mf4File, dbcFile, contextID);
 
-    let lastProgress = 0; // Store previous progress percentage
-    let lastTimestamp = Date.now(); // Store previous timestamp
-
-    /**
-     * Helper function to convert seconds to hours and minutes
-     *
-     * @param {int} seconds - seconds to convert
-     * @return {string} formatted data
-     */
-    const formatTime = (seconds) => {
-      const hrs = Math.floor(seconds / 3600);
-      const mins = Math.floor((seconds % 3600) / 60);
-      const secs = Math.floor(seconds % 60);
-
-      return `${hrs > 0 ? hrs + "h " : ""}${
-        mins > 0 ? mins + "m " : ""
-      }${secs}s remaining`;
-    };
     var fileUpload = false;
-
+    var lastProgress = -1;
     /**
      * Create an interval to update the progress bar every
      * second. Call to the backend and fetch the value
@@ -87,33 +70,24 @@ function DataUpload() {
         console.error("Error fetching progress:", data.error);
         return;
       }
-      //get the progress and the current time
+      //get the progress passed from the backend
+
       const currentProgress = data.progress;
-      const currentTime = Date.now();
-      //get how much progress was made and how ling it took
-      const progressDelta = currentProgress - lastProgress;
-      const timeDelta = (currentTime - lastTimestamp) / 1000;
+      if (currentProgress > lastProgress) {
+        // Update the UI with the formatted estimated time remaining
+        setProgressBar(
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <progress value={currentProgress} style={{ marginRight: "10px" }} />
+            <div>{Math.round(currentProgress * 100)}%</div>
+          </div>
+        );
 
-      lastProgress = currentProgress;
-      lastTimestamp = currentTime;
-      //calculate an estimate to how much time is left in upload
-      const progressRate = progressDelta / timeDelta;
-      const remainingProgress = 1 - currentProgress;
-      const estimatedTimeRemaining =
-        progressRate > 0 ? remainingProgress / progressRate : Infinity;
-
-      // Update the UI with the formatted estimated time remaining
-      setProgressBar(
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <progress value={currentProgress} style={{ marginRight: "10px" }} />
-          <div>{formatTime(estimatedTimeRemaining)}</div>
-        </div>
-      );
-
-      if (currentProgress >= 1 || currentProgress < 0 || fileUpload) {
-        //stop calling to the backend
-        clearInterval(interval);
-        setProgressBar(null);
+        if (currentProgress >= 1 || currentProgress < 0 || fileUpload) {
+          //stop calling to the backend
+          clearInterval(interval);
+          setProgressBar(null);
+        }
+        lastProgress = currentProgress;
       }
     }, 1000);
 
@@ -159,14 +133,30 @@ function DataUpload() {
         onSubmit={SubmitFile}
         encType='multipart/form-data'
       >
-        <h4 className='mb-3'>Upload MF4 File</h4>
-        <Input
-          type='file'
-          id='fileUpload'
-          className='file-input'
-          required
-          accept='.mf4'
-        />
+        <Container>
+          <Col>
+            <h4 className='mb-3'>Upload MF4 File</h4>
+            <Input
+              type='file'
+              id='fileUploadMF4'
+              className='file-input'
+              required
+              accept='.mf4'
+              bsSize='sm'
+            />
+          </Col>
+          <Col>
+            <h4 className='mb-3'>Upload DBC File</h4>
+            <Input
+              type='file'
+              id='fileUploadDBC'
+              className='file-input'
+              required
+              accept='.dbc'
+              bsSize='sm'
+            />
+          </Col>
+        </Container>
         <Button color='primary' className='submit-btn'>
           Submit
         </Button>
@@ -176,16 +166,12 @@ function DataUpload() {
 
   return (
     <Container fluid className='outer-container'>
-      <Row className='inner-row'>
-        <Col md='6' lg='4'>
-          <Card className='upload-card'>
-            <CardBody fluid className='text-center'>
-              {bodyDisplay}
-              {progressBar}
-            </CardBody>
-          </Card>
-        </Col>
-      </Row>
+      <Card className='upload-card'>
+        <CardBody fluid className='text-center'>
+          {bodyDisplay}
+          {progressBar}
+        </CardBody>
+      </Card>
     </Container>
   );
 }

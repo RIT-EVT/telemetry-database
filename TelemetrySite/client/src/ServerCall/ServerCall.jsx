@@ -94,11 +94,12 @@ const FetchEventDataCall = async (searchContextId) => {
 /* ---------------------------- Data Upload Calls --------------------------- */
 /* -------------------------------------------------------------------------- */
 
-const PostDataFile = async (file, contextID) => {
+const PostDataFile = async (mf4File, dbcFile, contextID) => {
   await CheckData();
 
   const formData = new FormData();
-  formData.append("file", file);
+  formData.append("mf4File", mf4File);
+  formData.append("dbcFile", dbcFile);
   formData.append("contextID", contextID);
 
   const response = await fetch(

@@ -20,6 +20,7 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
     border-radius: 8px !important;
     background-color: #504A43 !important;
+    width: 100%;
     color: white !important;
 }
 
@@ -34,7 +35,11 @@
 
 /* Submit Button */
 .submit-btn {
-    width: 100%;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 7px;
+    padding-bottom: 7px;
+
 }
 
 
