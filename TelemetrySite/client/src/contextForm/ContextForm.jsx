@@ -320,8 +320,10 @@ function ContextForm() {
     };
     var bikeIsCustom = false;
     var isADup = false;
-    //get the needed json object
+
+    //Load the json file that defines the way the data should be formatted
     const ConfigElements = ContextJSONIdValues.ConfigElements;
+    //!TODO remove the ability to save bike configs? Will be really hard to do with NRDB unless we rework the format
     if (document.getElementById("bikeSelect").value === "Custom") {
       bikeIsCustom = true;
       ConfigName.forEach((configName) => {
@@ -398,15 +400,10 @@ function ContextForm() {
       }
     }
 
-    PostContextData(collectedData).then((result) => {
-      if (result["success"]) {
-        document.getElementById(FormId).reset();
-        //switch to new screen
-        navigate("/DataUpload/" + result["contextID"]);
-      } else {
-        throw new Error("An error has occurred while submitting data");
-      }
-    });
+    //Save this data and pass it to the next step
+    //save the data in local storage in case user loses wifi/refreshes page
+    sessionStorage.setItem("BikeData", JSON.stringify(collectedData));
+    navigate("/DataUpload");
   };
 
   /**

@@ -10,7 +10,7 @@ from utils import exec_get_one
 # TODO modify scripts to accept a DBC file
 class DateUploadApi(MethodView):
 
-    ALLOWED_EXTENSIONS = {"mf4"}
+    ALLOWED_EXTENSIONS = {"mf4", "dbc"}
     UPLOAD_FOLDER = os.path.dirname(__file__) + "/data_upload_file"
 
     def __init__(self):
@@ -26,48 +26,32 @@ class DateUploadApi(MethodView):
         return jsonify({"progress": get_progress(contextId)}), 200
 
     def post(self, contextId):
-        # Check if the post request has the file part
+        # Check if the post request has all needed data needed
 
         if "mf4File" not in request.files:
             return jsonify({"error": "No mf4 file uploaded"}), 400
         elif "dbcFile" not in request.files:
             return jsonify({"error": "No dbc file uploaded"}), 400
+        elif "contextData" not in request.form:
+            return jsonify({"error": "No context data passed"}), 400
         elif "contextID" not in request.form:
             return jsonify({"error": "No id passed"}), 400
 
         config_id = request.form["contextID"]
         mf4File = request.files["mf4File"]
         dbcFile = request.files["dbcFile"]
-
-        # check for a duplicate context id value
-        sql_check_unique = "SELECT 1 FROM canMessage WHERE contextId = %s"
-        sql_check_result = exec_get_one(
-            sql_check_unique,
-            [config_id],
-        )
-
-        if not sql_check_result is None:
-            return jsonify({"error": "Attempt to upload duplicate context id"}), 400
-
-        # check for key in context db
-        sql_check_exists = "SELECT 1 FROM context WHERE id = %s"
-        sql_check_result = exec_get_one(
-            sql_check_exists,
-            [config_id],
-        )
-        # return an error if id doesn't exists
-        if sql_check_result is None:
-            return (
-                jsonify({"error": "Passed context id does not exits in database"}),
-                400,
-            )
+        contextData = request.form["contextData"]
 
         # ensure the file actually contains a valid file name
         if not mf4File or mf4File.name == "":
             return jsonify({"error": "No mf4 file uploaded"}), 400
-        if not dbcFile or dbcFile.name == "":
+        elif not dbcFile or dbcFile.name == "":
             return jsonify({"error": "No dbc file uploaded"}), 400
-        if self.file_type_check(mf4File.filename):
+
+        # ensure files are of correct file type before uploading data to NRDB
+        if self.file_type_check(mf4File.filename) or self.file_type_check(
+            dbcFile.filename
+        ):
             # Secure name for best practice
             # Prevent any special characters such
             # as / or . from affecting the path of
@@ -90,10 +74,13 @@ class DateUploadApi(MethodView):
             # remove mf4 and dbc file from local storage
             os.remove(mf4_file)
             os.remove(dbc_file)
+
             return jsonify({"message": "Data received successfully"}), 201
         else:
             return (
-                jsonify({"error": "Wrong file type submitted. Must be of type mf4"}),
+                jsonify(
+                    {"error": "Wrong file type submitted. Must be of type mf4 and dbc"}
+                ),
                 400,
             )
 

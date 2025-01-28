@@ -52,9 +52,16 @@ function DataUpload() {
    */
   const SubmitFile = async (event) => {
     event.preventDefault(); // Prevent page reload
+    const contextData = JSON.parse(sessionStorage.getItem("BikeData"));
+
+    if (!contextData) {
+      console.error("No data from context saved");
+      return;
+    }
+
     const mf4File = document.getElementById("fileUploadMF4").files[0];
     const dbcFile = document.getElementById("fileUploadDBC").files[0];
-    const response = PostDataFile(mf4File, dbcFile, contextID);
+    const response = PostDataFile(mf4File, dbcFile, contextData, contextID);
 
     var fileUpload = false;
     var lastProgress = -1;

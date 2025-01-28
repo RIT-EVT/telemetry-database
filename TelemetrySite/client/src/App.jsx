@@ -47,8 +47,8 @@ function App() {
             <Col>
               <Routes>
                 <Route path='404Page' element={<Page404 />} />
-                <Route path='/:contextID?' element={<ContextForm />} />
-                <Route path='/DataUpload/:contextID' element={<DataUpload />} />
+                <Route path='/' element={<ContextForm />} />
+                <Route path='/DataUpload' element={<DataUpload />} />
                 <Route path='*' element={<Page404 />} />
               </Routes>
             </Col>

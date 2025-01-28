@@ -339,6 +339,43 @@ def handle_pvc(signal):
     }
 
 
+## The function that handle the tms board messages
+#
+# @param signal information about the CAN message
+#
+# @return data entry
+def handle_tms(signal):
+    signal_name = signal.name
+
+    if signal_name.find("Duty_Cycle") != -1:
+        # no pump id seems to be present
+        if signal_name.find("Pump") != -1:
+            signal_name = "Pump_Duty_Cycle"
+        else:
+            fan_id = signal_name[5]
+            signal_name = "Fan_Duty_Cycle"
+
+    signal_to_table = {
+        "Temp_TMS_Internal": "TmsSensorTemp",
+        "Pump_Duty_Cycle": "TmsPumpSpeed",
+        "Fan_Duty_Cycle": "TmsFanSpeed",
+    }
+
+    if signal_name not in signal_to_table:
+        return None
+
+    entry = {
+        "table": signal_to_table[signal_name],
+        "size": signal.length,
+        "signage": "signed" if signal.is_signed else "unsigned",
+    }
+    if signal_name == "Fan_Duty_Cycle":
+        entry["fanId"] = fan_id
+    if signal_name == "Pump_Duty_Cycle":
+        entry["pumpId"] = 1
+    return entry
+
+
 ## The function that creates the configuration for for the data
 #
 # @param board_names_json dictionary of can signal -> board name
