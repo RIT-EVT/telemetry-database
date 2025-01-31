@@ -11,7 +11,7 @@ from utils import exec_get_one
 class DateUploadApi(MethodView):
 
     ALLOWED_EXTENSIONS = {"mf4", "dbc"}
-    UPLOAD_FOLDER = os.path.dirname(__file__) + "/data_upload_file"
+    UPLOAD_FOLDER = os.path.dirname(__file__) + "\\data_upload_file"
 
     def __init__(self):
         # Create upload folder if it doesn't exist
@@ -40,7 +40,7 @@ class DateUploadApi(MethodView):
         config_id = request.form["contextID"]
         mf4File = request.files["mf4File"]
         dbcFile = request.files["dbcFile"]
-        contextData = request.form["contextData"]
+        context_data = request.form["contextData"]
 
         # ensure the file actually contains a valid file name
         if not mf4File or mf4File.name == "":
@@ -66,15 +66,12 @@ class DateUploadApi(MethodView):
             mf4File.save(mf4_file)
             dbcFile.save(dbc_file)
 
+            
             # submit the data!
-            submit_data(mf4_file, dbc_file, contextId)
-            # save raw can messages
-            file_convert(mf4_file, config_id)
+            submit_data(mf4_file, dbc_file, context_data, contextId)
 
-            # remove mf4 and dbc file from local storage
-            os.remove(mf4_file)
-            os.remove(dbc_file)
-
+            
+            
             return jsonify({"message": "Data received successfully"}), 201
         else:
             return (

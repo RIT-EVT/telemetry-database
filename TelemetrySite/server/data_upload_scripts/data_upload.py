@@ -1,10 +1,7 @@
-from utils import connect
-from psycopg2.sql import Identifier, SQL
 import cantools
-import can_decoder
-import mdf_iter
-from datetime import datetime
-from tqdm import tqdm
+
+from asammdf import MDF
+import json
 
 progress_data = {}
 
@@ -14,7 +11,7 @@ progress_data = {}
 # @param data_path path to the mf4 file
 # @param dbc_file path to the dbc file
 # @param context_id context id for the data
-def submit_data(data_path, dbc_file, context_id):
+def submit_data(data_path, dbc_file, context_data, context_id):
 
     dbc_decoded = cantools.database.load_file(dbc_file)
 
@@ -23,85 +20,14 @@ def submit_data(data_path, dbc_file, context_id):
     # create an outline of how to read the data
     config_values = createConfig(can_id_values, dbc_decoded)
     # turn data from CAN messages -> list
-    data_values_json = parse_data(dbc_file, data_path)
+    data_values_json = parse_data(data_path, config_values)
 
-    # establish values of progress of the upload for the frontend
-    counter = 0
-    data_length = len(data_values_json) - 1
+    context_data = json.loads(context_data)
+    print(context_data)
+    context_data["event"]["runs"][0]["messages"] = data_values_json
 
-    progress_data[context_id] = 0
-
-    for data in tqdm(data_values_json):
-
-        counter += 1
-        # Update the progress of the upload system
-        progress_data[context_id] = counter / data_length
-
-        conn = connect()
-        cur = conn.cursor()
-        # if the data hasn't been parsed into the config file
-        # ignore it, its data we are not currently recording
-        if data["signal"] not in config_values:
-            continue
-
-        config_info = config_values[data["signal"]]
-
-        # insert_string is the amount of data to insert into the table
-        insert_string = ""
-
-        # the actual data replacing the placeholders in insert_string
-        data_insert_array = []
-
-        # column_string is the actual columns to insert data into
-        # column_string and insert_string should be the same length
-        column_string = ""
-
-        # the column names replacing the placeholder in column_string
-        # eventually added to format_array to make one longer array
-        insert_columns = []
-
-        # final array to replace all {} in the unformatted SQL command
-        format_array = []
-
-        # define the table to insert data into
-        format_array = [Identifier(config_info["table"].lower())]
-
-        for index in config_info:
-            # for all special column names (packId, cellId, axis)
-            # insert name into column list and handle the data
-            if (
-                index != "table"
-                and index != "signal"
-                and index != "size"
-                and index != "signage"
-                and index != "frame"
-            ):
-                insert_string += "%s, "
-                column_string += "{}, "
-                insert_columns.append(index)
-
-                data_insert_array.append(str(config_info[index]))
-
-        insert_string += "%s, %s, %s"
-        column_string += "{}, {}, {}"
-
-        # insert all the rest of the data which is present in every CAN message
-        insert_columns += ["val", "receivetime", "contextid"]
-        data_insert_array += [data["value"], data["time"], context_id]
-
-        # add each of the column names to be inserted
-        # the order will match with the same order of data_insert_array
-        for value in insert_columns:
-            format_array.append(Identifier(value.lower()))
-
-        cur.execute(
-            SQL(
-                "INSERT into {} (" + column_string + ")  VALUES (" + insert_string + ")"
-            ).format(*format_array),
-            (*data_insert_array,),
-        )
-        conn.commit()
-        conn.close()
+    with open("data.json", "w") as f:
+        json.dump(context_data, f, indent=4)
 
 
 ## The function that corelate frame id to board name
@@ -131,36 +57,42 @@ def get_board_names(dbc_database):
     return config
 
 
-## The function that converts datetime to ms
+## The function that converts partial bits into an int
 #
-# @param iso_timestamp timestamp to convert
+# @param number raw binary number to read
+# @param starting_bit bit to start reading from
+# @param final_bit bit to finish reading exclusive
+# @return binary string of bits
+def read_bits(number, starting_bit, final_bit):
+    binary_number = format(number, "08b")
+    binary_string = binary_number[starting_bit:final_bit]
+    return binary_string
+
+
+## The function that combines bytes of data
 #
-# @return timestamp in ms
-def timestamp_to_seconds(iso_timestamp):
-    parsed_time = datetime.strptime(iso_timestamp, "%Y-%m-%d %H:%M:%S.%f%z")
-    # get the current time of the bike since 1/1/1970 in ms
-    return float(parsed_time.timestamp())
+# @param numbers list of bytes to combine
+# @return binary string of bytes
+def combine_binary(*numbers):
+    # Convert each number to an 8-bit binary string
+    binary_list = [format(num, "08b") for num in numbers]
+
+    # Reverse the order to combine from right to left
+    binary_list.reverse()
+
+    # Join the binary strings together
+    combined_binary = "".join(binary_list)
+
+    return combined_binary
 
 
-## The function that converts timestamps from datetime to ms since bike start
+## The function that looks at the signage of a number
 #
-# @param time_stamps list of all timestamps currently in datetime
-#
-# @return list of timestamps in ms since bike start
-def convert_time(time_stamps):
-
-    # cut just the receive time out of the timestamp
-    # first time stamp serves as the start time of the bike
-    starting_timestamp = str(time_stamps[0])
-    starting_time_seconds = timestamp_to_seconds(starting_timestamp)
-
-    for index in range(0, len(time_stamps)):
-        current_time_seconds = timestamp_to_seconds(str(time_stamps[index]))
-
-        relative_time = current_time_seconds - starting_time_seconds
-        # overwrite the previous timestamp data
-        time_stamps[index] = relative_time
-    return time_stamps
+# @param x number
+# @param size number of bits
+# @return signed in
+def signed_bin_convert(x, size):
+    return (x & ((1 << size - 1) - 1)) - (x & (1 << size - 1))
 
 
 ## The function that converts data from CAN to a list =
@@ -169,41 +101,118 @@ def convert_time(time_stamps):
 # @param mdf_path the path to the mf4 file
 #
 # @return list form of CAN data
-def parse_data(dbc_path, mdf_path):
-    # df_decoder uses the dbc file to interpret the mf4 file
-    # and read all the can messages in the oder they were sent
-    db = can_decoder.load_dbc(dbc_path)
-    df_decoder = can_decoder.DataFrameDecoder(db)
+def parse_data(mdf_path, config_values):
+    # Load the MDF file
+    mdf = MDF(mdf_path, memory_map=False)
 
-    with open(mdf_path, "rb") as handle:
-        mdf_file = mdf_iter.MdfFile(handle)
-        df_raw = mdf_file.get_data_frame()
+    # Convert to a Pandas DataFrame
+    df = mdf.to_dataframe()
 
-    df_phys = df_decoder.decode_frame(df_raw)
-
-    # take just the data value not including the time stamp
-    # timestamp is saved as the index for the data
-    mf4_values = df_phys.values.tolist()
-
-    # time stamp is saved in YYYY/MM/DD : HH:MM:SS form
-    # convert to ms and assume the first message is sent at 0.0 ms
-    time_stamps = convert_time(df_phys.index.tolist())
-
+    # Display the DataFrame
+    values = df.values.tolist()
+    timestamps = df.index.tolist()
     json_data = []
+    
+    for index in range(0, len(df.index)):
 
-    # loop through each set of data in order and save it
-    for index in range(0, len(mf4_values)):
+        can_id = values[index][1]
+        if hex(can_id) not in config_values:
+            continue
 
-        json_object = {}
-        json_object["time"] = time_stamps[index]
-        json_object["canID"] = hex(mf4_values[index][0])
-        json_object["signal"] = mf4_values[index][1]
-        json_object["value"] = mf4_values[index][2]
+        config_data = config_values[hex(can_id)]
+        
+        data_array = values[index][5]
 
-        # physicalValue doesn't seem to have a purpose
-        # most of the time value == physicalValue, but sometime their values differ
-        # json_object["physicalValue"] = mf4_values[index][3]
-        json_data.append(json_object)
+        # save the number of bytes/array indexes used by previous can messages to know where next ones begin
+        # also save the number of bits used of the current byte if a message needs bits
+        previous_bytes_used = 0
+        previous_bits_used = 0
+
+        for config_current_index in range(0, len(config_data)):
+
+            config_current = config_data[config_current_index]
+
+            # get the number of bits for the current data
+            data_length_bits = config_current["size"]
+
+            # lets manipulate some data!
+            # each entry in the data array is 1 byte / 8  bits of data
+            # if there are more than one byte of data associated with a message,
+            # the second byte comes first in binary
+            # data_array comes in as a ndarray with 1 dimension
+
+            if data_length_bits % 8 == 0:
+
+                # get the length in bytes of the needed data
+
+                number_of_needed_bytes = data_length_bits // 8
+                data_list = data_array.tolist()
+
+                current_data_list = []
+
+                for data_index in range(
+                    previous_bytes_used, previous_bytes_used + number_of_needed_bytes
+                ):
+                    current_data_list.append(data_list[data_index])
+
+                raw_binary = combine_binary(*current_data_list)
+
+                previous_bytes_used += number_of_needed_bytes
+
+                if config_current["signage"] == "signed":
+                    decimal_result = signed_bin_convert(
+                        int(raw_binary, 2), data_length_bits
+                    )
+                else:
+                    decimal_result = int(raw_binary, 2)
+
+            else:
+                # some of the data comes in bits
+                # some toggles and states
+                # the sum always adds up to a byte
+                # if something uses 7 bits, something else will use the last bit
+
+                if len(data_list) <= previous_bytes_used:
+                    print(previous_bytes_used)
+                    print(config_current["table"])
+
+                raw_result = read_bits(
+                    data_list[previous_bytes_used],
+                    previous_bits_used,
+                    previous_bits_used + data_length_bits,
+                )
+
+                decimal_result = int(raw_result, 2)
+
+                # increment the previous bits for teh next time time
+                # also update bytes as needed. Some messages use both bits and bytes of data
+                previous_bits_used += data_length_bits
+                if previous_bits_used == 8:
+                    previous_bytes_used += 1
+                    previous_bits_used = 0
+
+            table_name = config_current["table"]
+            if table_name.find("ErrorRegister") != -1 or table_name.find("Manufacturer") != -1:
+                continue
+            json_object = {
+                "time": timestamps[index],
+                "signal": table_name,
+                "canID": hex(can_id),
+                "data": decimal_result,
+                "size": data_length_bits,
+            }
+
+            # if there is an axis present save it as its own field
+            if "axis" in config_current:
+                json_object["axis"] = config_current["axis"]
+            if "cellId" in config_current:
+                json_object["cellId"] = config_current["cellId"]
+            if "packId" in config_current:
+                json_object["packId"] = config_current["packId"]
+            if "thermId" in config_current:
+                json_object["thermId"] = config_current["thermId"]
+
+            json_data.append(json_object)
     return json_data
 
 
@@ -266,24 +275,24 @@ def handle_bms(signal, sender):
     }
 
     # if signal isn't in the table, it currently isn't being recorded
-    if signal_name not in signal_to_table:
-        return None
+    if signal_name in signal_to_table:
+        signal_name = signal_to_table[signal_name]
 
     # packId is found in the bms name in the fourth position
     # BMS_X_Y - X is the packId
     entry = {
-        "table": signal_to_table[signal_name],
+        "table": signal_name,
         "packId": sender[4],
         "size": signal.length,
         "signage": "signed" if signal.is_signed else "unsigned",
     }
 
     # add the special cases
-    if signal_to_table[signal_name] == "BmsCellVoltage":
+    if signal_name == "BmsCellVoltage":
         entry["cellId"] = cellId
-    elif signal_to_table[signal_name] == "BmsThermistorTemp":
+    elif signal_name == "BmsThermistorTemp":
         entry["thermId"] = tempId
-    elif signal_to_table[signal_name] == "BmsBqTemp":
+    elif signal_name == "BmsBqTemp":
         entry["tempId"] = tempId
 
     return entry
@@ -297,11 +306,6 @@ def handle_bms(signal, sender):
 def handle_imu(signal):
     signal_name = signal.name
 
-    # all imu CAN messages will have an axis in the last position
-
-    axis = signal_name[len(signal_name) - 1 :].lower()
-    signal_name = signal_name[: len(signal_name) - 2]
-
     # map the possible signal names to their table names in the sql db
     signal_to_table = {
         "VECTOR_EULER": "ImuEulerComponent",
@@ -309,15 +313,24 @@ def handle_imu(signal):
         "VECTOR_LINEAR_ACCEL": "ImuLinearAccelerationComponent",
         "VECTOR_ACCELEROMETER": "ImuAccelerometerComponent",
     }
-    if signal_name not in signal_to_table:
-        return None
 
-    return {
-        "table": signal_to_table[signal_name],
-        "axis": axis,
+    axis = None
+
+    # some imu CAN messages will have an axis in the last position
+
+    if signal_name[: len(signal_name) - 2] in signal_to_table:
+        axis = signal_name[len(signal_name) - 1 :].lower()
+        signal_name = signal_name[: len(signal_name) - 2]
+        signal_name = signal_to_table[signal_name]
+
+    json_object = {
+        "table": signal_name,
         "size": signal.length,
         "signage": "signed" if signal.is_signed else "unsigned",
     }
+    if axis:
+        json_object["axis"] = axis
+    return json_object
 
 
 ## The function that handle the pvc board messages
@@ -330,10 +343,11 @@ def handle_pvc(signal):
     signal_name = signal.name
     signal_to_table = {"State": "PvcState"}
 
-    if signal_name not in signal_to_table:
-        return None
+    if signal_name in signal_to_table:
+        signal_name = signal_to_table[signal_name]
+
     return {
-        "table": signal_to_table[signal_name],
+        "table": signal_name,
         "size": signal.length,
         "signage": "signed" if signal.is_signed else "unsigned",
     }
@@ -361,11 +375,11 @@ def handle_tms(signal):
         "Fan_Duty_Cycle": "TmsFanSpeed",
     }
 
-    if signal_name not in signal_to_table:
-        return None
+    if signal_name in signal_to_table:
+        signal_name = signal_to_table[signal_name]
 
     entry = {
-        "table": signal_to_table[signal_name],
+        "table": signal_name,
         "size": signal.length,
         "signage": "signed" if signal.is_signed else "unsigned",
     }
@@ -393,7 +407,7 @@ def createConfig(board_names_json, dbc_file):
             # if the board doesn't exist or is VirtualNMTMaster skip over it
             if not board_name:
                 continue
-
+            msg_config = []
             for signal in msg.signals:
                 entry = None
                 # each board name needs to be handled differently
@@ -405,9 +419,17 @@ def createConfig(board_names_json, dbc_file):
                         entry = handle_imu(signal)
                     case "PVC":
                         entry = handle_pvc(signal)
+                    case _:
+                        entry = {
+                            "table": signal.name,
+                            "size": signal.length,
+                            "signage": "signed" if signal.is_signed else "unsigned",
+                        }
 
                 if entry != None:
-                    config[signal.name] = entry
+                    msg_config.append(entry)
+
+        config[hex(msg.frame_id)] = msg_config
 
     # return the config dictionary,
     return config

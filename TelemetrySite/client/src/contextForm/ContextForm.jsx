@@ -304,101 +304,63 @@ function ContextForm() {
     //prevent the form from clearing data
     event.preventDefault();
 
+    //!TODO Come back and add the ability to save config names
+
     //gather all the data
     const collectedData = {
-      Context: {
-        MainBody: {},
-        Event: {},
-        BikeConfig: {},
-        bms: {},
-        imu: {},
-        tmu: {},
-        tms: {},
-        pvc: {},
-        mc: {},
+      event: {
+        name: document.getElementById(ContextJSONIdValues.event.name).value,
+        date: document.getElementById(ContextJSONIdValues.event.date).value,
+        type: document.getElementById(ContextJSONIdValues.event.type).value,
+        location: document.getElementById(ContextJSONIdValues.event.location)
+          .value,
+        runs: [
+          {
+            orderNumber: 0,
+            context: {
+              bikeConfig: {
+                platformName: null,
+                tirePressure: null,
+                coolantVolume: null,
+                firmwareConfig: {
+                  BMS: [],
+                  IMU: [],
+                  TMU: [],
+                  TMS: [],
+                  PVC: [],
+                  MC: [],
+                },
+              },
+              hardwareConfig: {},
+              riderName: document.getElementById(
+                ContextJSONIdValues.event.runs[0].context.riderName
+              ).value,
+              riderWeight: document.getElementById(
+                ContextJSONIdValues.event.runs[0].context.riderWeight
+              ).value,
+              airTemp: document.getElementById(
+                ContextJSONIdValues.event.runs[0].context.airTemp
+              ).value,
+              windSpeed: document.getElementById(
+                ContextJSONIdValues.event.runs[0].context.windSpeed
+              ).value,
+              windDirection: document.getElementById(
+                ContextJSONIdValues.event.runs[0].context.windDirection
+              ).value,
+              riderFeedback: document.getElementById(
+                ContextJSONIdValues.event.runs[0].context.riderFeedback
+              ).value,
+              distanceCovered: document.getElementById(
+                ContextJSONIdValues.event.runs[0].context.distanceCovered
+              ).value,
+              startTime: document.getElementById(
+                ContextJSONIdValues.event.runs[0].context.startTime
+              ).value,
+            },
+          },
+        ],
       },
     };
-    var bikeIsCustom = false;
-    var isADup = false;
-
-    //Load the json file that defines the way the data should be formatted
-    const ConfigElements = ContextJSONIdValues.ConfigElements;
-    //!TODO remove the ability to save bike configs? Will be really hard to do with NRDB unless we rework the format
-    if (document.getElementById("bikeSelect").value === "Custom") {
-      bikeIsCustom = true;
-      ConfigName.forEach((configName) => {
-        //get the json object of ids
-        const configIds = ConfigElements[configName + "Config"];
-
-        //check if the selected element is custom
-        if (document.getElementById(configName + "Select").value === "Custom") {
-          configIds.forEach((id) => {
-            //get the item and make sure it exists
-            const element = document.getElementById(id);
-            if (element) {
-              collectedData.Context[configName][id] = element.value; // Collect the value from the form element
-            }
-          });
-
-          const savedName = document.getElementById(
-            configName + "SavedName"
-          ).value;
-          collectedData.Context[configName]["savedName"] = savedName;
-          //check if the name is a duplicate
-          isADup = dropDownOptions[configName].some(
-            (configElement) => configElement === savedName
-          );
-
-          if (isADup) {
-            console.error(`Duplicate save name detected in ${configName}`);
-          }
-        } else {
-          collectedData.Context[configName]["selected"] =
-            document.getElementById(configName + "Select").value;
-        }
-      });
-    }
-    //don't send any data if there was a duplicate
-    if (isADup) {
-      return;
-    }
-    //handle the main, bike, and event
-    const MainElements = ContextJSONIdValues.MainElements;
-
-    for (const key in MainElements) {
-      //if the bike is custom, make sure saved name
-      //isn't a duplicate name
-      if (key === "BikeConfig" && bikeIsCustom) {
-        if (
-          dropDownOptions["bike"].some(
-            (contextElement) =>
-              contextElement === document.getElementById("bikeConfigName").value
-          )
-        ) {
-          console.error(`Duplicate save name detected in bike config`);
-          return;
-        }
-      }
-
-      if (key === "Event" && eventData) {
-        collectedData.Context.Event.eventID = eventData.id;
-      } else if (key === "BikeConfig" && !bikeIsCustom) {
-        //collect the config name and check for a duplicate
-        const element = document.getElementById("bikeSelect").value;
-        // Collect the value from the form element
-        collectedData.Context[key]["selected"] = element;
-      } else {
-        MainElements[key].forEach((id) => {
-          //get the item and make sure it exists
-
-          const element = document.getElementById(id);
-          if (element) {
-            // Collect the value from the form element
-            collectedData.Context[key][id] = element.value;
-          }
-        });
-      }
-    }
 
     //Save this data and pass it to the next step
     //save the data in local storage in case user loses wifi/refreshes page

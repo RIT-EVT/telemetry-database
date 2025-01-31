@@ -1,66 +1,69 @@
 {
-    "MainElements": {
-        "MainBody": [
-            "airTemp",
-            "humidity",
-            "windSpeed",
-            "windAngle",
-            "riderName",
-            "riderWeight",
-            "driverFeedback",
-            "distanceCovered",
-            "startTime"
-        ],
-        "Event": [
-            "eventDate",
-            "eventType",
-            "location"
-        ],
-        "BikeConfig": [
-            "platformName",
-            "tirePressure",
-            "coolantVolume",
-            "bikeConfigName"
-        ]
-    },
-    "ConfigElements": {
-        "bmsConfig": [
-            "hardwareRevisionBMS",
-            "softwareCommitHashBMS",
-            "totalVoltageUnits",
-            "batteryVoltageUnits",
-            "currentUnits",
-            "packTempUnits",
-            "bqTempUnits",
-            "cellVoltageUnits"
-        ],
-        "tmsConfig": [
-            "hardwareRevisionTMS",
-            "softwareCommitHashTMS",
-            "tempUnits",
-            "pumpSpeedUnits",
-            "fanSpeedUnits"
-        ],
-        "imuConfig": [
-            "hardwareRevisionIMU",
-            "softwareCommitHashIMU",
-            "eulerUnits",
-            "gyroUnits",
-            "linearAccelerationUnits",
-            "accelerometerUnits"
-        ],
-        "tmuConfig": [
-            "hardwareRevisionTMU",
-            "softwareCommitHashTMU",
-            "thermUnits"
-        ],
-        "pvcConfig": [
-            "hardwareRevisionPVC",
-            "softwareCommitHashPVC"
-        ],
-        "mcConfig": [
-            "model",
-            "firmwareVersion"
+    "event": {
+        "name": "eventName",
+        "date": "eventDate",
+        "type": "eventType",
+        "location": "location",
+        "runs": [
+            {
+                "orderNumber": [],
+                "context": {
+                    "bikeConfig": {
+                        "platformName": "platformName",
+                        "tirePressure": "tirePressure",
+                        "coolantVolume": "coolantVolume",
+                        "firmwareConfig": {
+                            "BMS": [
+                                "hardwareRevisionBMS",
+                                "softwareCommitHashBMS",
+                                "totalVoltageUnits",
+                                "batteryVoltageUnits",
+                                "currentUnits",
+                                "packTempUnits",
+                                "bqTempUnits",
+                                "cellVoltageUnits"
+                            ],
+                            "IMU": [
+                                "hardwareRevisionIMU",
+                                "softwareCommitHashIMU",
+                                "eulerUnits",
+                                "gyroUnits",
+                                "linearAccelerationUnits",
+                                "accelerometerUnits"
+                            ],
+                            "TMU": [
+                                "hardwareRevisionTMU",
+                                "softwareCommitHashTMU",
+                                "thermUnits"
+                            ],
+                            "TMS": [
+                                "hardwareRevisionTMS",
+                                "softwareCommitHashTMS",
+                                "tempUnits",
+                                "pumpSpeedUnits",
+                                "fanSpeedUnits"
+                            ],
+                            "PVC": [
+                                "hardwareRevisionPVC",
+                                "softwareCommitHashPVC"
+                            ],
+                            "MC": [
+                                "model",
+                                "firmwareVersion"
+                            ]
+                        }
+                    },
+                    "hardwareConfig": {},
+                    "riderName": "riderName",
+                    "riderWeight": "riderWeight",
+                    "airTemp": "airTemp",
+                    "windSpeed": "windSpeed",
+                    "windDirection": "windAngle",
+                    "riderFeedback": "driverFeedback",
+                    "distanceCovered": "distanceCovered",
+                    "startTime": "startTime"
+                }
+            }
         ]
     }
 }

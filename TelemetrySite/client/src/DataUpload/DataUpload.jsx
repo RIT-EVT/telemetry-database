@@ -52,7 +52,7 @@ function DataUpload() {
    */
   const SubmitFile = async (event) => {
     event.preventDefault(); // Prevent page reload
-    const contextData = JSON.parse(sessionStorage.getItem("BikeData"));
+    const contextData = sessionStorage.getItem("BikeData");
 
     if (!contextData) {
       console.error("No data from context saved");

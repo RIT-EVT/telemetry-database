@@ -104,7 +104,7 @@ const PostDataFile = async (mf4File, dbcFile, contextData, contextID) => {
   formData.append("contextID", contextID);
 
   const response = await fetch(
-    BASE_URL + ServerCalls["data_upload"] + "/" + contextID,
+    BASE_URL + ServerCalls["data_upload"] + "/" + 1,
     {
       method: "POST",
       body: formData,
