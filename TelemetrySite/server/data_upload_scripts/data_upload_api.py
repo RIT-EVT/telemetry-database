@@ -3,7 +3,6 @@ from flask import request, jsonify
 from werkzeug.utils import secure_filename
 import os
 from data_upload_scripts.data_upload import submit_data, get_progress
-from data_upload_scripts.data_organization import file_convert
 from utils import exec_get_one
 
 
@@ -66,6 +65,10 @@ class DateUploadApi(MethodView):
             mf4File.save(mf4_file)
             dbcFile.save(dbc_file)
 
+            # some process is still using these files after function executes
+            # !TODO figure out a way to safely remove them from the local server
+            #os.remove(mf4_file)
+            #os.remove(dbc_file)
             
             # submit the data!
             submit_data(mf4_file, dbc_file, context_data, contextId)

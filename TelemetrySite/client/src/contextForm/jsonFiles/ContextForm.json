@@ -51,9 +51,9 @@
                                 "model",
                                 "firmwareVersion"
                             ]
-                        }
+                        },
+                        "hardwareConfig": {}
                     },
-                    "hardwareConfig": {},
                     "riderName": "riderName",
                     "riderWeight": "riderWeight",
                     "airTemp": "airTemp",

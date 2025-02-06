@@ -80,7 +80,7 @@ function DataUpload() {
       //get the progress passed from the backend
 
       const currentProgress = data.progress;
-      if (currentProgress > lastProgress) {
+      if (currentProgress > lastProgress || currentProgress < 0) {
         // Update the UI with the formatted estimated time remaining
         setProgressBar(
           <div style={{ display: "flex", alignItems: "center" }}>
@@ -107,6 +107,8 @@ function DataUpload() {
       if (responseValue === true) {
         fileUpload = true;
         setProgressBar(null);
+        sessionStorage.removeItem("BikeData");
+
         setBodyDisplay(
           <Container className='button-container'>
             <Col>

@@ -304,9 +304,8 @@ function ContextForm() {
     //prevent the form from clearing data
     event.preventDefault();
 
-    //!TODO Come back and add the ability to save config names
-
-    //gather all the data
+    const contextValues = ContextJSONIdValues.event.runs[0].context;
+    //gather all the data inputted by the user and save it to be passed to the backend
     const collectedData = {
       event: {
         name: document.getElementById(ContextJSONIdValues.event.name).value,
@@ -322,46 +321,54 @@ function ContextForm() {
                 platformName: null,
                 tirePressure: null,
                 coolantVolume: null,
-                firmwareConfig: {
-                  BMS: [],
-                  IMU: [],
-                  TMU: [],
-                  TMS: [],
-                  PVC: [],
-                  MC: [],
-                },
+                firmwareConfig: {},
               },
               hardwareConfig: {},
-              riderName: document.getElementById(
-                ContextJSONIdValues.event.runs[0].context.riderName
-              ).value,
-              riderWeight: document.getElementById(
-                ContextJSONIdValues.event.runs[0].context.riderWeight
-              ).value,
-              airTemp: document.getElementById(
-                ContextJSONIdValues.event.runs[0].context.airTemp
-              ).value,
-              windSpeed: document.getElementById(
-                ContextJSONIdValues.event.runs[0].context.windSpeed
-              ).value,
+              riderName: document.getElementById(contextValues.riderName).value,
+              riderWeight: document.getElementById(contextValues.riderWeight)
+                .value,
+              airTemp: document.getElementById(contextValues.airTemp).value,
+              windSpeed: document.getElementById(contextValues.windSpeed).value,
               windDirection: document.getElementById(
-                ContextJSONIdValues.event.runs[0].context.windDirection
+                contextValues.windDirection
               ).value,
               riderFeedback: document.getElementById(
-                ContextJSONIdValues.event.runs[0].context.riderFeedback
+                contextValues.riderFeedback
               ).value,
               distanceCovered: document.getElementById(
-                ContextJSONIdValues.event.runs[0].context.distanceCovered
+                contextValues.distanceCovered
               ).value,
-              startTime: document.getElementById(
-                ContextJSONIdValues.event.runs[0].context.startTime
-              ).value,
+              startTime: document.getElementById(contextValues.startTime).value,
             },
           },
         ],
       },
     };
 
+    // save input from user about the firmware configuration
+    const firmwareConfig = contextValues.bikeConfig.firmwareConfig;
+
+    for (const firmwareConfigPart in firmwareConfig) {
+      //declare the board name to be saved
+      collectedData.event.runs[0].context.bikeConfig.firmwareConfig[
+        firmwareConfigPart
+      ] = {};
+
+      for (const firmwareId in contextValues.bikeConfig.firmwareConfig[
+        firmwareConfigPart
+      ]) {
+        //get the field from the web page to ensure it exists before you get the value
+        const partId = firmwareConfig[firmwareConfigPart][firmwareId];
+        const formInputField = document.getElementById(partId);
+
+        if (formInputField != null) {
+          // save the to be passed to the backend
+          collectedData.event.runs[0].context.bikeConfig.firmwareConfig[
+            firmwareConfigPart
+          ][partId] = formInputField.value;
+        }
+      }
+    }
     //Save this data and pass it to the next step
     //save the data in local storage in case user loses wifi/refreshes page
     sessionStorage.setItem("BikeData", JSON.stringify(collectedData));

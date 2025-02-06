@@ -23,7 +23,6 @@ def submit_data(data_path, dbc_file, context_data, context_id):
     data_values_json = parse_data(data_path, config_values)
 
     context_data = json.loads(context_data)
-    print(context_data)
     context_data["event"]["runs"][0]["messages"] = data_values_json
 
     with open("data.json", "w") as f:
@@ -439,7 +438,8 @@ def createConfig(board_names_json, dbc_file):
 #
 # @param config_id config id to find the progress for
 def get_progress(config_id):
-    if not config_id in progress_data:
+    
+    if not config_id in progress_data :
         return -1
 
     dataValue = progress_data[config_id]
