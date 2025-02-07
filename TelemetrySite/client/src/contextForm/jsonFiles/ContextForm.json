@@ -21,7 +21,8 @@
                                 "currentUnits",
                                 "packTempUnits",
                                 "bqTempUnits",
-                                "cellVoltageUnits"
+                                "cellVoltageUnits",
+                                "bmsSavedName"
                             ],
                             "IMU": [
                                 "hardwareRevisionIMU",
@@ -29,30 +30,36 @@
                                 "eulerUnits",
                                 "gyroUnits",
                                 "linearAccelerationUnits",
-                                "accelerometerUnits"
+                                "accelerometerUnits",
+                                "imuSavedName"
                             ],
                             "TMU": [
                                 "hardwareRevisionTMU",
                                 "softwareCommitHashTMU",
-                                "thermUnits"
+                                "thermUnits",
+                                "tmuSavedName"
                             ],
                             "TMS": [
                                 "hardwareRevisionTMS",
                                 "softwareCommitHashTMS",
                                 "tempUnits",
                                 "pumpSpeedUnits",
-                                "fanSpeedUnits"
+                                "fanSpeedUnits",
+                                "tmsSavedName"
                             ],
                             "PVC": [
                                 "hardwareRevisionPVC",
-                                "softwareCommitHashPVC"
+                                "softwareCommitHashPVC",
+                                "pvcSavedName"
                             ],
                             "MC": [
                                 "model",
-                                "firmwareVersion"
+                                "firmwareVersion",
+                                "mcSavedName"
                             ]
                         },
-                        "hardwareConfig": {}
+                        "hardwareConfig": {},
+                        "BikeConfigName": "bikeConfigName"
                     },
                     "riderName": "riderName",
                     "riderWeight": "riderWeight",

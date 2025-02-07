@@ -94,22 +94,18 @@ const FetchEventDataCall = async (searchContextId) => {
 /* ---------------------------- Data Upload Calls --------------------------- */
 /* -------------------------------------------------------------------------- */
 
-const PostDataFile = async (mf4File, dbcFile, contextData, contextID) => {
+const PostDataFile = async (mf4File, dbcFile, contextData) => {
   await CheckData();
 
   const formData = new FormData();
   formData.append("mf4File", mf4File);
   formData.append("dbcFile", dbcFile);
   formData.append("contextData", contextData);
-  formData.append("contextID", contextID);
 
-  const response = await fetch(
-    BASE_URL + ServerCalls["data_upload"] + "/" + 1,
-    {
-      method: "POST",
-      body: formData,
-    }
-  );
+  const response = await fetch(BASE_URL + ServerCalls["data_upload"], {
+    method: "POST",
+    body: formData,
+  });
   if (!response.ok) {
     const jsonResponse = await response.json(); // await here
     console.error(

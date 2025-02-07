@@ -12,7 +12,7 @@ import {
   Button,
   Form,
 } from "reactstrap";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 /**
  * Upload a mf4 file to the backend sever as
@@ -21,8 +21,6 @@ import { useParams, useNavigate } from "react-router-dom";
  */
 function DataUpload() {
   const [bodyDisplay, setBodyDisplay] = useState(null);
-
-  const { contextID } = useParams();
 
   const [progressBar, setProgressBar] = useState(null);
 
@@ -61,7 +59,7 @@ function DataUpload() {
 
     const mf4File = document.getElementById("fileUploadMF4").files[0];
     const dbcFile = document.getElementById("fileUploadDBC").files[0];
-    const response = PostDataFile(mf4File, dbcFile, contextData, contextID);
+    const response = PostDataFile(mf4File, dbcFile, contextData);
 
     var fileUpload = false;
     var lastProgress = -1;
@@ -71,7 +69,7 @@ function DataUpload() {
      * based off the context id and update the
      */
     const interval = setInterval(async () => {
-      const data = await FetchProgress(contextID);
+      const data = await FetchProgress();
 
       if (data.error) {
         console.error("Error fetching progress:", data.error);
@@ -115,7 +113,7 @@ function DataUpload() {
               <Button
                 className='newContext'
                 color='primary'
-                onClick={() => RedirectToContext(contextID)}
+                onClick={() => RedirectToContext()}
               >
                 Same Event
               </Button>

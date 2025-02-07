@@ -20,11 +20,11 @@ class DateUploadApi(MethodView):
     ## Get the current progress of the
     #  current data upload action
     #  TODO revisit this. Not quite happy with where this call is
-    def get(self, contextId):
+    def get(self):
 
-        return jsonify({"progress": get_progress(contextId)}), 200
+        return jsonify({"progress": get_progress()}), 200
 
-    def post(self, contextId):
+    def post(self):
         # Check if the post request has all needed data needed
 
         if "mf4File" not in request.files:
@@ -33,10 +33,9 @@ class DateUploadApi(MethodView):
             return jsonify({"error": "No dbc file uploaded"}), 400
         elif "contextData" not in request.form:
             return jsonify({"error": "No context data passed"}), 400
-        elif "contextID" not in request.form:
-            return jsonify({"error": "No id passed"}), 400
+      
 
-        config_id = request.form["contextID"]
+      
         mf4File = request.files["mf4File"]
         dbcFile = request.files["dbcFile"]
         context_data = request.form["contextData"]
@@ -65,13 +64,12 @@ class DateUploadApi(MethodView):
             mf4File.save(mf4_file)
             dbcFile.save(dbc_file)
 
-            # some process is still using these files after function executes
-            # !TODO figure out a way to safely remove them from the local server
-            #os.remove(mf4_file)
-            #os.remove(dbc_file)
+            # remove the file from the sever end
+            os.remove(mf4_file)
+            os.remove(dbc_file)
             
             # submit the data!
-            submit_data(mf4_file, dbc_file, context_data, contextId)
+            submit_data(mf4_file, dbc_file, context_data)
 
             
             

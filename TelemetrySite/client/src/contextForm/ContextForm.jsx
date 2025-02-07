@@ -305,6 +305,10 @@ function ContextForm() {
     event.preventDefault();
 
     const contextValues = ContextJSONIdValues.event.runs[0].context;
+
+    // save bike config
+    const bikeConfig = contextValues.bikeConfig;
+
     //gather all the data inputted by the user and save it to be passed to the backend
     const collectedData = {
       event: {
@@ -318,27 +322,36 @@ function ContextForm() {
             orderNumber: 0,
             context: {
               bikeConfig: {
-                platformName: null,
-                tirePressure: null,
-                coolantVolume: null,
+                platformName: document.getElementById(bikeConfig.platformName)
+                  .value,
+                tirePressure: document.getElementById(bikeConfig.tirePressure)
+                  .value,
+                coolantVolume: document.getElementById(bikeConfig.coolantVolume)
+                  .value,
+                bikeName: document.getElementById(bikeConfig.BikeConfigName)
+                  .value,
                 firmwareConfig: {},
+
+                hardwareConfig: {},
+                riderName: document.getElementById(contextValues.riderName)
+                  .value,
+                riderWeight: document.getElementById(contextValues.riderWeight)
+                  .value,
+                airTemp: document.getElementById(contextValues.airTemp).value,
+                windSpeed: document.getElementById(contextValues.windSpeed)
+                  .value,
+                windDirection: document.getElementById(
+                  contextValues.windDirection
+                ).value,
+                riderFeedback: document.getElementById(
+                  contextValues.riderFeedback
+                ).value,
+                distanceCovered: document.getElementById(
+                  contextValues.distanceCovered
+                ).value,
+                startTime: document.getElementById(contextValues.startTime)
+                  .value,
               },
-              hardwareConfig: {},
-              riderName: document.getElementById(contextValues.riderName).value,
-              riderWeight: document.getElementById(contextValues.riderWeight)
-                .value,
-              airTemp: document.getElementById(contextValues.airTemp).value,
-              windSpeed: document.getElementById(contextValues.windSpeed).value,
-              windDirection: document.getElementById(
-                contextValues.windDirection
-              ).value,
-              riderFeedback: document.getElementById(
-                contextValues.riderFeedback
-              ).value,
-              distanceCovered: document.getElementById(
-                contextValues.distanceCovered
-              ).value,
-              startTime: document.getElementById(contextValues.startTime).value,
             },
           },
         ],

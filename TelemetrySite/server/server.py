@@ -26,7 +26,7 @@ user_view = DateUploadApi.as_view("DateUploadApi")
 # and use data to return data from db based
 # off the context id
 app.add_url_rule(
-    "/DataUpload/<contextId>",
+    "/DataUpload",
     view_func=user_view,
     methods=["GET", "POST"],
 )

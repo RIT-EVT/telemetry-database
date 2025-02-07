@@ -3,7 +3,7 @@ import cantools
 from asammdf import MDF
 import json
 
-progress_data = {}
+progress_data = None
 
 
 ## The function that sends data to the db
@@ -11,7 +11,7 @@ progress_data = {}
 # @param data_path path to the mf4 file
 # @param dbc_file path to the dbc file
 # @param context_id context id for the data
-def submit_data(data_path, dbc_file, context_data, context_id):
+def submit_data(data_path, dbc_file, context_data):
 
     dbc_decoded = cantools.database.load_file(dbc_file)
 
@@ -126,8 +126,10 @@ def parse_data(mdf_path, config_values):
         # also save the number of bits used of the current byte if a message needs bits
         previous_bytes_used = 0
         previous_bits_used = 0
-
-        for config_current_index in range(0, len(config_data)):
+        
+        config_data_length = len(config_data)
+         
+        for config_current_index in range(0, config_data_length ):
 
             config_current = config_data[config_current_index]
 
@@ -210,8 +212,10 @@ def parse_data(mdf_path, config_values):
                 json_object["packId"] = config_current["packId"]
             if "thermId" in config_current:
                 json_object["thermId"] = config_current["thermId"]
-
+            progress_data = config_current_index/config_data_length
             json_data.append(json_object)
+
+    mdf.close()
     return json_data
 
 
@@ -436,14 +440,12 @@ def createConfig(board_names_json, dbc_file):
 
 ## The function that makes the progress of data upload visible to the frontend
 #
-# @param config_id config id to find the progress for
-def get_progress(config_id):
+def get_progress():
     
-    if not config_id in progress_data :
-        return -1
 
-    dataValue = progress_data[config_id]
+
+    dataValue = progress_data
     # remove value if data has been fully uploaded
     if dataValue == 1:
-        progress_data.pop(config_id)
+        progress_data=None
     return dataValue
