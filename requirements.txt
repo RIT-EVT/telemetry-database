@@ -5,3 +5,4 @@ Flask_RESTful==0.3.10
 psycopg2==2.9.9
 tqdm==4.66.5
 Werkzeug==3.0.4
+cantools==39.4.13
