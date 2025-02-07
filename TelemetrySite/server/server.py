@@ -6,7 +6,7 @@ import json
 from context_scripts.context_api import ContextApi
 from data_upload_scripts.data_upload_api import DateUploadApi
 from event_api_scripts.event_api import EventApi
-
+import urllib
 import os
 
 app = Flask(__name__)  # Create Flask instance
@@ -55,6 +55,7 @@ if __name__ == "__main__":
     # from the current file
     two_up = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
     dotenv.load_dotenv(two_up + "/credentials.env")
+    # print("mongodb://" + urllib.parse.quote_plus(str(os.getenv("MDB_USER"))) + ":" + urllib.parse.quote_plus(str(os.getenv("MDB_PASSWORD"))) + "@" + str(os.getenv("HOST")) + ":" + str(os.getenv("MDB_PORT")))
     print("Starting flask")
 
     app.run(debug=True)  # Starts Flask

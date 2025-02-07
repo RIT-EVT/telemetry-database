@@ -1,10 +1,10 @@
 import cantools
-
+import pymongo
 from asammdf import MDF
 import json
-
+import os
+import urllib
 progress_data = {}
-
 
 ## The function that sends data to the db
 #
@@ -12,6 +12,11 @@ progress_data = {}
 # @param dbc_file path to the dbc file
 # @param context_id context id for the data
 def submit_data(data_path, dbc_file, context_data, context_id):
+
+    connection_string = "mongodb://" + urllib.parse.quote_plus(str(os.getenv("MDB_USER"))) + ":" + urllib.parse.quote_plus(str(os.getenv("MDB_PASSWORD"))) + "@" + str(os.getenv("HOST")) + ":" + str(os.getenv("MDB_PORT"))
+    mongo_client = pymongo.MongoClient(connection_string)
+    db_access = mongo_client["test"]
+    collection_access = db_access["test"]
 
     dbc_decoded = cantools.database.load_file(dbc_file)
 
@@ -25,8 +30,9 @@ def submit_data(data_path, dbc_file, context_data, context_id):
     context_data = json.loads(context_data)
     context_data["event"]["runs"][0]["messages"] = data_values_json
 
-    with open("data.json", "w") as f:
-        json.dump(context_data, f, indent=4)
+    x = collection_access.insert_one(context_data)
+    # with open("data.json", "w") as f:
+    #     json.dump(context_data, f, indent=4)
 
 
 ## The function that corelate frame id to board name
