@@ -94,7 +94,7 @@ def signed_bin_convert(x, size):
     return (x & ((1 << size - 1) - 1)) - (x & (1 << size - 1))
 
 
-## The function that converts data from CAN to a list =
+## The function that converts data from CAN to a list
 #
 # @param dbc_path the path to the dbc file for the CAN data
 # @param mdf_path the path to the mf4 file
