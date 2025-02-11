@@ -63,6 +63,7 @@ function DataUpload() {
 
     var fileUpload = false;
     var lastProgress = -1;
+    var lastResponseString = "";
     /**
      * Create an interval to update the progress bar every
      * second. Call to the backend and fetch the value
@@ -77,22 +78,34 @@ function DataUpload() {
       }
       //get the progress passed from the backend
 
-      const currentProgress = data.progress;
-      if (currentProgress > lastProgress || currentProgress < 0) {
-        // Update the UI with the formatted estimated time remaining
-        setProgressBar(
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <progress value={currentProgress} style={{ marginRight: "10px" }} />
-            <div>{Math.round(currentProgress * 100)}%</div>
-          </div>
-        );
+      const responseString = Object.keys(data)[0];
 
-        if (currentProgress >= 1 || currentProgress < 0 || fileUpload) {
-          //stop calling to the backend
-          clearInterval(interval);
-          setProgressBar(null);
+      if (responseString != "Finished") {
+        const currentProgress = data[responseString];
+        if (
+          currentProgress > lastProgress ||
+          currentProgress < 0 ||
+          responseString != lastResponseString
+        ) {
+          // Update the UI with the formatted estimated time remaining
+          setProgressBar(
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <progress
+                value={currentProgress}
+                style={{ marginRight: "10px" }}
+              />
+              <div>
+                {responseString}:{Math.round(currentProgress * 100)}%
+              </div>
+            </div>
+          );
+          lastProgress = currentProgress;
+          lastResponseString = responseString;
         }
-        lastProgress = currentProgress;
+      } else {
+        //stop calling to the backend
+        clearInterval(interval);
+        setProgressBar(null);
       }
     }, 1000);
 
@@ -104,6 +117,7 @@ function DataUpload() {
     response.then((responseValue) => {
       if (responseValue === true) {
         fileUpload = true;
+        clearInterval(interval);
         setProgressBar(null);
         sessionStorage.removeItem("BikeData");
 

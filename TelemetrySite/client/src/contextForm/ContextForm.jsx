@@ -22,12 +22,6 @@ import {
 } from "reactstrap";
 import React, { useEffect, useState } from "react";
 
-import {
-  FetchConfigData,
-  PostContextData,
-  FetchEventDataCall,
-} from "ServerCall/ServerCall.jsx";
-
 //list of all id values to pass to backend
 import ContextJSONIdValues from "./jsonFiles/ContextForm.json";
 //all elements to have as input field and their properties
@@ -58,7 +52,7 @@ function ContextForm() {
     pvc: null,
     mc: null,
   });
-  //each dropdown object
+  //each dropdown object created in runtime with saved names and a field for custom
   const [dropDowns, setDropDowns] = useState({
     bike: null,
     bms: null,
@@ -93,9 +87,11 @@ function ContextForm() {
   const { contextID } = useParams();
 
   const [eventData, setEventData] = useState(null);
+
   /* -------------------------------------------------------------------------- */
   /* --------------------------- Initialize Constants ------------------------- */
   /* -------------------------------------------------------------------------- */
+
   let ConfigName = ["bms", "imu", "tmu", "tms", "pvc", "mc"];
 
   //which config selects are optional
@@ -106,6 +102,7 @@ function ContextForm() {
     tmuConfig: false,
     pvcConfig: true,
     mcConfig: true,
+    bike: true,
   };
   let FormId = "ContextForm";
 
@@ -162,14 +159,7 @@ function ContextForm() {
    * Set them to the corresponding dropdown option
    */
   const FetchConfigOptions = () => {
-    //tables do not contain a name column
-    //fetch names of config files to display for user to choose from
-    FetchConfigData().then((data) => {
-      if (!data) {
-        return;
-      }
-      setDropdownOptions(data);
-    });
+    //TODO refactor to work with nrdb
   };
 
   /**
@@ -178,12 +168,7 @@ function ContextForm() {
    * to the date response.
    */
   const FetchEventData = () => {
-    FetchEventDataCall(contextID).then((data) => {
-      //convert date into js date form
-      data.date = new Date(data.date).toISOString().slice(0, 10);
-
-      setEventData(data);
-    });
+    //TODO refactor to work with nrdb
   };
 
   /**
@@ -306,10 +291,12 @@ function ContextForm() {
 
     const contextValues = ContextJSONIdValues.event.runs[0].context;
 
-    // save bike config
+    // save bike config id values
     const bikeConfig = contextValues.bikeConfig;
 
-    //gather all the data inputted by the user and save it to be passed to the backend
+    // gather all the data inputted by the user and save it to be passed to the backend
+    // all hard coded values are required to exists as fields in the form and will therefore
+    // will never throw an error but may have the value of null if they are not required to be filled out
     const collectedData = {
       event: {
         name: document.getElementById(ContextJSONIdValues.event.name).value,
@@ -333,25 +320,22 @@ function ContextForm() {
                 firmwareConfig: {},
 
                 hardwareConfig: {},
-                riderName: document.getElementById(contextValues.riderName)
-                  .value,
-                riderWeight: document.getElementById(contextValues.riderWeight)
-                  .value,
-                airTemp: document.getElementById(contextValues.airTemp).value,
-                windSpeed: document.getElementById(contextValues.windSpeed)
-                  .value,
-                windDirection: document.getElementById(
-                  contextValues.windDirection
-                ).value,
-                riderFeedback: document.getElementById(
-                  contextValues.riderFeedback
-                ).value,
-                distanceCovered: document.getElementById(
-                  contextValues.distanceCovered
-                ).value,
-                startTime: document.getElementById(contextValues.startTime)
-                  .value,
               },
+              riderName: document.getElementById(contextValues.riderName).value,
+              riderWeight: document.getElementById(contextValues.riderWeight)
+                .value,
+              airTemp: document.getElementById(contextValues.airTemp).value,
+              windSpeed: document.getElementById(contextValues.windSpeed).value,
+              windDirection: document.getElementById(
+                contextValues.windDirection
+              ).value,
+              riderFeedback: document.getElementById(
+                contextValues.riderFeedback
+              ).value,
+              distanceCovered: document.getElementById(
+                contextValues.distanceCovered
+              ).value,
+              startTime: document.getElementById(contextValues.startTime).value,
             },
           },
         ],

@@ -3,10 +3,7 @@ from flask import request, jsonify
 from werkzeug.utils import secure_filename
 import os
 from data_upload_scripts.data_upload import submit_data, get_progress
-from utils import exec_get_one
 
-
-# TODO modify scripts to accept a DBC file
 class DateUploadApi(MethodView):
 
     ALLOWED_EXTENSIONS = {"mf4", "dbc"}
@@ -19,11 +16,11 @@ class DateUploadApi(MethodView):
 
     ## Get the current progress of the
     #  current data upload action
-    #  TODO revisit this. Not quite happy with where this call is
     def get(self):
 
-        return jsonify({"progress": get_progress()}), 200
+        return jsonify(get_progress()), 200
 
+    ## Take in a mf4, dbc, and json object for the run and submit to nrdb
     def post(self):
         # Check if the post request has all needed data needed
 
@@ -35,25 +32,23 @@ class DateUploadApi(MethodView):
             return jsonify({"error": "No context data passed"}), 400
       
 
-      
+       # save all needed data to local variables
         mf4File = request.files["mf4File"]
         dbcFile = request.files["dbcFile"]
         context_data = request.form["contextData"]
 
-        # ensure the file actually contains a valid file name
+        # ensure the file actually contains a valid file name and files
         if not mf4File or mf4File.name == "":
             return jsonify({"error": "No mf4 file uploaded"}), 400
         elif not dbcFile or dbcFile.name == "":
             return jsonify({"error": "No dbc file uploaded"}), 400
 
         # ensure files are of correct file type before uploading data to NRDB
-        if self.file_type_check(mf4File.filename) or self.file_type_check(
+        if self.file_type_check(mf4File.filename) and self.file_type_check(
             dbcFile.filename
         ):
-            # Secure name for best practice
-            # Prevent any special characters such
-            # as / or . from affecting the path of
-            # the file being saved by the server
+            # Secure file names for best practice when saving external
+            # gets rid of any "/" or "." that can change where the file is saved
 
             mf4FileName = secure_filename(mf4File.filename)
             dbcFileName = secure_filename(dbcFile.filename)
@@ -63,15 +58,13 @@ class DateUploadApi(MethodView):
 
             mf4File.save(mf4_file)
             dbcFile.save(dbc_file)
-
-            # remove the file from the sever end
-            os.remove(mf4_file)
-            os.remove(dbc_file)
             
             # submit the data!
             submit_data(mf4_file, dbc_file, context_data)
 
-            
+            # remove the file from the sever end
+            os.remove(mf4_file)
+            os.remove(dbc_file)
             
             return jsonify({"message": "Data received successfully"}), 201
         else:
@@ -82,6 +75,11 @@ class DateUploadApi(MethodView):
                 400,
             )
 
+    ## Ensure the uploaded file types match the expected files
+    #
+    # @param self instance of the object
+    # @param filename name of the file to check
+    # @return boolean of if the name matches
     def file_type_check(self, filename):
         return (
             "." in filename

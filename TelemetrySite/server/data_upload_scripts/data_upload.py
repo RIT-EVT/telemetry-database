@@ -1,10 +1,20 @@
 import cantools
-
+import pymongo
 from asammdf import MDF
 import json
+from more_itertools import sliced
+from bson import ObjectId
+import os
+import urllib
 
-progress_data = None
+parsing_data_progress = [0]
+uploading_data_progress = [0]
 
+def create_db_connection():
+    connection_string = "mongodb://" + urllib.parse.quote_plus(str(os.getenv("MDB_USER"))) + ":" + urllib.parse.quote_plus(str(os.getenv("MDB_PASSWORD")))  + "@" + str(os.getenv("HOST")) + ":" + str(os.getenv("MDB_PORT"))
+    mongo_client = pymongo.MongoClient(connection_string)
+    db_access = mongo_client["ernie"]
+    return db_access
 
 ## The function that sends data to the db
 #
@@ -12,6 +22,9 @@ progress_data = None
 # @param dbc_file path to the dbc file
 # @param context_id context id for the data
 def submit_data(data_path, dbc_file, context_data):
+   
+    collection_access_events = create_db_connection()["events"]
+
 
     dbc_decoded = cantools.database.load_file(dbc_file)
 
@@ -23,10 +36,59 @@ def submit_data(data_path, dbc_file, context_data):
     data_values_json = parse_data(data_path, config_values)
 
     context_data = json.loads(context_data)
-    context_data["event"]["runs"][0]["messages"] = data_values_json
+    context_data["event"]["runs"][0]["messages"] = []
 
-    with open("data.json", "w") as f:
-        json.dump(context_data, f, indent=4)
+    # overall upload can not exceed 16 mb
+    # splice data until it is 16 mb then submit it
+    # add data as needed
+    object_id = collection_access_events.insert_one(context_data).inserted_id
+    
+    upload_data_in_chunks(collection_access_events, object_id, data_values_json)
+    # with open("data.json", "w") as f:
+    #     json.dump(context_data, f, indent=4)
+
+## This function uploads the contents of the messages
+# to the NRDB in chunks of ~16 mb. Max size of a document
+# is just below 17 mb, but to save time in the upload process
+# we don't try to get it exact since each file could be > 160_000
+# entries long
+#
+# @param collection_access_event reference to the mongo db connection
+# @param id of the main document to which context was uploaded
+# @param data_values_json data to add to the db
+def upload_data_in_chunks(collection_access_event, object_id, data_values_json):
+    # divide the data into chunks that are less the 16 mb
+    # 150_000 ~< 15 mb but always < 16 mb
+    sliced_data = list(sliced(data_values_json, 150_000))
+    
+    collection_access_messages = create_db_connection()["messages"]
+    
+    for data_index in range(0, len(sliced_data)):
+        
+        #update progress of upload bar
+        uploading_data_progress[0]=data_index/(len(sliced_data)-1)
+        
+        data = sliced_data[data_index]
+        # add data until it exceeds 16 mb
+        # even at 10_000 additions per cycle the data will not get too big 
+        while len(json.dumps(data).encode('utf-8')) < 16_000_000 and data_index+1 != len(sliced_data) and  len(sliced_data[data_index+1]) !=0:
+            for _ in range(0, 10_000):
+                if len(sliced_data[data_index+1]) ==0:
+                    break
+                data.append(sliced_data[data_index+1].pop())
+                
+        data_to_insert = {"messages":data}
+        # add data to its own document and get the reference id number 
+        new_db_id=collection_access_messages.insert_one(data_to_insert).inserted_id
+        
+        # add the reference id to the main document so the messages can be accessed
+        # in the order they were sent
+        collection_access_event.update_one(
+            {"_id": ObjectId(object_id)},
+            {"$push": {"event.runs.0.messages": new_db_id}}
+        )
+        
+    uploading_data_progress[0]=1
 
 
 ## The function that corelate frame id to board name
@@ -212,10 +274,11 @@ def parse_data(mdf_path, config_values):
                 json_object["packId"] = config_current["packId"]
             if "thermId" in config_current:
                 json_object["thermId"] = config_current["thermId"]
-            progress_data = config_current_index/config_data_length
+            parsing_data_progress[0] = config_current_index/config_data_length
             json_data.append(json_object)
 
     mdf.close()
+    parsing_data_progress[0]=1
     return json_data
 
 
@@ -442,10 +505,12 @@ def createConfig(board_names_json, dbc_file):
 #
 def get_progress():
     
-
-
-    dataValue = progress_data
-    # remove value if data has been fully uploaded
-    if dataValue == 1:
-        progress_data=None
-    return dataValue
+    if parsing_data_progress[0]!=1:
+       return {"Parsing Data": parsing_data_progress[0]}
+    elif uploading_data_progress[0]!=1:
+       return {"uploading data": uploading_data_progress[0]}
+    
+    parsing_data_progress[0]=0
+    uploading_data_progress[0]=0
+    
+    return {"Finished": None}
