@@ -6,6 +6,7 @@ from more_itertools import sliced
 from bson import ObjectId
 import os
 import urllib
+import gridfs
 
 parsing_data_progress = [0]
 uploading_data_progress = [0]
@@ -21,10 +22,12 @@ def create_db_connection():
 # @param data_path path to the mf4 file
 # @param dbc_file path to the dbc file
 # @param context_id context id for the data
-def submit_data(data_path, dbc_file, context_data):
+def submit_data(mf4_file, dbc_file, context_data):
    
-    collection_access_events = create_db_connection()["events"]
-
+    db_connection = create_db_connection()
+    collection_access_events = db_connection["events"]
+    fs = gridfs.GridFS(db_connection)
+    
 
     dbc_decoded = cantools.database.load_file(dbc_file)
 
@@ -33,11 +36,15 @@ def submit_data(data_path, dbc_file, context_data):
     # create an outline of how to read the data
     config_values = createConfig(can_id_values, dbc_decoded)
     # turn data from CAN messages -> list
-    data_values_json = parse_data(data_path, config_values)
+    data_values_json = parse_data(mf4_file, config_values)
 
     context_data = json.loads(context_data)
     context_data["event"]["runs"][0]["messages"] = []
-
+    
+    create_db_connection()["files"]
+    
+    context_data["event"]["runs"][0]["mf4File"]=fs.put(mf4_file, encoding="utf-8")
+    context_data["event"]["runs"][0]["dbcFile"]=fs.put(dbc_file, encoding="utf-8")
     # overall upload can not exceed 16 mb
     # splice data until it is 16 mb then submit it
     # add data as needed
