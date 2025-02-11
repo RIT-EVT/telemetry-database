@@ -94,7 +94,6 @@ const CheckServerStatus = async () => {
     return await fetch(BASE_URL + "/")
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
         ServerCalls = data;
         return true;
       })

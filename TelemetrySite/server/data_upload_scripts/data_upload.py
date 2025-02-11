@@ -235,10 +235,6 @@ def parse_data(mdf_path, config_values):
                 # the sum always adds up to a byte
                 # if something uses 7 bits, something else will use the last bit
 
-                if len(data_list) <= previous_bytes_used:
-                    print(previous_bytes_used)
-                    print(config_current["table"])
-
                 raw_result = read_bits(
                     data_list[previous_bytes_used],
                     previous_bits_used,
