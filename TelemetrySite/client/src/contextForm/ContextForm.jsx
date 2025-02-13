@@ -26,7 +26,7 @@ import React, { useEffect, useState } from "react";
 import ContextJSONIdValues from "./jsonFiles/ContextForm.json";
 //all elements to have as input field and their properties
 import ContextJSONFormElements from "./jsonFiles/FormElementFormat.json";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 import "./ContextForm.css";
 /**
@@ -42,6 +42,8 @@ function ContextForm() {
 
   const [eventContextForm, UpdateEventForm] = useState(null);
   const [bikeContextForm, UpdateBikeForm] = useState(null);
+
+  const [eventData, setEventData] = useState(null);
 
   //each config form object
   const [configForm, setFormElements] = useState({
@@ -84,10 +86,6 @@ function ContextForm() {
 
   const [bikeSelected, setBikeSelected] = useState(false);
 
-  const { contextID } = useParams();
-
-  const [eventData, setEventData] = useState(null);
-
   /* -------------------------------------------------------------------------- */
   /* --------------------------- Initialize Constants ------------------------- */
   /* -------------------------------------------------------------------------- */
@@ -107,6 +105,7 @@ function ContextForm() {
   let FormId = "ContextForm";
 
   let navigate = useNavigate();
+  let location = useLocation();
   /* -------------------------------------------------------------------------- */
   /* ----------------------------- Const Functions ---------------------------- */
   /* -------------------------------------------------------------------------- */
@@ -185,9 +184,23 @@ function ContextForm() {
     if (eventData && jsonValue === "Event") {
       return (
         <FormGroup>
+          <InputGroup key={"eventName"} className='FormGroupElement'>
+            <InputGroupText>Event Name</InputGroupText>
+            <Input
+              id='eventName'
+              type='string'
+              readOnly
+              value={eventData.eventName}
+            />
+          </InputGroup>
           <InputGroup key={"eventDate"} className='FormGroupElement'>
             <InputGroupText>Event Date</InputGroupText>
-            <Input id='eventDate' type='date' readOnly value={eventData.date} />
+            <Input
+              id='eventDate'
+              type='date'
+              readOnly
+              value={eventData.eventDate}
+            />
           </InputGroup>
           <InputGroup key={"eventType"} className='FormGroupElement'>
             <InputGroupText>Event Type</InputGroupText>
@@ -204,7 +217,7 @@ function ContextForm() {
               id='location'
               type='text'
               readOnly
-              value={eventData.location}
+              value={eventData.eventLocation}
             />
           </InputGroup>
         </FormGroup>
@@ -306,6 +319,7 @@ function ContextForm() {
           .value,
         runs: [
           {
+            //this number may be updated by the backend if this is not the first run
             orderNumber: 0,
             context: {
               bikeConfig: {
@@ -403,20 +417,22 @@ function ContextForm() {
   }, [dropDownOptions, eventData]);
   /**
    * Fetch all the saved configs on the first load
+   * and check if this is a new run
    */
   useEffect(() => {
-    //check if contextID exists and is a number
-    //if it exists but isn't a number, redirect to
-    //404 error page
-    //TODO change when home page is included
-    if (contextID) {
-      if (isNaN(contextID)) {
-        navigate("/404Page");
+    if (location.pathname === "/NewRun") {
+      var eventData;
+      if (
+        (eventData = JSON.parse(sessionStorage.getItem("EventData"))) !== null
+      ) {
+        setEventData(eventData);
       } else {
-        FetchEventData();
+        console.error("Data for event was unsaved");
       }
+    } else {
+      //ensure no data leaks from past runs
+      sessionStorage.removeItem("EventData");
     }
-    FetchConfigOptions();
   }, []);
   /**
    * Check all config select value. If it is == Custom
@@ -507,7 +523,9 @@ function ContextForm() {
        * Submitting data is handled in the
        * SubmitData() const function
        */}
-      <Button className='submitButton'>Submit</Button>
+      <Button className='submitButton'>
+        Submit {eventData != null ? "Run" : null}
+      </Button>
     </Form>
   );
 }

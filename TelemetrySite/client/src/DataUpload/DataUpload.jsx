@@ -12,7 +12,7 @@ import {
   Button,
   Form,
 } from "reactstrap";
-import { useNavigate } from "react-router-dom";
+import { json, useNavigate } from "react-router-dom";
 
 /**
  * Upload a mf4 file to the backend sever as
@@ -27,17 +27,46 @@ function DataUpload() {
   let navigate = useNavigate();
 
   /**
-   * Set the new path back to the context creation
-   * page. Send back to basic page if id is null
-   *
-   * @param {id} id - context id to get the event data
+   * Set the path to redirect the user to. User can choose
+   * to create a new context or a new run with the same event
+   * @param {string} url - url to redirect the user to
    */
-  const RedirectToContext = (id) => {
-    if (!id) {
-      navigate("/");
-    } else {
-      navigate("/" + id);
-    }
+  const RedirectToContext = (url) => {
+    sessionStorage.setItem("DataSubmitted", false);
+    sessionStorage.removeItem("BikeData");
+    navigate(url);
+  };
+
+  /**
+   * Display the button options too redirect user to a new context
+   * page or to upload a new run under the same event
+   */
+  const DisplayRedirect = () => {
+    setBodyDisplay(
+      <Container className='button-container'>
+        <Col>
+          <Button
+            className='redirectButton'
+            onClick={() => {
+              RedirectToContext("/NewRun");
+            }}
+          >
+            New Run
+          </Button>
+        </Col>
+        <Col>
+          <Button
+            className='redirectButton'
+            onClick={() => {
+              sessionStorage.clear("EventData");
+              RedirectToContext("/Context");
+            }}
+          >
+            New Context
+          </Button>
+        </Col>
+      </Container>
+    );
   };
 
   /**
@@ -59,11 +88,13 @@ function DataUpload() {
 
     const mf4File = document.getElementById("fileUploadMF4").files[0];
     const dbcFile = document.getElementById("fileUploadDBC").files[0];
-    const response = PostDataFile(mf4File, dbcFile, contextData);
+    const eventData = sessionStorage.getItem("EventData");
+    const mongoDocId = eventData ? JSON.parse(eventData)["documentId"] : null;
+    const response = PostDataFile(mf4File, dbcFile, contextData, mongoDocId);
 
-    var fileUpload = false;
     var lastProgress = -1;
     var lastResponseString = "";
+    setBodyDisplay(null);
     /**
      * Create an interval to update the progress bar every
      * second. Call to the backend and fetch the value
@@ -105,7 +136,7 @@ function DataUpload() {
       } else {
         //stop calling to the backend
         clearInterval(interval);
-        setProgressBar(null);
+        //clearing the bar is done when back end responds to submitting data
       }
     }, 1000);
 
@@ -115,74 +146,71 @@ function DataUpload() {
      * with the option of keeping the same event data
      */
     response.then((responseValue) => {
-      if (responseValue === true) {
-        fileUpload = true;
+      if (responseValue != false) {
+        sessionStorage.setItem("DataSubmitted", true);
+
         clearInterval(interval);
         setProgressBar(null);
-        sessionStorage.removeItem("BikeData");
 
-        setBodyDisplay(
-          <Container className='button-container'>
-            <Col>
-              <Button
-                className='newContext'
-                color='primary'
-                onClick={() => RedirectToContext()}
-              >
-                Same Event
-              </Button>
-            </Col>
-            <Col>
-              <Button
-                className='newContext'
-                color='success'
-                onClick={() => RedirectToContext(null)}
-              >
-                New Context
-              </Button>
-            </Col>
-          </Container>
-        );
+        const parsedContextData = JSON.parse(contextData);
+
+        //save the needed event details to be displayed on the next page
+        const eventObject = {
+          documentId: responseValue["id"],
+          eventName: parsedContextData["event"]["name"],
+          eventDate: parsedContextData.event.date,
+          eventType: parsedContextData.event.type,
+          eventLocation: parsedContextData.event.location,
+        };
+
+        sessionStorage.setItem("EventData", JSON.stringify(eventObject));
+
+        DisplayRedirect();
       }
     });
   };
 
   useEffect(() => {
-    setBodyDisplay(
-      <Form
-        className='DataUploadForm'
-        onSubmit={SubmitFile}
-        encType='multipart/form-data'
-      >
-        <Container>
-          <Col>
-            <h4 className='mb-3'>Upload MF4 File</h4>
-            <Input
-              type='file'
-              id='fileUploadMF4'
-              className='file-input'
-              required
-              accept='.mf4'
-              bsSize='sm'
-            />
-          </Col>
-          <Col>
-            <h4 className='mb-3'>Upload DBC File</h4>
-            <Input
-              type='file'
-              id='fileUploadDBC'
-              className='file-input'
-              required
-              accept='.dbc'
-              bsSize='sm'
-            />
-          </Col>
-        </Container>
-        <Button color='primary' className='submit-btn'>
-          Submit
-        </Button>
-      </Form>
-    );
+    //make sure a refresh doesn't make the user resubmit data
+    if (sessionStorage.getItem("DataSubmitted") !== null) {
+      DisplayRedirect();
+    } else {
+      setBodyDisplay(
+        <Form
+          className='DataUploadForm'
+          onSubmit={SubmitFile}
+          encType='multipart/form-data'
+        >
+          <Container>
+            <Col>
+              <h4 className='mb-3'>Upload MF4 File</h4>
+              <Input
+                type='file'
+                id='fileUploadMF4'
+                className='file-input'
+                required
+                accept='.mf4'
+                bsSize='sm'
+              />
+            </Col>
+            <Col>
+              <h4 className='mb-3'>Upload DBC File</h4>
+              <Input
+                type='file'
+                id='fileUploadDBC'
+                className='file-input'
+                required
+                accept='.dbc'
+                bsSize='sm'
+              />
+            </Col>
+          </Container>
+          <Button color='primary' className='submit-btn'>
+            Submit {sessionStorage.getItem("EventData") ? "Run" : null}
+          </Button>
+        </Form>
+      );
+    }
   }, []);
 
   return (
@@ -190,7 +218,7 @@ function DataUpload() {
       <Card className='upload-card'>
         <CardBody fluid className='text-center'>
           {bodyDisplay}
-          {progressBar}
+          <center>{progressBar}</center>
         </CardBody>
       </Card>
     </Container>

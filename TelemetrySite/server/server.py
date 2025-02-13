@@ -25,7 +25,7 @@ user_view = DateUploadApi.as_view("DateUploadApi")
 app.add_url_rule(
     "/DataUpload",
     view_func=user_view,
-    methods=["GET", "POST"],
+    methods=["GET", "POST", "PUT"],
 )
 
 ## Get all the url paths

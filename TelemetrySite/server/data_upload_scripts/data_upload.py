@@ -11,9 +11,13 @@ import gridfs
 parsing_data_progress = [0]
 uploading_data_progress = [0]
 
+## Create a connection to the Mongo DB
+#
+# @return db connection object
 def create_db_connection():
     connection_string = "mongodb://" + urllib.parse.quote_plus(str(os.getenv("MDB_USER"))) + ":" + urllib.parse.quote_plus(str(os.getenv("MDB_PASSWORD")))  + "@" + str(os.getenv("HOST")) + ":" + str(os.getenv("MDB_PORT"))
     mongo_client = pymongo.MongoClient(connection_string)
+    
     db_access = mongo_client["ernie"]
     return db_access
 
@@ -50,9 +54,56 @@ def submit_data(mf4_file, dbc_file, context_data):
     # add data as needed
     object_id = collection_access_events.insert_one(context_data).inserted_id
     
-    upload_data_in_chunks(collection_access_events, object_id, data_values_json)
-    # with open("data.json", "w") as f:
-    #     json.dump(context_data, f, indent=4)
+    upload_data_in_chunks(collection_access_events, object_id, data_values_json, 0)
+    
+    return str(object_id)
+
+
+def add_data(mf4_file, dbc_file, new_run_data, mongo_doc_id):
+    db_connection = create_db_connection()
+    collection_access_events = db_connection["events"]
+    fs = gridfs.GridFS(db_connection)
+    
+
+    dbc_decoded = cantools.database.load_file(dbc_file)
+
+    # get a dictionary of CAN id -> Board name
+    can_id_values = get_board_names(dbc_decoded)
+    # create an outline of how to read the data
+    config_values = createConfig(can_id_values, dbc_decoded)
+    # turn data from CAN messages -> list
+    data_values_json = parse_data(mf4_file, config_values)
+
+    # get just the needed portion
+    new_run_data = json.loads(new_run_data)["event"]["runs"][0]
+    new_run_data["messages"]=[]
+    
+    create_db_connection()["files"]
+    
+    new_run_data["mf4File"]=fs.put(mf4_file, encoding="utf-8")
+    new_run_data["dbcFile"]=fs.put(dbc_file, encoding="utf-8")
+    
+    document=collection_access_events.find_one({"_id":ObjectId(mongo_doc_id)})
+    
+    if document and "event" in document and "runs" in document["event"]:
+        runs_length = len(document["event"]["runs"])  # Get the length of messages
+    else:
+        runs_length = 0  # Default to 0 if messages don't exist
+        return str(mongo_doc_id)
+    
+    # update the run order
+    new_run_data["orderNumber"] = runs_length
+    
+    collection_access_events.update_one(
+    {"_id": ObjectId(mongo_doc_id)},
+    {"$push": {"event.runs": new_run_data}}
+    )
+    
+    upload_data_in_chunks(collection_access_events, mongo_doc_id, data_values_json, runs_length)
+    
+    return str(mongo_doc_id)
+    
+    
 
 ## This function uploads the contents of the messages
 # to the NRDB in chunks of ~16 mb. Max size of a document
@@ -63,7 +114,8 @@ def submit_data(mf4_file, dbc_file, context_data):
 # @param collection_access_event reference to the mongo db connection
 # @param id of the main document to which context was uploaded
 # @param data_values_json data to add to the db
-def upload_data_in_chunks(collection_access_event, object_id, data_values_json):
+# @param data_index run index to post the data to
+def upload_data_in_chunks(collection_access_event, object_id, data_values_json, data_mongo_index):
     # divide the data into chunks that are less the 16 mb
     # 150_000 ~< 15 mb but always < 16 mb
     sliced_data = list(sliced(data_values_json, 150_000))
@@ -92,7 +144,7 @@ def upload_data_in_chunks(collection_access_event, object_id, data_values_json):
         # in the order they were sent
         collection_access_event.update_one(
             {"_id": ObjectId(object_id)},
-            {"$push": {"event.runs.0.messages": new_db_id}}
+            {"$push": {f"event.runs.{data_mongo_index}.messages": new_db_id}}
         )
         
     uploading_data_progress[0]=1
@@ -506,6 +558,7 @@ def createConfig(board_names_json, dbc_file):
 
 ## The function that makes the progress of data upload visible to the frontend
 #
+# @return dictionary with the current state the process is on and its percentage
 def get_progress():
     
     if parsing_data_progress[0]!=1:
