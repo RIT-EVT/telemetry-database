@@ -34,9 +34,9 @@ function DataUpload() {
    */
   const RedirectToContext = (id) => {
     if (!id) {
-      navigate("/");
+      navigate("/context-form");
     } else {
-      navigate("/" + id);
+      navigate("/context-form" + id);
     }
   };
 
@@ -76,8 +76,8 @@ function DataUpload() {
         console.error("Error fetching progress:", data.error);
         return;
       }
-      //get the progress passed from the backend
 
+      //get the progress passed from the backend
       const responseString = Object.keys(data)[0];
 
       if (responseString != "Finished") {

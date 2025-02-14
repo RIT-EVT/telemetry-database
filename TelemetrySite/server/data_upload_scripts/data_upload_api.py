@@ -17,21 +17,17 @@ class DateUploadApi(MethodView):
     ## Get the current progress of the
     #  current data upload action
     def get(self):
-
         return jsonify(get_progress()), 200
 
     ## Take in a mf4, dbc, and json object for the run and submit to nrdb
     def post(self):
         # Check if the post request has all needed data needed
-
         if "mf4File" not in request.files:
             return jsonify({"error": "No mf4 file uploaded"}), 400
         elif "dbcFile" not in request.files:
             return jsonify({"error": "No dbc file uploaded"}), 400
         elif "contextData" not in request.form:
             return jsonify({"error": "No context data passed"}), 400
-      
-
        # save all needed data to local variables
         mf4File = request.files["mf4File"]
         dbcFile = request.files["dbcFile"]

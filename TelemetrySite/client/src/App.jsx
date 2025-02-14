@@ -6,9 +6,12 @@ import Page404 from "./404/404.jsx";
 import { CheckServerStatus } from "./ServerCall/ServerCall.jsx";
 import { useEffect, useState } from "react";
 import { Container, Row, Col } from "reactstrap";
+import { useNavigate, useLocation } from "react-router-dom";
 
 function App() {
   const [ServerStatus, setStatus] = useState(false);
+  const location = useLocation();
+  const navigation = useNavigate();
 
   /**
    * Call to the backend and ensure the server is online
@@ -18,6 +21,12 @@ function App() {
       setStatus(response);
     });
   };
+
+  useEffect(() => {
+    if ((location.pathname = "")) {
+      navigate("/context");
+    }
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -47,8 +56,8 @@ function App() {
             <Col>
               <Routes>
                 <Route path='404Page' element={<Page404 />} />
-                <Route path='/' element={<ContextForm />} />
-                <Route path='/DataUpload' element={<DataUpload />} />
+                <Route path='/context-form' element={<ContextForm />} />
+                <Route path='/data-upload' element={<DataUpload />} />
                 <Route path='*' element={<Page404 />} />
               </Routes>
             </Col>

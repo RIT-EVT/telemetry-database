@@ -22,9 +22,9 @@ import {
 } from "reactstrap";
 import React, { useEffect, useState } from "react";
 
-//list of all id values to pass to backend
+// List of all id values to pass to backend
 import ContextJSONIdValues from "./jsonFiles/ContextForm.json";
-//all elements to have as input field and their properties
+// All elements to have as input field and their properties
 import ContextJSONFormElements from "./jsonFiles/FormElementFormat.json";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -43,7 +43,7 @@ function ContextForm() {
   const [eventContextForm, UpdateEventForm] = useState(null);
   const [bikeContextForm, UpdateBikeForm] = useState(null);
 
-  //each config form object
+  // Each config form object
   const [configForm, setFormElements] = useState({
     bms: null,
     imu: null,
@@ -52,7 +52,7 @@ function ContextForm() {
     pvc: null,
     mc: null,
   });
-  //each dropdown object created in runtime with saved names and a field for custom
+  // Each dropdown object created in runtime with saved names and a field for custom
   const [dropDowns, setDropDowns] = useState({
     bike: null,
     bms: null,
@@ -62,7 +62,7 @@ function ContextForm() {
     pvc: null,
     mc: null,
   });
-  //current selected value of each dropdown
+  // Current selected value of each dropdown
   const [configSelects, setConfigSelects] = useState({
     bms: null,
     imu: null,
@@ -71,7 +71,7 @@ function ContextForm() {
     pvc: null,
     mc: null,
   });
-  //values passed from back end
+  // Values passed from back end
   const [dropDownOptions, setDropdownOptions] = useState({
     bms: [],
     imu: [],
@@ -83,9 +83,7 @@ function ContextForm() {
   });
 
   const [bikeSelected, setBikeSelected] = useState(false);
-
   const { contextID } = useParams();
-
   const [eventData, setEventData] = useState(null);
 
   /* -------------------------------------------------------------------------- */
@@ -94,7 +92,7 @@ function ContextForm() {
 
   let ConfigName = ["bms", "imu", "tmu", "tms", "pvc", "mc"];
 
-  //which config selects are optional
+  // Which config selects are optional
   let RequiredSelects = {
     bmsConfig: true,
     tmsConfig: true,
@@ -133,7 +131,7 @@ function ContextForm() {
    */
   const handleConfigFormChange = async (event, configName) => {
     const value = event.target.value;
-    //handle the bike differently from the configs
+    // Handle the bike differently from the configs
     if (configName !== "bike") {
       handleConfigSelectChange(configName, value);
       if (value === "Custom") {
@@ -158,18 +156,7 @@ function ContextForm() {
    * forms, get any saved configs that are in the DB.
    * Set them to the corresponding dropdown option
    */
-  const FetchConfigOptions = () => {
-    //TODO refactor to work with nrdb
-  };
-
-  /**
-   * Call to the backend to fetch event data
-   * relating to a context id. Set eventData
-   * to the date response.
-   */
-  const FetchEventData = () => {
-    //TODO refactor to work with nrdb
-  };
+  const FetchConfigOptions = () => {};
 
   /**
    * Create a form group based off of the json key passed in.
@@ -180,8 +167,8 @@ function ContextForm() {
    * @return {HTMLFormElement} Form group of all the input elements on the json file
    */
   const GenerateFormElement = (jsonValue) => {
-    //if the event has been loaded based on a past event file
-    //load that data and use it to create a read only form
+    // If the event has been loaded based on a past event file
+    // Load that data and use it to create a read only form
     if (eventData && jsonValue === "Event") {
       return (
         <FormGroup>
@@ -210,8 +197,8 @@ function ContextForm() {
         </FormGroup>
       );
     } else {
-      //loop through every json element for the current field and
-      //create a new reactstrap input element for it
+      // Loop through every json element for the current field and
+      // Create a new reactstrap input element for it
       return (
         <FormGroup>
           {Object.values(ContextJSONFormElements[jsonValue]).map(
@@ -247,8 +234,8 @@ function ContextForm() {
 
   /**
    * Create the select dropdowns for the config forms
-   * On change check if value is Custom
-   * If it is then display the normal form
+   * on change check if value is Custom
+   * if it is then display the normal form
    *
    * @param {string} displayValues - Options to display in select
    * @param {string} name - Name of config form
@@ -286,16 +273,16 @@ function ContextForm() {
    * @param {Event} event - event of form submit
    */
   const SubmitData = (event) => {
-    //prevent the form from clearing data
+    // Prevent the form from clearing data
     event.preventDefault();
 
     const contextValues = ContextJSONIdValues.event.runs[0].context;
 
-    // save bike config id values
+    // Save bike config id values
     const bikeConfig = contextValues.bikeConfig;
 
-    // gather all the data inputted by the user and save it to be passed to the backend
-    // all hard coded values are required to exists as fields in the form and will therefore
+    // Gather all the data inputted by the user and save it to be passed to the backend.
+    // All hard coded values are required to exists as fields in the form and will therefore
     // will never throw an error but may have the value of null if they are not required to be filled out
     const collectedData = {
       event: {
@@ -342,11 +329,11 @@ function ContextForm() {
       },
     };
 
-    // save input from user about the firmware configuration
+    // Save input from user about the firmware configuration
     const firmwareConfig = contextValues.bikeConfig.firmwareConfig;
 
     for (const firmwareConfigPart in firmwareConfig) {
-      //declare the board name to be saved
+      // Declare the board name to be saved
       collectedData.event.runs[0].context.bikeConfig.firmwareConfig[
         firmwareConfigPart
       ] = {};
@@ -354,12 +341,12 @@ function ContextForm() {
       for (const firmwareId in contextValues.bikeConfig.firmwareConfig[
         firmwareConfigPart
       ]) {
-        //get the field from the web page to ensure it exists before you get the value
+        // Get the field from the web page to ensure it exists before you get the value
         const partId = firmwareConfig[firmwareConfigPart][firmwareId];
         const formInputField = document.getElementById(partId);
 
         if (formInputField != null) {
-          // save the to be passed to the backend
+          // Save the to be passed to the backend
           collectedData.event.runs[0].context.bikeConfig.firmwareConfig[
             firmwareConfigPart
           ][partId] = formInputField.value;
@@ -367,9 +354,9 @@ function ContextForm() {
       }
     }
     //Save this data and pass it to the next step
-    //save the data in local storage in case user loses wifi/refreshes page
+    //Save the data in local storage in case user loses wifi/refreshes page
     sessionStorage.setItem("BikeData", JSON.stringify(collectedData));
-    navigate("/DataUpload");
+    navigate("/data-upload");
   };
 
   /**
@@ -398,17 +385,17 @@ function ContextForm() {
 
     const bikeDrop = SelectCreator(dropDownOptions["bike"], "bike");
     setDropDowns((prev) => ({ ...prev, ["bike"]: bikeDrop }));
-    //call out to initialize Context and Event
+    // Call out to initialize Context and Event
     InitializeForms();
   }, [dropDownOptions, eventData]);
   /**
    * Fetch all the saved configs on the first load
    */
   useEffect(() => {
-    //check if contextID exists and is a number
-    //if it exists but isn't a number, redirect to
-    //404 error page
-    //TODO change when home page is included
+    // Check if contextID exists and is a number
+    // if it exists but isn't a number, redirect to
+    // 404 error page
+
     if (contextID) {
       if (isNaN(contextID)) {
         navigate("/404Page");
@@ -420,8 +407,8 @@ function ContextForm() {
   }, []);
   /**
    * Check all config select value. If it is == Custom
-   * generate the needed config page
-   * else set to null
+   * generate the needed config page.
+   * Else set to null
    *
    * Hook on configSelect change
    */
