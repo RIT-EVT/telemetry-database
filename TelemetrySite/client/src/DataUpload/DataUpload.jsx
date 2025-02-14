@@ -37,10 +37,6 @@ function DataUpload() {
     navigate(url);
   };
 
-  /**
-   * Display the button options too redirect user to a new context
-   * page or to upload a new run under the same event
-   */
   const DisplayRedirect = () => {
     setBodyDisplay(
       <Container className='button-container'>
@@ -48,7 +44,7 @@ function DataUpload() {
           <Button
             className='redirectButton'
             onClick={() => {
-              RedirectToContext("/NewRun");
+              RedirectToContext("/new-run");
             }}
           >
             New Run
@@ -59,7 +55,7 @@ function DataUpload() {
             className='redirectButton'
             onClick={() => {
               sessionStorage.clear("EventData");
-              RedirectToContext("/Context");
+              RedirectToContext("/context-form");
             }}
           >
             New Context
@@ -107,8 +103,8 @@ function DataUpload() {
         console.error("Error fetching progress:", data.error);
         return;
       }
-      //get the progress passed from the backend
 
+      //get the progress passed from the backend
       const responseString = Object.keys(data)[0];
 
       if (responseString != "Finished") {

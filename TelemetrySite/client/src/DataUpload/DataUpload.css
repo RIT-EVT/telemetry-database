@@ -4,7 +4,6 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-
 }
 
 /* Centered Row */
@@ -39,10 +38,7 @@
     padding-right: 20px;
     padding-top: 7px;
     padding-bottom: 7px;
-
 }
-
-
 
 #container {
     margin: 20px;
@@ -50,8 +46,6 @@
     height: 8px;
     position: relative;
 }
-
-
 
 /* General button styles */
 .redirectButton {
