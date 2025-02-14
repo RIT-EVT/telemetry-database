@@ -392,17 +392,6 @@ function ContextForm() {
    * Fetch all the saved configs on the first load
    */
   useEffect(() => {
-    // Check if contextID exists and is a number
-    // if it exists but isn't a number, redirect to
-    // 404 error page
-
-    if (contextID) {
-      if (isNaN(contextID)) {
-        navigate("/404Page");
-      } else {
-        FetchEventData();
-      }
-    }
     FetchConfigOptions();
   }, []);
   /**

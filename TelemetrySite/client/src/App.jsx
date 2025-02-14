@@ -11,7 +11,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 function App() {
   const [ServerStatus, setStatus] = useState(false);
   const location = useLocation();
-  const navigation = useNavigate();
+  const navigate = useNavigate();
 
   /**
    * Call to the backend and ensure the server is online
@@ -23,8 +23,8 @@ function App() {
   };
 
   useEffect(() => {
-    if ((location.pathname = "")) {
-      navigate("/context");
+    if ((location.pathname = "/")) {
+      navigate("/context-form");
     }
   }, []);
 
