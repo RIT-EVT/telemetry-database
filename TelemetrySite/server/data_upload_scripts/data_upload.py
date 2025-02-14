@@ -15,8 +15,8 @@ def submit_data(data_path, dbc_file, context_data, context_id):
 
     connection_string = "mongodb://" + urllib.parse.quote_plus(str(os.getenv("MDB_USER"))) + ":" + urllib.parse.quote_plus(str(os.getenv("MDB_PASSWORD"))) + "@" + str(os.getenv("HOST")) + ":" + str(os.getenv("MDB_PORT"))
     mongo_client = pymongo.MongoClient(connection_string)
-    db_access = mongo_client["test"]
-    collection_access = db_access["test"]
+    db_access = mongo_client["ernie"]
+    collection_access = db_access["events"]
 
     dbc_decoded = cantools.database.load_file(dbc_file)
 
