@@ -29,6 +29,8 @@ import ContextJSONFormElements from "./jsonFiles/FormElementFormat.json";
 import { useNavigate, useLocation } from "react-router-dom";
 
 import "./ContextForm.css";
+
+import { PostConfigData, GetConfigData } from "ServerCall/ServerCall";
 /**
  * Create needed context forms. Return the configured elements
  *
@@ -158,16 +160,7 @@ function ContextForm() {
    * Set them to the corresponding dropdown option
    */
   const FetchConfigOptions = () => {
-    //TODO refactor to work with nrdb
-  };
-
-  /**
-   * Call to the backend to fetch event data
-   * relating to a context id. Set eventData
-   * to the date response.
-   */
-  const FetchEventData = () => {
-    //TODO refactor to work with nrdb
+    setDropdownOptions(GetConfigData());
   };
 
   /**
@@ -365,9 +358,7 @@ function ContextForm() {
         firmwareConfigPart
       ] = {};
 
-      for (const firmwareId in contextValues.bikeConfig.firmwareConfig[
-        firmwareConfigPart
-      ]) {
+      for (const firmwareId in firmwareConfig[firmwareConfigPart]) {
         //get the field from the web page to ensure it exists before you get the value
         const partId = firmwareConfig[firmwareConfigPart][firmwareId];
         const formInputField = document.getElementById(partId);
@@ -432,6 +423,7 @@ function ContextForm() {
     } else {
       //ensure no data leaks from past runs
       sessionStorage.removeItem("EventData");
+      console.log(GetConfigData());
     }
   }, []);
   /**

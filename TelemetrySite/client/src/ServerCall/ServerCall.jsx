@@ -11,6 +11,30 @@ var ServerCalls = {};
 let BASE_URL = "http://127.0.0.1:5000";
 
 /* -------------------------------------------------------------------------- */
+/* --------------------------- Config Upload Calls -------------------------- */
+/* -------------------------------------------------------------------------- */
+
+const PostConfigData = async () => {
+  await fetch(BASE_URL + ServerCalls["config_data"], {
+    method: "POST",
+  });
+};
+
+const GetConfigData = async () => {
+  const response = await fetch(BASE_URL + ServerCalls["config_data"], {
+    method: "GET",
+  });
+
+  if (!response.ok) {
+    console.error("Network response was not ok: " + response.statusText);
+  }
+
+  const data = await response.json();
+
+  return data;
+};
+
+/* -------------------------------------------------------------------------- */
 /* ---------------------------- Data Upload Calls --------------------------- */
 /* -------------------------------------------------------------------------- */
 
@@ -124,4 +148,10 @@ const CheckData = async () => {
   return true;
 };
 
-export { PostDataFile, FetchProgress, CheckServerStatus };
+export {
+  PostDataFile,
+  FetchProgress,
+  CheckServerStatus,
+  PostConfigData,
+  GetConfigData,
+};

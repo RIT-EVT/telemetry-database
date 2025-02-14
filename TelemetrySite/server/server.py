@@ -4,7 +4,7 @@ from flask_cors import CORS
 import dotenv
 import json
 from data_upload_scripts.data_upload_api import DateUploadApi
-import urllib
+from bike_config_scripts.bike_conifg_api import BikeConfigApi
 import os
 import logging
 
@@ -27,6 +27,11 @@ app.add_url_rule(
     view_func=user_view,
     methods=["GET", "POST", "PUT"],
 )
+
+user_view =BikeConfigApi.as_view("BikeConfigApi")
+
+app.add_url_rule("/ConfigData", view_func = user_view, methods=["GET", "POST", "DELETE"])
+
 
 ## Get all the url paths
 #
