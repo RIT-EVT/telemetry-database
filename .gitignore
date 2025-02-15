@@ -2,6 +2,7 @@
 *.MF4
 .idea/
 *.env
+*.dbc
 *.cpython-312.pyc
 /.vscode
 __pycache__/

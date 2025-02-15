@@ -2,15 +2,12 @@ from flask.views import MethodView
 from flask import request, jsonify
 from werkzeug.utils import secure_filename
 import os
-from data_upload_scripts.data_upload import file_convert, get_progress
-from data_upload_scripts.data_organization import organize_can_from_db
-from utils import exec_get_one, exec_get_all
-
+from data_upload_scripts.data_upload import submit_data, get_progress
 
 class DateUploadApi(MethodView):
 
-    ALLOWED_EXTENSIONS = {"mf4"}
-    UPLOAD_FOLDER = os.path.dirname(__file__) + "/data_upload_file"
+    ALLOWED_EXTENSIONS = {"mf4", "dbc"}
+    UPLOAD_FOLDER = os.path.dirname(__file__) + "\\data_upload_file"
 
     def __init__(self):
         # Create upload folder if it doesn't exist
@@ -19,78 +16,66 @@ class DateUploadApi(MethodView):
 
     ## Get the current progress of the
     #  current data upload action
-    #  TODO revisit this. Not quite happy with where this call is
-    def get(self, contextId):
+    def get(self):
+        return jsonify(get_progress()), 200
 
-        return jsonify({"progress": get_progress(contextId)}), 200
+    ## Take in a mf4, dbc, and json object for the run and submit to nrdb
+    def post(self):
+        # Check if the post request has all needed data needed
+        if "mf4File" not in request.files:
+            return jsonify({"error": "No mf4 file uploaded"}), 400
+        elif "dbcFile" not in request.files:
+            return jsonify({"error": "No dbc file uploaded"}), 400
+        elif "contextData" not in request.form:
+            return jsonify({"error": "No context data passed"}), 400
+       # save all needed data to local variables
+        mf4File = request.files["mf4File"]
+        dbcFile = request.files["dbcFile"]
+        context_data = request.form["contextData"]
 
-    def post(self, contextId):
-        # Check if the post request has the file part
+        # ensure the file actually contains a valid file name and files
+        if not mf4File or mf4File.name == "":
+            return jsonify({"error": "No mf4 file uploaded"}), 400
+        elif not dbcFile or dbcFile.name == "":
+            return jsonify({"error": "No dbc file uploaded"}), 400
 
-        if "file" not in request.files:
-            return jsonify({"error": "No file uploaded"}), 400
-        elif "contextID" not in request.form:
-            return jsonify({"error": "No id passed"}), 400
+        # ensure files are of correct file type before uploading data to NRDB
+        if self.file_type_check(mf4File.filename) and self.file_type_check(
+            dbcFile.filename
+        ):
+            # Secure file names for best practice when saving external
+            # gets rid of any "/" or "." that can change where the file is saved
 
-        config_id = request.form["contextID"]
-        file = request.files["file"]
+            mf4FileName = secure_filename(mf4File.filename)
+            dbcFileName = secure_filename(dbcFile.filename)
 
-        # check for a duplicate context id value
-        sql_check_unique = "SELECT 1 FROM canMessage WHERE contextId = %s"
-        sql_check_result = exec_get_one(
-            sql_check_unique,
-            [config_id],
-        )
+            mf4_file = os.path.join(self.UPLOAD_FOLDER, mf4FileName)
+            dbc_file = os.path.join(self.UPLOAD_FOLDER, dbcFileName)
 
-        if not sql_check_result is None:
-            return jsonify({"error": "Attempt to upload duplicate context id"}), 400
+            mf4File.save(mf4_file)
+            dbcFile.save(dbc_file)
+            
+            # submit the data!
+            submit_data(mf4_file, dbc_file, context_data)
 
-        # check for key in context db
-        sql_check_exists = "SELECT 1 FROM context WHERE id = %s"
-        sql_check_result = exec_get_one(
-            sql_check_exists,
-            [config_id],
-        )
-        # return an error if id doesn't exists
-        if sql_check_result is None:
-            return (
-                jsonify({"error": "Passed context id does not exits in database"}),
-                400,
-            )
-
-        # ensure the file actually contains a valid file name
-        if not file or file.name == "":
-            return jsonify({"error": "No file uploaded"}), 400
-
-        if self.file_type_check(file.filename):
-            # Secure name for best practice
-            # Prevent any special characters such
-            # as / or . from affecting the path of
-            # the file being saved by the server
-
-            filename = secure_filename(file.filename)
-
-            temp_file_name = filename
-            file_number = 1
-            # prevent files of same name
-            while os.path.isfile(os.path.join(self.UPLOAD_FOLDER, temp_file_name)):
-                temp_file_name = f"({file_number})_{filename}"
-                file_number += 1
-            # save file path and file
-            filename = temp_file_name
-            file_path = os.path.join(self.UPLOAD_FOLDER, filename)
-            file.save(file_path)
-            file_convert(file_path, config_id)
-            # remove mf4 file from local storage
-            os.remove(file_path)
-            organize_can_from_db(contextId)
+            # remove the file from the sever end
+            os.remove(mf4_file)
+            os.remove(dbc_file)
+            
             return jsonify({"message": "Data received successfully"}), 201
         else:
             return (
-                jsonify({"error": "Wrong file type submitted. Must be of type mf4"}),
+                jsonify(
+                    {"error": "Wrong file type submitted. Must be of type mf4 and dbc"}
+                ),
                 400,
             )
 
+    ## Ensure the uploaded file types match the expected files
+    #
+    # @param self instance of the object
+    # @param filename name of the file to check
+    # @return boolean of if the name matches
     def file_type_check(self, filename):
         return (
             "." in filename

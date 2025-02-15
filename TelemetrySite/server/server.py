@@ -3,36 +3,30 @@ from flask_restful import Api
 from flask_cors import CORS
 import dotenv
 import json
-from context_scripts.context_api import ContextApi
 from data_upload_scripts.data_upload_api import DateUploadApi
-from event_api_scripts.event_api import EventApi
-
+import urllib
 import os
+import logging
 
 app = Flask(__name__)  # Create Flask instance
 api = Api(app)  # API router
 CORS(app)
+log = logging.getLogger('werkzeug')
+# Set the desired log level (e.g., ERROR or CRITICAL)
+# Currently set to only print if something goes wrong internally
+# Does not display every call
+log.setLevel(logging.ERROR)
 
 # create views for url rules
-user_view = ContextApi.as_view("ContextApi")
+
+user_view = DateUploadApi.as_view("DateUploadApi")
+
 
 app.add_url_rule(
-    "/Context", view_func=user_view, methods=["GET", "PUT", "DELETE", "POST"]
-)
-user_view = DateUploadApi.as_view("DateUploadApi")
-# TODO Look at refactoring this later
-# I don't love that data upload is in charge of
-# the progress, shift instead to its own call
-# and use data to return data from db based
-# off the context id
-app.add_url_rule(
-    "/DataUpload/<contextId>",
+    "/DataUpload",
     view_func=user_view,
     methods=["GET", "POST"],
 )
-user_view = EventApi.as_view("EventApi")
-app.add_url_rule("/Event/<contextId>", view_func=user_view, methods=["GET"])
-
 
 ## Get all the url paths
 #

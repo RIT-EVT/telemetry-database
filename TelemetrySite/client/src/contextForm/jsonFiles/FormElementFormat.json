@@ -64,6 +64,12 @@
     }
   },
   "Event": {
+    "eventName": {
+      "id": "eventName",
+      "type": "text",
+      "required": true,
+      "label": "Event Name"
+    },
     "eventDate": {
       "id": "eventDate",
       "type": "date",

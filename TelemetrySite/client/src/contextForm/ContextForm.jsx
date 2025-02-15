@@ -22,15 +22,9 @@ import {
 } from "reactstrap";
 import React, { useEffect, useState } from "react";
 
-import {
-  FetchConfigData,
-  PostContextData,
-  FetchEventDataCall,
-} from "ServerCall/ServerCall.jsx";
-
-//list of all id values to pass to backend
+// List of all id values to pass to backend
 import ContextJSONIdValues from "./jsonFiles/ContextForm.json";
-//all elements to have as input field and their properties
+// All elements to have as input field and their properties
 import ContextJSONFormElements from "./jsonFiles/FormElementFormat.json";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -49,7 +43,7 @@ function ContextForm() {
   const [eventContextForm, UpdateEventForm] = useState(null);
   const [bikeContextForm, UpdateBikeForm] = useState(null);
 
-  //each config form object
+  // Each config form object
   const [configForm, setFormElements] = useState({
     bms: null,
     imu: null,
@@ -58,7 +52,7 @@ function ContextForm() {
     pvc: null,
     mc: null,
   });
-  //each dropdown object
+  // Each dropdown object created in runtime with saved names and a field for custom
   const [dropDowns, setDropDowns] = useState({
     bike: null,
     bms: null,
@@ -68,7 +62,7 @@ function ContextForm() {
     pvc: null,
     mc: null,
   });
-  //current selected value of each dropdown
+  // Current selected value of each dropdown
   const [configSelects, setConfigSelects] = useState({
     bms: null,
     imu: null,
@@ -77,7 +71,7 @@ function ContextForm() {
     pvc: null,
     mc: null,
   });
-  //values passed from back end
+  // Values passed from back end
   const [dropDownOptions, setDropdownOptions] = useState({
     bms: [],
     imu: [],
@@ -89,16 +83,16 @@ function ContextForm() {
   });
 
   const [bikeSelected, setBikeSelected] = useState(false);
-
   const { contextID } = useParams();
-
   const [eventData, setEventData] = useState(null);
+
   /* -------------------------------------------------------------------------- */
   /* --------------------------- Initialize Constants ------------------------- */
   /* -------------------------------------------------------------------------- */
+
   let ConfigName = ["bms", "imu", "tmu", "tms", "pvc", "mc"];
 
-  //which config selects are optional
+  // Which config selects are optional
   let RequiredSelects = {
     bmsConfig: true,
     tmsConfig: true,
@@ -106,6 +100,7 @@ function ContextForm() {
     tmuConfig: false,
     pvcConfig: true,
     mcConfig: true,
+    bike: true,
   };
   let FormId = "ContextForm";
 
@@ -136,7 +131,7 @@ function ContextForm() {
    */
   const handleConfigFormChange = async (event, configName) => {
     const value = event.target.value;
-    //handle the bike differently from the configs
+    // Handle the bike differently from the configs
     if (configName !== "bike") {
       handleConfigSelectChange(configName, value);
       if (value === "Custom") {
@@ -161,30 +156,7 @@ function ContextForm() {
    * forms, get any saved configs that are in the DB.
    * Set them to the corresponding dropdown option
    */
-  const FetchConfigOptions = () => {
-    //tables do not contain a name column
-    //fetch names of config files to display for user to choose from
-    FetchConfigData().then((data) => {
-      if (!data) {
-        return;
-      }
-      setDropdownOptions(data);
-    });
-  };
-
-  /**
-   * Call to the backend to fetch event data
-   * relating to a context id. Set eventData
-   * to the date response.
-   */
-  const FetchEventData = () => {
-    FetchEventDataCall(contextID).then((data) => {
-      //convert date into js date form
-      data.date = new Date(data.date).toISOString().slice(0, 10);
-
-      setEventData(data);
-    });
-  };
+  const FetchConfigOptions = () => {};
 
   /**
    * Create a form group based off of the json key passed in.
@@ -195,8 +167,8 @@ function ContextForm() {
    * @return {HTMLFormElement} Form group of all the input elements on the json file
    */
   const GenerateFormElement = (jsonValue) => {
-    //if the event has been loaded based on a past event file
-    //load that data and use it to create a read only form
+    // If the event has been loaded based on a past event file
+    // Load that data and use it to create a read only form
     if (eventData && jsonValue === "Event") {
       return (
         <FormGroup>
@@ -225,8 +197,8 @@ function ContextForm() {
         </FormGroup>
       );
     } else {
-      //loop through every json element for the current field and
-      //create a new reactstrap input element for it
+      // Loop through every json element for the current field and
+      // Create a new reactstrap input element for it
       return (
         <FormGroup>
           {Object.values(ContextJSONFormElements[jsonValue]).map(
@@ -262,8 +234,8 @@ function ContextForm() {
 
   /**
    * Create the select dropdowns for the config forms
-   * On change check if value is Custom
-   * If it is then display the normal form
+   * on change check if value is Custom
+   * if it is then display the normal form
    *
    * @param {string} displayValues - Options to display in select
    * @param {string} name - Name of config form
@@ -301,112 +273,90 @@ function ContextForm() {
    * @param {Event} event - event of form submit
    */
   const SubmitData = (event) => {
-    //prevent the form from clearing data
+    // Prevent the form from clearing data
     event.preventDefault();
 
-    //gather all the data
+    const contextValues = ContextJSONIdValues.event.runs[0].context;
+
+    // Save bike config id values
+    const bikeConfig = contextValues.bikeConfig;
+
+    // Gather all the data inputted by the user and save it to be passed to the backend.
+    // All hard coded values are required to exists as fields in the form and will therefore
+    // will never throw an error but may have the value of null if they are not required to be filled out
     const collectedData = {
-      Context: {
-        MainBody: {},
-        Event: {},
-        BikeConfig: {},
-        bms: {},
-        imu: {},
-        tmu: {},
-        tms: {},
-        pvc: {},
-        mc: {},
+      event: {
+        name: document.getElementById(ContextJSONIdValues.event.name).value,
+        date: document.getElementById(ContextJSONIdValues.event.date).value,
+        type: document.getElementById(ContextJSONIdValues.event.type).value,
+        location: document.getElementById(ContextJSONIdValues.event.location)
+          .value,
+        runs: [
+          {
+            orderNumber: 0,
+            context: {
+              bikeConfig: {
+                platformName: document.getElementById(bikeConfig.platformName)
+                  .value,
+                tirePressure: document.getElementById(bikeConfig.tirePressure)
+                  .value,
+                coolantVolume: document.getElementById(bikeConfig.coolantVolume)
+                  .value,
+                bikeName: document.getElementById(bikeConfig.BikeConfigName)
+                  .value,
+                firmwareConfig: {},
+
+                hardwareConfig: {},
+              },
+              riderName: document.getElementById(contextValues.riderName).value,
+              riderWeight: document.getElementById(contextValues.riderWeight)
+                .value,
+              airTemp: document.getElementById(contextValues.airTemp).value,
+              windSpeed: document.getElementById(contextValues.windSpeed).value,
+              windDirection: document.getElementById(
+                contextValues.windDirection
+              ).value,
+              riderFeedback: document.getElementById(
+                contextValues.riderFeedback
+              ).value,
+              distanceCovered: document.getElementById(
+                contextValues.distanceCovered
+              ).value,
+              startTime: document.getElementById(contextValues.startTime).value,
+            },
+          },
+        ],
       },
     };
-    var bikeIsCustom = false;
-    var isADup = false;
-    //get the needed json object
-    const ConfigElements = ContextJSONIdValues.ConfigElements;
-    if (document.getElementById("bikeSelect").value === "Custom") {
-      bikeIsCustom = true;
-      ConfigName.forEach((configName) => {
-        //get the json object of ids
-        const configIds = ConfigElements[configName + "Config"];
 
-        //check if the selected element is custom
-        if (document.getElementById(configName + "Select").value === "Custom") {
-          configIds.forEach((id) => {
-            //get the item and make sure it exists
-            const element = document.getElementById(id);
-            if (element) {
-              collectedData.Context[configName][id] = element.value; // Collect the value from the form element
-            }
-          });
+    // Save input from user about the firmware configuration
+    const firmwareConfig = contextValues.bikeConfig.firmwareConfig;
 
-          const savedName = document.getElementById(
-            configName + "SavedName"
-          ).value;
-          collectedData.Context[configName]["savedName"] = savedName;
-          //check if the name is a duplicate
-          isADup = dropDownOptions[configName].some(
-            (configElement) => configElement === savedName
-          );
+    for (const firmwareConfigPart in firmwareConfig) {
+      // Declare the board name to be saved
+      collectedData.event.runs[0].context.bikeConfig.firmwareConfig[
+        firmwareConfigPart
+      ] = {};
 
-          if (isADup) {
-            console.error(`Duplicate save name detected in ${configName}`);
-          }
-        } else {
-          collectedData.Context[configName]["selected"] =
-            document.getElementById(configName + "Select").value;
-        }
-      });
-    }
-    //don't send any data if there was a duplicate
-    if (isADup) {
-      return;
-    }
-    //handle the main, bike, and event
-    const MainElements = ContextJSONIdValues.MainElements;
+      for (const firmwareId in contextValues.bikeConfig.firmwareConfig[
+        firmwareConfigPart
+      ]) {
+        // Get the field from the web page to ensure it exists before you get the value
+        const partId = firmwareConfig[firmwareConfigPart][firmwareId];
+        const formInputField = document.getElementById(partId);
 
-    for (const key in MainElements) {
-      //if the bike is custom, make sure saved name
-      //isn't a duplicate name
-      if (key === "BikeConfig" && bikeIsCustom) {
-        if (
-          dropDownOptions["bike"].some(
-            (contextElement) =>
-              contextElement === document.getElementById("bikeConfigName").value
-          )
-        ) {
-          console.error(`Duplicate save name detected in bike config`);
-          return;
+        if (formInputField != null) {
+          // Save the to be passed to the backend
+          collectedData.event.runs[0].context.bikeConfig.firmwareConfig[
+            firmwareConfigPart
+          ][partId] = formInputField.value;
         }
       }
-
-      if (key === "Event" && eventData) {
-        collectedData.Context.Event.eventID = eventData.id;
-      } else if (key === "BikeConfig" && !bikeIsCustom) {
-        //collect the config name and check for a duplicate
-        const element = document.getElementById("bikeSelect").value;
-        // Collect the value from the form element
-        collectedData.Context[key]["selected"] = element;
-      } else {
-        MainElements[key].forEach((id) => {
-          //get the item and make sure it exists
-
-          const element = document.getElementById(id);
-          if (element) {
-            // Collect the value from the form element
-            collectedData.Context[key][id] = element.value;
-          }
-        });
-      }
     }
-
-    PostContextData(collectedData).then((result) => {
-      if (result["success"]) {
-        document.getElementById(FormId).reset();
-        //switch to new screen
-        navigate("/DataUpload/" + result["contextID"]);
-      } else {
-        throw new Error("An error has occurred while submitting data");
-      }
-    });
+    //Save this data and pass it to the next step
+    //Save the data in local storage in case user loses wifi/refreshes page
+    sessionStorage.setItem("BikeData", JSON.stringify(collectedData));
+    navigate("/data-upload");
   };
 
   /**
@@ -435,30 +385,19 @@ function ContextForm() {
 
     const bikeDrop = SelectCreator(dropDownOptions["bike"], "bike");
     setDropDowns((prev) => ({ ...prev, ["bike"]: bikeDrop }));
-    //call out to initialize Context and Event
+    // Call out to initialize Context and Event
     InitializeForms();
   }, [dropDownOptions, eventData]);
   /**
    * Fetch all the saved configs on the first load
    */
   useEffect(() => {
-    //check if contextID exists and is a number
-    //if it exists but isn't a number, redirect to
-    //404 error page
-    //TODO change when home page is included
-    if (contextID) {
-      if (isNaN(contextID)) {
-        navigate("/404Page");
-      } else {
-        FetchEventData();
-      }
-    }
     FetchConfigOptions();
   }, []);
   /**
    * Check all config select value. If it is == Custom
-   * generate the needed config page
-   * else set to null
+   * generate the needed config page.
+   * Else set to null
    *
    * Hook on configSelect change
    */

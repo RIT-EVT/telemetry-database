@@ -5,7 +5,7 @@
     "TMU": {
         "0x180": [
             {
-                "table": "TmuThermistorTemp", 
+                "table": "TmuThermistorTemp",
                 "thermId": 1,
                 "size": 16,
                 "signage": "unsigned"
@@ -437,27 +437,26 @@
         ]
     },
     "nodeIDDictionary": {
-        "1" : "Motor Controller",
-        "7" : "TMU",
-        "8" : "TMS",
-        "9" : "IMU",
-        "10" : "PVC",
-        "11" : "HUDL",
-        "12" : "TPMS",
-        "13" : "APM",
-        "16" : "Charge Controller",
-        "20" : "BMS0_0",
-        "21" : "BMS1_0",
-        "22" : "BMS2_0",
-        "23" : "BMS3_0",
-        "24" : "BMS4_0",
-        "25" : "BMS5_0",
-        "30" : "BMS0_1",
-        "31" : "BMS1_1",
-        "32" : "BMS2_1",
-        "33" : "BMS3_1",
-        "34" : "BMS4_1",
-        "35" : "BMS5_1"
+        "1": "Motor Controller",
+        "7": "TMU",
+        "8": "TMS",
+        "9": "IMU",
+        "10": "PVC",
+        "11": "HUDL",
+        "12": "TPMS",
+        "13": "APM",
+        "16": "Charge Controller",
+        "20": "BMS0_0",
+        "21": "BMS1_0",
+        "22": "BMS2_0",
+        "23": "BMS3_0",
+        "24": "BMS4_0",
+        "25": "BMS5_0",
+        "30": "BMS0_1",
+        "31": "BMS1_1",
+        "32": "BMS2_1",
+        "33": "BMS3_1",
+        "34": "BMS4_1",
+        "35": "BMS5_1"
     }
-
 }

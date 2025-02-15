@@ -11,111 +11,46 @@ var ServerCalls = {};
 let BASE_URL = "http://127.0.0.1:5000";
 
 /* -------------------------------------------------------------------------- */
-/* --------------------------- Context Data Calls --------------------------- */
-/* -------------------------------------------------------------------------- */
-
-/**
- * Fetch the saved config names
- *
- * @return {Dictionary} key: board name, value: saved names
- */
-const FetchConfigData = async () => {
-  await CheckData();
-  try {
-    const response = await fetch(BASE_URL + ServerCalls["context"]);
-
-    if (!response.ok) {
-      console.error("Network response was not ok: " + response.statusText);
-    }
-
-    const jsonResponse = await response.json(); // await here
-
-    return jsonResponse;
-  } catch (error) {
-    return { error: error.message };
-  }
-};
-
-/**
- * Send the given data to the backend
- *
- * @param {Object} postData - data to post to the backend. Formatted as an object
- * @return {Object} - response from server
- */
-const PostContextData = async (postData) => {
-  await CheckData();
-
-  try {
-    const response = await fetch(BASE_URL + ServerCalls["context"], {
-      //post data to the server
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(postData), // Convert the data to JSON
-    });
-    if (!response.ok) {
-      return false;
-    }
-    const jsonResponse = await response.json();
-
-    return jsonResponse;
-  } catch (error) {
-    return false;
-  }
-};
-
-/* -------------------------------------------------------------------------- */
-/* ---------------------------- Event Data Calls ---------------------------- */
-/* -------------------------------------------------------------------------- */
-
-/**
- * Call to the backend to fetch data from an event based off the context id
- *
- * @param {int} searchContextId - context id to find the event id for
- * @return {JSON} object containing data
- */
-const FetchEventDataCall = async (searchContextId) => {
-  await CheckData();
-  try {
-    const response = await fetch(
-      BASE_URL + ServerCalls["event_data"] + "/" + searchContextId
-    );
-
-    const jsonResponse = await response.json(); // await here
-
-    return jsonResponse;
-  } catch (error) {
-    return { error: error.message };
-  }
-};
-
-/* -------------------------------------------------------------------------- */
 /* ---------------------------- Data Upload Calls --------------------------- */
 /* -------------------------------------------------------------------------- */
 
-const PostDataFile = async (file, contextID) => {
-  await CheckData();
+const PostDataFile = async (mf4File, dbcFile, contextData) => {
+  // Ensure CheckData() completes before proceeding
+  if (!ServerCalls) {
+    try {
+      const response = await CheckData(); // Await the result
+      if (!response) {
+        console.error("CheckData failed or returned an invalid response.");
+        return false; // Stop execution if CheckData fails
+      }
+    } catch (error) {
+      console.error("Error in CheckData:", error);
+      return false;
+    }
+  }
 
   const formData = new FormData();
-  formData.append("file", file);
-  formData.append("contextID", contextID);
+  formData.append("mf4File", mf4File);
+  formData.append("dbcFile", dbcFile);
+  formData.append("contextData", contextData);
 
-  const response = await fetch(
-    BASE_URL + ServerCalls["data_upload"] + "/" + contextID,
-    {
+  try {
+    const response = await fetch(BASE_URL + ServerCalls["data_upload"], {
       method: "POST",
       body: formData,
+    });
+
+    if (!response.ok) {
+      const jsonResponse = await response.json();
+      console.error(
+        "Error occurred on server side. Error message: " + jsonResponse.error
+      );
+      return false;
     }
-  );
-  if (!response.ok) {
-    const jsonResponse = await response.json(); // await here
-    console.error(
-      "Error occurred on server side. Error message:" + jsonResponse.error
-    );
-    return false;
-  } else {
     return true;
+  } catch (error) {
+    console.error("Network or server error:", error);
+    return false;
   }
 };
 /**
@@ -124,14 +59,11 @@ const PostDataFile = async (file, contextID) => {
  * @param {int} contextId - id to get progress off
  * @return {int} decimal of how much has been uploaded
  */
-const FetchProgress = async (contextId) => {
+const FetchProgress = async () => {
   try {
-    const response = await fetch(
-      BASE_URL + ServerCalls["data_upload"] + "/" + contextId,
-      {
-        method: "GET",
-      }
-    );
+    const response = await fetch(BASE_URL + ServerCalls["data_upload"], {
+      method: "GET",
+    });
 
     if (!response.ok) {
       console.error("Network response was not ok: " + response.statusText);
@@ -188,11 +120,4 @@ const CheckData = async () => {
   return true;
 };
 
-export {
-  FetchConfigData,
-  PostContextData,
-  PostDataFile,
-  FetchProgress,
-  CheckServerStatus,
-  FetchEventDataCall,
-};
+export { PostDataFile, FetchProgress, CheckServerStatus };
