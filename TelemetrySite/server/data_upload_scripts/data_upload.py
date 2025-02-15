@@ -63,7 +63,6 @@ def add_data(mf4_file, dbc_file, new_run_data, mongo_doc_id):
     db_connection = create_db_connection()
     collection_access_events = db_connection["events"]
     fs = gridfs.GridFS(db_connection)
-    
 
     dbc_decoded = cantools.database.load_file(dbc_file)
 

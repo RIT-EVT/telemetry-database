@@ -35,15 +35,16 @@ class BikeConfigApi(MethodView):
         return jsonify({"data":config_data}), 200
     
     def post(self):
-
-        if not "conifgData" in request.form:
-           return jsonify({"error": "No config data submitted"}), 400
+        db_connection = self.create_db_connection()["configs"]
+        config_data = request.form["configData"]
     
-        conifg_data = request.form["configData"]
-        
-        
-        
-        return jsonify({"error":"Not implemented"}), 501
+        config_data = json.loads(config_data)
+    
+        for key in config_data:
+            if len(config_data[key])!=0:
+                db_connection.update_one({"_id":ObjectId(self.BIKE_CONFIG_DOC)}, {"$push":{f"config_data.{key}":config_data[key]}})
+
+        return jsonify({"error": "Not implemented"}), 501
     
     
     def delete(self):

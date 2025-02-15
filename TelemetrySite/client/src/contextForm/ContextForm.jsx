@@ -96,12 +96,12 @@ function ContextForm() {
 
   // Which config selects are optional
   let RequiredSelects = {
-    bmsConfig: true,
-    tmsConfig: true,
-    imuConfig: false,
-    tmuConfig: false,
-    pvcConfig: true,
-    mcConfig: true,
+    bms: true,
+    tms: true,
+    imu: false,
+    tmu: false,
+    pvc: true,
+    mc: true,
     bike: true,
   };
   let FormId = "ContextForm";
@@ -140,7 +140,7 @@ function ContextForm() {
       if (value === "Custom") {
         const formElement = GenerateFormElement(`${configName}Config`);
         setFormElements((prev) => ({ ...prev, [configName]: formElement }));
-      } else {
+      } else if (value !== "") {
         setFormElements((prev) => ({ ...prev, [configName]: null }));
       }
     } else {
@@ -155,25 +155,18 @@ function ContextForm() {
   };
 
   /**
-   * Call to the python API. For each of the config
-   * forms, get any saved configs that are in the DB.
-   * Set them to the corresponding dropdown option
-   */
-  const FetchConfigOptions = () => {
-    setDropdownOptions(GetConfigData());
-  };
-
-  /**
    * Create a form group based off of the json key passed in.
    * Loop through all elements in the json object and create that
    * many input and label objects.
    *
    * @param {string} jsonValue - Key for the element in the FormElementFormat.json file
+   * @param {json} optionalSetData - Predefined data for config inputs
    * @return {HTMLFormElement} Form group of all the input elements on the json file
    */
-  const GenerateFormElement = (jsonValue) => {
+  const GenerateFormElement = (jsonValue, optionalSetData) => {
     // If the event has been loaded based on a past event file
     // Load that data and use it to create a read only form
+
     if (eventData && jsonValue === "Event") {
       return (
         <FormGroup>
@@ -218,6 +211,7 @@ function ContextForm() {
     } else {
       // Loop through every json element for the current field and
       // Create a new reactstrap input element for it
+      console.log(optionalSetData ? "yeay" : "no");
       return (
         <FormGroup>
           {Object.values(ContextJSONFormElements[jsonValue]).map(
@@ -231,8 +225,11 @@ function ContextForm() {
                     type={formElement["type"]}
                     placeholder={formElement["placeHolder"]}
                     required={formElement["required"]}
-                    readOnly={formElement["readOnly"]}
+                    readOnly={
+                      formElement["readOnly"] || optionalSetData ? true : false
+                    }
                     className='formInput'
+                    value={optionalSetData ? optionalSetData[idValue] : null}
                   >
                     {formElement["type"] === "select"
                       ? formElement["selectValues"].map((value) => (
@@ -274,11 +271,14 @@ function ContextForm() {
         <option value='' disabled hidden>
           Select an option
         </option>
-        {displayValues.map((configNameValue) => (
-          <option key={configNameValue} value={configNameValue}>
-            {configNameValue}
-          </option>
-        ))}
+        {displayValues.map((configNameValue) => {
+          let savedName = configNameValue[name + "SavedName"];
+          return (
+            <option key={savedName} value={savedName}>
+              {savedName}
+            </option>
+          );
+        })}
         <option value='Custom'>Custom</option>
       </Input>
     );
@@ -349,15 +349,60 @@ function ContextForm() {
       },
     };
 
+    const newConfigItems = {
+      bms: {},
+      imu: {},
+      tmu: {},
+      tms: {},
+      pvc: {},
+      mc: {},
+      bike: {},
+    };
+
     // Save input from user about the firmware configuration
     const firmwareConfig = contextValues.bikeConfig.firmwareConfig;
 
-    for (const firmwareConfigPart in firmwareConfig) {
-      // Declare the board name to be saved
-      collectedData.event.runs[0].context.bikeConfig.firmwareConfig[
-        firmwareConfigPart
-      ] = {};
+    /**
+     * Check a new saved name against previous saved names for that board.
+     * This avoids multiple configs being saved under the same name
+     *
+     * @param {string} savedName - name to check for
+     * @param {string} boardName - board to check for a duplicate of
+     *
+     * @return {bool} if there is a duplicate
+     */
+    const CheckSavedName = (savedName, boardName) => {
+      return dropDownOptions[boardName].some(
+        (config) => config[boardName + "SavedName"] === savedName
+      );
+    };
 
+    for (const firmwareConfigPart in firmwareConfig) {
+      const firmwareConfigDataToSave = {};
+      const savedNameObject = document.getElementById(
+        firmwareConfigPart.toLowerCase() + "SavedName"
+      );
+
+      var saveConfigData = false;
+      if (savedNameObject !== null) {
+        const savedName = savedNameObject.value;
+
+        //Check if the config part is custom
+        if (configSelects[firmwareConfigPart.toLowerCase()] === "Custom") {
+          // If it is custom make sure it is not a duplicate saved name
+
+          if (
+            savedName === null ||
+            CheckSavedName(savedName, firmwareConfigPart.toLowerCase())
+          ) {
+            //Stop the data submission if it is a duplicate
+            alert("Duplicate custom name " + savedName);
+            return;
+          } else {
+            saveConfigData = true;
+          }
+        }
+      }
       for (const firmwareId in firmwareConfig[firmwareConfigPart]) {
         //get the field from the web page to ensure it exists before you get the value
         const partId = firmwareConfig[firmwareConfigPart][firmwareId];
@@ -365,15 +410,30 @@ function ContextForm() {
 
         if (formInputField != null) {
           // Save the to be passed to the backend
-          collectedData.event.runs[0].context.bikeConfig.firmwareConfig[
-            firmwareConfigPart
-          ][partId] = formInputField.value;
+          console.log(formInputField.value);
+          firmwareConfigDataToSave[partId] = formInputField.value;
+          if (saveConfigData) {
+            newConfigItems[firmwareConfigPart.toLowerCase()][partId] =
+              formInputField.value;
+          }
         }
       }
+      console.log(firmwareConfigDataToSave);
+      // Declare the board name to be saved
+      collectedData.event.runs[0].context.bikeConfig.firmwareConfig[
+        firmwareConfigPart
+      ] = firmwareConfigDataToSave;
     }
     //Save this data and pass it to the next step
     //Save the data in local storage in case user loses wifi/refreshes page
     sessionStorage.setItem("BikeData", JSON.stringify(collectedData));
+
+    //if there is any data saved in a new config send it to the backend
+    if (
+      Object.values(newConfigItems).some((item) => Object.keys(item).length > 0)
+    ) {
+      PostConfigData(JSON.stringify(newConfigItems));
+    }
     navigate("/data-upload");
   };
 
@@ -382,7 +442,10 @@ function ContextForm() {
    * form elements.
    */
   const InitializeForms = () => {
-    UpdateContext(GenerateFormElement("MainBody"));
+    UpdateContext(
+      GenerateFormElement("MainBody"),
+      eventData ? eventData : null
+    );
     UpdateEventForm(GenerateFormElement("Event"));
   };
 
@@ -411,6 +474,10 @@ function ContextForm() {
    * and check if this is a new run
    */
   useEffect(() => {
+    GetConfigData().then((response) => {
+      setDropdownOptions(response.data.config_data);
+    });
+
     if (location.pathname === "/new-run") {
       var eventData;
       if (
@@ -423,7 +490,6 @@ function ContextForm() {
     } else {
       //ensure no data leaks from past runs
       sessionStorage.removeItem("EventData");
-      console.log(GetConfigData());
     }
   }, []);
   /**
@@ -438,10 +504,18 @@ function ContextForm() {
       const configSelectValue = configSelects[configName]; // Access the corresponding value for the config
 
       if (configSelectValue === "Custom") {
+        setFormElements((prev) => ({ ...prev, [configName]: null })); // Reset first
         const formElement = GenerateFormElement(`${configName}Config`);
         setFormElements((prev) => ({ ...prev, [configName]: formElement }));
-      } else {
-        setFormElements((prev) => ({ ...prev, [configName]: null }));
+      } else if (configSelectValue !== null) {
+        const target_config = dropDownOptions[configName].find(
+          (obj) => obj[configName + "SavedName"] === configSelectValue
+        );
+        const formElement = GenerateFormElement(
+          `${configName}Config`,
+          target_config
+        );
+        setFormElements((prev) => ({ ...prev, [configName]: formElement }));
       }
     });
   }, [configSelects]);

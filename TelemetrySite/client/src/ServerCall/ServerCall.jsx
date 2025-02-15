@@ -14,9 +14,12 @@ let BASE_URL = "http://127.0.0.1:5000";
 /* --------------------------- Config Upload Calls -------------------------- */
 /* -------------------------------------------------------------------------- */
 
-const PostConfigData = async () => {
+const PostConfigData = async (configData) => {
+  const formData = new FormData();
+  formData.append("configData", configData);
   await fetch(BASE_URL + ServerCalls["config_data"], {
     method: "POST",
+    body: formData, // Convert object to JSON string
   });
 };
 

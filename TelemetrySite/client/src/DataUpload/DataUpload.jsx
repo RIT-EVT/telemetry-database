@@ -168,7 +168,11 @@ function DataUpload() {
 
   useEffect(() => {
     //make sure a refresh doesn't make the user resubmit data
-    if (sessionStorage.getItem("DataSubmitted") !== null) {
+    if (
+      sessionStorage.getItem("DataSubmitted") !== null &&
+      sessionStorage.getItem("DataSubmitted") === true
+    ) {
+      console.log(sessionStorage.getItem("DataSubmitted"));
       DisplayRedirect();
     } else {
       setBodyDisplay(
