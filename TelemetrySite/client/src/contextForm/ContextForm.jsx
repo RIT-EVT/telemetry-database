@@ -58,7 +58,6 @@ function ContextForm() {
   });
   // Each dropdown object created in runtime with saved names and a field for custom
   const [dropDowns, setDropDowns] = useState({
-    bike: null,
     bms: null,
     imu: null,
     tmu: null,
@@ -83,7 +82,6 @@ function ContextForm() {
     tms: [],
     pvc: [],
     mc: [],
-    bike: [],
   });
 
   const [bikeSelected, setBikeSelected] = useState(false);
@@ -134,23 +132,13 @@ function ContextForm() {
    */
   const handleConfigFormChange = async (event, configName) => {
     const value = event.target.value;
-    // Handle the bike differently from the configs
-    if (configName !== "bike") {
-      handleConfigSelectChange(configName, value);
-      if (value === "Custom") {
-        const formElement = GenerateFormElement(`${configName}Config`);
-        setFormElements((prev) => ({ ...prev, [configName]: formElement }));
-      } else if (value !== "") {
-        setFormElements((prev) => ({ ...prev, [configName]: null }));
-      }
-    } else {
-      if (value === "Custom") {
-        UpdateBikeForm(GenerateFormElement("BikeConfig"));
-        setBikeSelected(true);
-      } else {
-        UpdateBikeForm(null);
-        setBikeSelected(false);
-      }
+
+    handleConfigSelectChange(configName, value);
+    if (value === "Custom") {
+      const formElement = GenerateFormElement(`${configName}Config`);
+      setFormElements((prev) => ({ ...prev, [configName]: formElement }));
+    } else if (value !== "") {
+      setFormElements((prev) => ({ ...prev, [configName]: null }));
     }
   };
 
@@ -211,7 +199,6 @@ function ContextForm() {
     } else {
       // Loop through every json element for the current field and
       // Create a new reactstrap input element for it
-      console.log(optionalSetData ? "yeay" : "no");
       return (
         <FormGroup>
           {Object.values(ContextJSONFormElements[jsonValue]).map(
@@ -321,8 +308,6 @@ function ContextForm() {
                 tirePressure: document.getElementById(bikeConfig.tirePressure)
                   .value,
                 coolantVolume: document.getElementById(bikeConfig.coolantVolume)
-                  .value,
-                bikeName: document.getElementById(bikeConfig.BikeConfigName)
                   .value,
                 firmwareConfig: {},
 
@@ -447,6 +432,7 @@ function ContextForm() {
       eventData ? eventData : null
     );
     UpdateEventForm(GenerateFormElement("Event"));
+    UpdateBikeForm(GenerateFormElement("BikeConfig"));
   };
 
   /* -------------------------------------------------------------------------- */
@@ -464,9 +450,6 @@ function ContextForm() {
       setDropDowns((prev) => ({ ...prev, [name]: dropDown }));
     });
 
-    const bikeDrop = SelectCreator(dropDownOptions["bike"], "bike");
-    setDropDowns((prev) => ({ ...prev, ["bike"]: bikeDrop }));
-    // Call out to initialize Context and Event
     InitializeForms();
   }, [dropDownOptions, eventData]);
   /**
