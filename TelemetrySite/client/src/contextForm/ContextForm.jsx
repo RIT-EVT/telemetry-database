@@ -565,7 +565,7 @@ function ContextForm() {
           );
         })}
       </Container>
-      )
+
       {/*
        * Submitting data is handled in the
        * SubmitData() const function
