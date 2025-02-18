@@ -6,7 +6,7 @@ import "./App.css";
 import Page404 from "./404/404.jsx";
 import { CheckServerStatus } from "./ServerCall/ServerCall.jsx";
 import { useEffect, useState } from "react";
-import { Container, Row, Col } from "reactstrap";
+import { Container, Row, Col, Button } from "reactstrap";
 import { useNavigate, useLocation } from "react-router-dom";
 
 function App() {
@@ -24,6 +24,12 @@ function App() {
     setToken(signupData);
     localStorage.setItem("authToken", signupData);
     navigate("/context-form");
+  };
+
+  const handleSignout = () => {
+    localStorage.removeItem("authToken");
+    setToken(null);
+    navigate("/login");
   };
 
   /**
@@ -61,7 +67,6 @@ function App() {
       location.pathname != "/signup" &&
       location.pathname != "/login"
     ) {
-      console.log(location.pathname);
       navigate("/login");
     }
   }, [navigate, location]);
@@ -69,11 +74,14 @@ function App() {
   return (
     <div className='MainBody'>
       <Container className='ContextSelect'>
-        <Row className='ContextHeader'>
+        <div className='ContextHeader'>
           <center>
-            <Col className='ContextHeaderText'>Context Creator</Col>
+            <div className='ContextHeaderText'>Context Creator</div>
           </center>
-        </Row>
+          <button onClick={handleSignout} className='SignOutButton'>
+            Sign Out
+          </button>
+        </div>
 
         {ServerStatus ? (
           <Row className='Components'>
