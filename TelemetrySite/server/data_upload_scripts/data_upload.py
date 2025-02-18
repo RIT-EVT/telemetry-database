@@ -1,25 +1,16 @@
 import cantools
-import pymongo
+
 from asammdf import MDF
 import json
 from more_itertools import sliced
 from bson import ObjectId
-import os
-import urllib
 import gridfs
+
+from utils import create_db_connection
 
 parsing_data_progress = [0]
 uploading_data_progress = [0]
 
-## Create a connection to the Mongo DB
-#
-# @return db connection object
-def create_db_connection():
-    connection_string = "mongodb://" + urllib.parse.quote_plus(str(os.getenv("MDB_USER"))) + ":" + urllib.parse.quote_plus(str(os.getenv("MDB_PASSWORD")))  + "@" + str(os.getenv("HOST")) + ":" + str(os.getenv("MDB_PORT"))
-    mongo_client = pymongo.MongoClient(connection_string)
-    
-    db_access = mongo_client["ernie"]
-    return db_access
 
 ## The function that sends data to the db
 #

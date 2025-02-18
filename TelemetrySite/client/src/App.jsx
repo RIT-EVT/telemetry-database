@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import ContextForm from "./contextForm/ContextForm.jsx"; // Import other components
 import DataUpload from "./DataUpload/DataUpload.jsx";
+import { LoginPage, SignupPage } from "LoginPage/LoginPage.jsx";
 import "./App.css";
 import Page404 from "./404/404.jsx";
 import { CheckServerStatus } from "./ServerCall/ServerCall.jsx";
@@ -12,6 +13,18 @@ function App() {
   const [ServerStatus, setStatus] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const [authToken, setToken] = useState(null);
+
+  const handleLogin = (loginData) => {
+    setToken(loginData);
+    localStorage.setItem("authToken", loginData);
+    navigate("/context-form");
+  };
+  const handleSignup = (signupData) => {
+    setToken(signupData);
+    localStorage.setItem("authToken", signupData);
+    navigate("/context-form");
+  };
 
   /**
    * Call to the backend and ensure the server is online
@@ -21,12 +34,6 @@ function App() {
       setStatus(response);
     });
   };
-
-  useEffect(() => {
-    if ((location.pathname = "/")) {
-      navigate("/context-form");
-    }
-  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -40,7 +47,24 @@ function App() {
 
     // Cleanup interval when component unmounts
     return () => clearInterval(interval);
-  }, [ServerStatus]); // Add serverOnline as a dependency to stop interval when it's true
+  }, [ServerStatus, location, navigate]); // Add serverOnline as a dependency to stop interval when it's true
+
+  useEffect(() => {
+    const savedToken = localStorage.getItem("authToken");
+
+    if (savedToken) {
+      setToken(savedToken);
+      if ((location.pathname = "/")) {
+        navigate("/context-form");
+      }
+    } else if (
+      location.pathname != "/signup" &&
+      location.pathname != "/login"
+    ) {
+      console.log(location.pathname);
+      navigate("/login");
+    }
+  }, [navigate, location]);
 
   return (
     <div className='MainBody'>
@@ -55,10 +79,17 @@ function App() {
           <Row className='Components'>
             <Col>
               <Routes>
-                <Route path='404Page' element={<Page404 />} />
                 <Route path='/context-form' element={<ContextForm />} />
                 <Route path='/new-run' element={<ContextForm />} />
                 <Route path='/data-upload' element={<DataUpload />} />
+                <Route
+                  path='/login'
+                  element={<LoginPage onLogin={handleLogin} />}
+                />
+                <Route
+                  path='/signup'
+                  element={<SignupPage onSignup={handleSignup} />}
+                />
                 <Route path='*' element={<Page404 />} />
               </Routes>
             </Col>

@@ -5,6 +5,7 @@ import dotenv
 import json
 from data_upload_scripts.data_upload_api import DateUploadApi
 from bike_config_scripts.bike_conifg_api import BikeConfigApi
+from user_auth_scripts.user_auth_api import UserAuthApi
 import os
 import logging
 
@@ -32,6 +33,9 @@ user_view =BikeConfigApi.as_view("BikeConfigApi")
 
 app.add_url_rule("/ConfigData", view_func = user_view, methods=["GET", "POST", "DELETE"])
 
+user_view = UserAuthApi.as_view("UserAuthApi")
+
+app.add_url_rule("/Login", view_func=user_view, methods=["POST"])
 
 ## Get all the url paths
 #
@@ -54,6 +58,7 @@ if __name__ == "__main__":
     # from the current file
     two_up = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
     dotenv.load_dotenv(two_up + "/credentials.env")
+    dotenv.load_dotenv(two_up+"/integer.env")
     print("Starting flask")
 
     app.run(debug=True)  # Starts Flask
