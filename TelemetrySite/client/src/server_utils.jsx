@@ -53,4 +53,4 @@ const CheckData = async () => {
   return true;
 };
 
-export { BuildURI, CheckServerStatus, CheckData } ;
+export { BuildURI, CheckServerStatus, CheckData, ServerCalls } ;

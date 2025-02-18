@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import "./DataUpload.css";
-import { BuildURI, CheckData } from "../server_utils";
+import { BuildURI, CheckData, ServerCalls } from "../server_utils";
 import {
   Container,
   Row,
@@ -108,7 +108,7 @@ function DataUpload() {
      */
     const FetchProgress = async () => {
       try {
-        const response = await fetch(BASE_URL + ServerCalls["data_upload"], {
+        const response = await fetch(BuildURI, {
           method: "GET",
         });
     
