@@ -547,27 +547,25 @@ function ContextForm() {
           </Row>
         </Col>
       </Container>
-
-      {bikeSelected ? (
-        <Container className='grid-container'>
-          {ConfigName.map((name) => {
-            return (
-              <Card className='grid-item'>
-                <CardTitle className='grid-header'>
-                  {/*
-                   *Create each element of the grid. Initially each has the name
-                   *of the config and a dropdown. Dropdown is populated by past
-                   *configs of the same type that have been saved. Allow user to also
-                   *create a new one with the option to save it with a name
-                   */}
-                  {name.toLocaleUpperCase()} Configuration: {dropDowns[name]}
-                </CardTitle>
-                <CardBody>{configForm[name]}</CardBody>
-              </Card>
-            );
-          })}
-        </Container>
-      ) : null}
+      <Container className='grid-container'>
+        {ConfigName.map((name) => {
+          return (
+            <Card className='grid-item'>
+              <CardTitle className='grid-header'>
+                {/*
+                 *Create each element of the grid. Initially each has the name
+                 *of the config and a dropdown. Dropdown is populated by past
+                 *configs of the same type that have been saved. Allow user to also
+                 *create a new one with the option to save it with a name
+                 */}
+                {name.toLocaleUpperCase()} Configuration: {dropDowns[name]}
+              </CardTitle>
+              <CardBody>{configForm[name]}</CardBody>
+            </Card>
+          );
+        })}
+      </Container>
+      )
       {/*
        * Submitting data is handled in the
        * SubmitData() const function
