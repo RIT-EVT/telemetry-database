@@ -3,7 +3,7 @@ import ContextForm from "./contextForm/ContextForm.jsx"; // Import other compone
 import DataUpload from "./DataUpload/DataUpload.jsx";
 import "./App.css";
 import Page404 from "./404/404.jsx";
-import { CheckServerStatus } from "./ServerCall/ServerCall.jsx";
+import { CheckServerStatus } from "server_utils"
 import { useEffect, useState } from "react";
 import { Container, Row, Col } from "reactstrap";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -17,7 +17,7 @@ function App() {
    * Call to the backend and ensure the server is online
    */
   const CheckBackendConnection = () => {
-    CheckServerStatus().then((response) => {
+    CheckServerStatus().then( (response) => {
       setStatus(response);
     });
   };
