@@ -4,7 +4,6 @@ import "./DataUpload.css";
 import { PostDataFile, FetchProgress } from "../ServerCall/ServerCall";
 import {
   Container,
-  Row,
   Col,
   Card,
   CardBody,
@@ -12,7 +11,7 @@ import {
   Button,
   Form,
 } from "reactstrap";
-import { json, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 /**
  * Upload a mf4 file to the backend sever as

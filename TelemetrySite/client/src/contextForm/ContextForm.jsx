@@ -30,7 +30,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 import "./ContextForm.css";
 
-import { PostConfigData, GetConfigData } from "ServerCall/ServerCall";
+import { BuildURI } from "ServerUtils";
+
 /**
  * Create needed context forms. Return the configured elements
  *
@@ -47,7 +48,7 @@ function ContextForm() {
 
   const [eventData, setEventData] = useState(null);
 
-  //each config form object
+  // Each config form object
   const [configForm, setFormElements] = useState({
     bms: null,
     imu: null,
@@ -83,8 +84,6 @@ function ContextForm() {
     pvc: [],
     mc: [],
   });
-
-  const [bikeSelected, setBikeSelected] = useState(false);
 
   /* -------------------------------------------------------------------------- */
   /* --------------------------- Initialize Constants ------------------------- */
@@ -233,6 +232,35 @@ function ContextForm() {
         </FormGroup>
       );
     }
+  };
+
+  /**
+   * Get all the saved configs from the backend
+   */
+  const GetConfigData = async () => {
+    console.log(BuildURI("config_data"));
+    const response = await fetch(BuildURI("config_data"), {
+      method: "GET",
+    });
+
+    if (!response.ok) {
+      console.error("Network response was not ok: " + response.statusText);
+    }
+    const data = await response.json();
+
+    return data;
+  };
+
+  /**
+   * Post the saved conifg data to the backend
+   */
+  const PostConfigData = async (configData) => {
+    const formData = new FormData();
+    formData.append("configData", configData);
+    await fetch(BuildURI("config_data"), {
+      method: "POST",
+      body: formData, // Convert object to JSON string
+    });
   };
 
   /**

@@ -15,7 +15,6 @@ log = logging.getLogger('werkzeug')
 # Set the desired log level (e.g., ERROR or CRITICAL)
 # Currently set to only print if something goes wrong internally
 # Does not display every call
-log.setLevel(logging.ERROR)
 
 # create views for url rules
 
