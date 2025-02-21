@@ -14,7 +14,7 @@ let BASE_URL = "http://127.0.0.1:5000";
 /* ---------------------------- Data Upload Calls --------------------------- */
 /* -------------------------------------------------------------------------- */
 
-const PostDataFile = async (mf4File, dbcFile, contextData) => {
+const PostDataFile = async (mf4File, dbcFile, contextData, mongoDbDocId) => {
   // Ensure CheckData() completes before proceeding
   if (!ServerCalls) {
     try {
@@ -34,6 +34,10 @@ const PostDataFile = async (mf4File, dbcFile, contextData) => {
   formData.append("dbcFile", dbcFile);
   formData.append("contextData", contextData);
 
+  if (mongoDbDocId) {
+    formData.append("mongoDocID", mongoDbDocId);
+  }
+
   try {
     const response = await fetch(BASE_URL + ServerCalls["data_upload"], {
       method: "POST",
@@ -47,7 +51,7 @@ const PostDataFile = async (mf4File, dbcFile, contextData) => {
       );
       return false;
     }
-    return true;
+    return await response.json();
   } catch (error) {
     console.error("Network or server error:", error);
     return false;
