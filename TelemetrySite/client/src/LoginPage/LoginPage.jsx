@@ -33,6 +33,11 @@ const LoginPage = ({ onLogin }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
+  const [invalidCredentialsModal, setInvalidCredModal] = useState(false);
+
+  const toggleInvalidCredentialsModal = () =>
+    setInvalidCredModal(!invalidCredentialsModal);
+
   const navigate = useNavigate();
 
   /*
@@ -43,8 +48,7 @@ const LoginPage = ({ onLogin }) => {
    */
   const LoginChallenge = async (e) => {
     e.preventDefault();
-
-    const response = await fetch(BASE_URL, {
+    fetch(BASE_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -52,6 +56,16 @@ const LoginPage = ({ onLogin }) => {
         password: password,
         action: "login",
       }),
+    }).then(async (response) => {
+      if (!response.ok) {
+        if (response.status === 404) {
+          setInvalidCredModal(true);
+          return;
+        }
+      } else {
+        let data = await response.json();
+        onLogin(data["auth_token"]);
+      }
     });
   };
 
@@ -101,6 +115,15 @@ const LoginPage = ({ onLogin }) => {
           </Button>
         </Form>
       </center>
+      <Modal
+        isOpen={invalidCredentialsModal}
+        toggle={toggleInvalidCredentialsModal}
+      >
+        <ModalHeader toggle={toggleInvalidCredentialsModal}>
+          Invalid credentials
+        </ModalHeader>
+        <ModalBody>Invalid username or password</ModalBody>
+      </Modal>
     </Card>
   );
 };
@@ -161,7 +184,9 @@ const SignupPage = ({ onSignup }) => {
     <Card className='card'>
       <Container>
         <Col>
-          <h2>Signup</h2>
+          <center>
+            <h2>Signup</h2>
+          </center>
           <Form onSubmit={HandleSignup} className='form'>
             <Row>
               <Col>
@@ -209,17 +234,19 @@ const SignupPage = ({ onSignup }) => {
               </Col>
             </Row>
             <Row>
-              <InputGroup className='InputGroup'>
-                <Label htmlFor='challenge-value'>Challenge Value:</Label>
-                <Input
-                  type='number'
-                  id='challenge-value'
-                  className='Input'
-                  value={challengeInt}
-                  onChange={(e) => setChallengeInt(e.target.value)}
-                  required
-                />
-              </InputGroup>
+              <Col>
+                <InputGroup className='InputGroup'>
+                  <Label htmlFor='challenge-value'>Challenge Value:</Label>
+                  <Input
+                    type='number'
+                    id='challenge-value'
+                    className='Input'
+                    value={challengeInt}
+                    onChange={(e) => setChallengeInt(e.target.value)}
+                    required
+                  />
+                </InputGroup>
+              </Col>
             </Row>
             <Row className='mt-3'>
               <Col>

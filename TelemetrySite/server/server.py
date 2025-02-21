@@ -24,14 +24,14 @@ user_view = DateUploadApi.as_view("DateUploadApi")
 
 
 app.add_url_rule(
-    "/DataUpload",
+    "/DataUpload/<auth_token>",
     view_func=user_view,
-    methods=["GET", "POST", "PUT"],
+    methods=["GET", "POST"],
 )
 
 user_view =BikeConfigApi.as_view("BikeConfigApi")
 
-app.add_url_rule("/ConfigData", view_func = user_view, methods=["GET", "POST", "DELETE"])
+app.add_url_rule("/ConfigData/<auth_token>", view_func = user_view, methods=["GET", "POST", "DELETE"])
 
 user_view = UserAuthApi.as_view("UserAuthApi")
 
@@ -58,7 +58,7 @@ if __name__ == "__main__":
     # from the current file
     two_up = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
     dotenv.load_dotenv(two_up + "/credentials.env")
-    dotenv.load_dotenv(two_up+"/integer.env")
+    dotenv.load_dotenv(two_up+"/encryption.env")
     print("Starting flask")
 
     app.run(debug=True)  # Starts Flask

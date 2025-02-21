@@ -29,6 +29,7 @@
 
     background-color: #F36917 !important;
     border-color: black !important;
+    cursor: pointer;
 }
 
 /* Hover effects */
@@ -37,12 +38,9 @@
     /* Slightly enlarge button */
     background-color: #ac4b13 !important;
     border: black;
-
 }
 
 .SwitchButton {
-
-
     margin-top: 20px;
     margin-left: 20px;
     font-size: 20px !important;
@@ -53,6 +51,8 @@
     background-color: black !important;
     color: #F36917 !important;
     border-color: black !important;
+
+    cursor: pointer;
 }
 
 .SwitchButton:hover {

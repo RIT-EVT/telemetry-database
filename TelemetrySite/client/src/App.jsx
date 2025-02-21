@@ -6,7 +6,7 @@ import "./App.css";
 import Page404 from "./404/404.jsx";
 import { CheckServerStatus } from "./ServerCall/ServerCall.jsx";
 import { useEffect, useState } from "react";
-import { Container, Row, Col, Button } from "reactstrap";
+import { Container, Row, Col } from "reactstrap";
 import { useNavigate, useLocation } from "react-router-dom";
 
 function App() {
@@ -57,10 +57,10 @@ function App() {
 
   useEffect(() => {
     const savedToken = localStorage.getItem("authToken");
-
+    console.log(savedToken);
     if (savedToken) {
       setToken(savedToken);
-      if ((location.pathname = "/")) {
+      if (location.pathname === "/") {
         navigate("/context-form");
       }
     } else if (
@@ -78,9 +78,11 @@ function App() {
           <center>
             <div className='ContextHeaderText'>Context Creator</div>
           </center>
-          <button onClick={handleSignout} className='SignOutButton'>
-            Sign Out
-          </button>
+          {authToken ? (
+            <button onClick={handleSignout} className='SignOutButton'>
+              Sign Out
+            </button>
+          ) : null}
         </div>
 
         {ServerStatus ? (
