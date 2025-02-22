@@ -3,7 +3,7 @@ import ContextForm from "./contextForm/ContextForm.jsx"; // Import other compone
 import DataUpload from "./DataUpload/DataUpload.jsx";
 import "./App.css";
 import Page404 from "./404/404.jsx";
-import { CheckServerStatus } from "./ServerCall/ServerCall.jsx";
+import { CheckServerStatus } from "SeverUtils.jsx"
 import { useEffect, useState } from "react";
 import { Container, Row, Col } from "reactstrap";
 import { useNavigate, useLocation } from "react-router-dom";
