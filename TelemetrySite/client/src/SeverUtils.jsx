@@ -11,7 +11,7 @@ let BASE_URL = "http://127.0.0.1:5000";
 // These functions are not immediately used in seperate files, but they
 // are general enough to grant them their own place
 
-const BuildURI = async (ServerCallsKey) => {
+const BuildURI = (ServerCallsKey) => {
   return BASE_URL + ServerCalls[ServerCallsKey] ;
 }
 

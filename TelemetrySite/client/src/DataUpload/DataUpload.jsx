@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import "./DataUpload.css";
-import { BuildURI, CheckData, ServerCalls } from "../server_utils";
+import { BuildURI, CheckData, ServerCalls } from "../SeverUtils";
 import {
   Container,
   Row,
@@ -78,7 +78,7 @@ function DataUpload() {
       formData.append("contextData", contextData);
     
       try {
-        const response = await fetch( await BuildURI(), {
+        const response = await fetch(BuildURI(), {
           method: "POST",
           body: formData,
         });
