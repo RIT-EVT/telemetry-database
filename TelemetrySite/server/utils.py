@@ -18,10 +18,20 @@ def create_db_connection():
 # @param auth_token token to query against the db
 # @return bool if the auth_token exists
 def authenticate_user(auth_token):
-    auth_connection = create_db_connection()["users"]
     
     # Query the db to see if the user's token is on it
     # If it is then allow the operation to continue
     # Otherwise return an error
     
+    auth_connection = create_db_connection()["users"]
+    
+    
+    
     return (auth_connection.find_one({"auth_token":auth_token})==None)
+
+
+def check_expired_tokens(auth_token):
+    
+    
+    
+    return False

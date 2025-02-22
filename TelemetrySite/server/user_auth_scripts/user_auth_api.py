@@ -3,6 +3,7 @@ from flask import request, jsonify
 from secrets import token_urlsafe
 from os import getenv
 from utils import create_db_connection
+from datetime import datetime
 
 
 class UserAuthApi(MethodView):   
@@ -18,6 +19,7 @@ class UserAuthApi(MethodView):
         if user_data.get("action")=="login":
             username = user_data.get("name")
             password = user_data.get("password")
+            
             mongo_data = user_db_connection.find_one({"username":username, "password":password.encode()})
             
             if mongo_data == None:
@@ -28,7 +30,8 @@ class UserAuthApi(MethodView):
         elif user_data.get("action") == "signup":
             username = user_data.get("name")
             password = user_data.get("password")  
-            secure_num = user_data.get("secureNum")    
+            secure_num = user_data.get("secureNum")
+            current_date_time = datetime.now()    
             if secure_num != getenv("CHALLENGE_NUM"):
                 # User value doesn't match the needed value
                 # return an error message
@@ -49,7 +52,8 @@ class UserAuthApi(MethodView):
                     auth_token=token_urlsafe(32)
                     print("Go to the lottery!")
                                 
-                user_db_connection.insert_one({"username":username, "password":password.encode(), "auth_token":auth_token})
+                user_db_connection.insert_one({"username" : username, "password" : password.encode(),
+                                               "auth_token" : auth_token, "auth_time" : current_date_time})
                 
                 return jsonify({"auth_token":auth_token})
                     
