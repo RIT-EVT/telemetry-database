@@ -2,8 +2,7 @@ from flask.views import MethodView
 from flask import request, jsonify
 from werkzeug.utils import secure_filename
 import os
-from data_upload_scripts.data_upload import submit_data, get_progress, add_data
-from utils import authenticate_user
+from data_upload_scripts.data_upload import submit_data, get_progress
 
 class DateUploadApi(MethodView):
 
@@ -17,18 +16,11 @@ class DateUploadApi(MethodView):
 
     ## Get the current progress of the
     #  current data upload action
-    def get(self, auth_token):
-        if authenticate_user(auth_token)==False:
-            return jsonify({"error", "Invalid user"}), 401
+    def get(self):
         return jsonify(get_progress()), 200
 
     ## Take in a mf4, dbc, and json object for the run and submit to nrdb
-    def post(self, auth_token):
-        
-        if authenticate_user(auth_token)==False:
-            return jsonify({"error", "Invalid user"}), 401
-        
-        
+    def post(self):
         # Check if the post request has all needed data needed
         if "mf4File" not in request.files:
             return jsonify({"error": "No mf4 file uploaded"}), 400
@@ -40,7 +32,6 @@ class DateUploadApi(MethodView):
         mf4File = request.files["mf4File"]
         dbcFile = request.files["dbcFile"]
         context_data = request.form["contextData"]
-        
 
         # ensure the file actually contains a valid file name and files
         if not mf4File or mf4File.name == "":
@@ -64,18 +55,14 @@ class DateUploadApi(MethodView):
             mf4File.save(mf4_file)
             dbcFile.save(dbc_file)
             
-            if "mongoDocID" in request.form:
-                document_id = request.form["mongoDocID"]
-                add_data(mf4_file, dbc_file, context_data, document_id)
-            else:
-                # submit the data as a new document 
-                document_id = submit_data(mf4_file, dbc_file, context_data)
+            # submit the data!
+            submit_data(mf4_file, dbc_file, context_data)
 
             # remove the file from the sever end
             os.remove(mf4_file)
             os.remove(dbc_file)
             
-            return jsonify({"id": document_id}), 201
+            return jsonify({"message": "Data received successfully"}), 201
         else:
             return (
                 jsonify(
