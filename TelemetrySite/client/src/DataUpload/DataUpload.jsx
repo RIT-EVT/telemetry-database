@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import "./DataUpload.css";
-import { PostDataFile, FetchProgress } from "../ServerCall/ServerCall";
+import { BuildURI, CheckData, ServerCalls } from "ServerUtils.jsx";
 import {
   Container,
   Col,
@@ -81,11 +81,85 @@ function DataUpload() {
       return;
     }
 
+    const PostDataFile = async (
+      mf4File,
+      dbcFile,
+      contextData,
+      mongoDbDocId
+    ) => {
+      // Ensure CheckData() completes before proceeding
+      if (!ServerCalls) {
+        try {
+          const response = await CheckData(); // Await the result
+          if (!response) {
+            console.error("CheckData failed or returned an invalid response.");
+            return false; // Stop execution if CheckData fails
+          }
+        } catch (error) {
+          console.error("Error in CheckData:", error);
+          return false;
+        }
+      }
+
+      const formData = new FormData();
+      formData.append("mf4File", mf4File);
+      formData.append("dbcFile", dbcFile);
+      formData.append("contextData", contextData);
+
+      if (mongoDbDocId) {
+        formData.append("mongoDocID", mongoDbDocId);
+      }
+
+      try {
+        const response = await fetch(BuildURI("data_upload"), {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const jsonResponse = await response.json();
+          console.error(
+            "Error occurred on server side. Error message: " +
+              jsonResponse.error
+          );
+          return false;
+        }
+        return await response.json();
+      } catch (error) {
+        console.error("Network or server error:", error);
+        return false;
+      }
+    };
+
     const mf4File = document.getElementById("fileUploadMF4").files[0];
     const dbcFile = document.getElementById("fileUploadDBC").files[0];
     const eventData = sessionStorage.getItem("EventData");
     const mongoDocId = eventData ? JSON.parse(eventData)["documentId"] : null;
     const response = PostDataFile(mf4File, dbcFile, contextData, mongoDocId);
+
+    /**
+     * Fetch the progress of the current upload
+     *
+     * @return {int} decimal of how much has been uploaded
+     */
+    const FetchProgress = async () => {
+      try {
+        const response = await fetch(BuildURI("data_upload"), {
+          method: "GET",
+        });
+
+        if (!response.ok) {
+          console.error("Network response was not ok: " + response.statusText);
+        }
+
+        const data = await response.json();
+
+        return data;
+      } catch (error) {
+        console.error("Failed to fetch progress:", error);
+        return { error: error.message };
+      }
+    };
 
     var lastProgress = -1;
     var lastResponseString = "";
@@ -115,15 +189,17 @@ function DataUpload() {
         ) {
           // Update the UI with the formatted estimated time remaining
           setProgressBar(
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <progress
-                value={currentProgress}
-                style={{ marginRight: "10px" }}
-              />
-              <div>
-                {responseString}:{Math.round(currentProgress * 100)}%
+            <center>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <progress
+                  value={currentProgress}
+                  style={{ marginRight: "10px" }}
+                />
+                <div>
+                  {responseString}:{Math.round(currentProgress * 100)}%
+                </div>
               </div>
-            </div>
+            </center>
           );
           lastProgress = currentProgress;
           lastResponseString = responseString;

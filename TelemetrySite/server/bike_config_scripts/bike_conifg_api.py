@@ -44,7 +44,7 @@ class BikeConfigApi(MethodView):
             if len(config_data[key])!=0:
                 db_connection.update_one({"_id":ObjectId(self.BIKE_CONFIG_DOC)}, {"$push":{f"config_data.{key}":config_data[key]}})
 
-        return jsonify({"error": "Not implemented"}), 501
+        return jsonify({"error": "Not implemented"}), 200
     
     
     def delete(self):

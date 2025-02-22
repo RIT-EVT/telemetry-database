@@ -30,7 +30,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 import "./ContextForm.css";
 
-import { BuildURI } from "ServerUtils";
+import { BuildURI } from "ServerUtils.jsx";
 
 /**
  * Create needed context forms. Return the configured elements

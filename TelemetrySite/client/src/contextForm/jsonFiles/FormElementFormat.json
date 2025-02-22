@@ -116,12 +116,6 @@
       "placeHolder": "mL",
       "label": "Coolant Volume",
       "required": false
-    },
-    "configName": {
-      "id": "bikeConfigName",
-      "type": "text",
-      "label": "Saved Name",
-      "required": true
     }
   },
   "bmsConfig": {
