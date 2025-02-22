@@ -17,7 +17,7 @@ function App() {
    * Call to the backend and ensure the server is online
    */
   const CheckBackendConnection = () => {
-    CheckServerStatus().then( (response) => {
+    CheckServerStatus().then((response) => {
       setStatus(response);
     });
   };
