@@ -15,8 +15,7 @@ import {
 import { useState } from "react";
 import "./LoginPage.css";
 import { useNavigate } from "react-router-dom";
-
-let BASE_URL = "http://127.0.0.1:5000/Login";
+import { BuildURI } from "ServerUtils";
 
 const styles = {
   container: {
@@ -48,7 +47,7 @@ const LoginPage = ({ onLogin }) => {
    */
   const LoginChallenge = async (e) => {
     e.preventDefault();
-    fetch(BASE_URL, {
+    fetch(BuildURI("user_auth"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -152,7 +151,7 @@ const SignupPage = ({ onSignup }) => {
     }
     // Pass all value to the backend to check if user's input is valid
     // and there aren't conflicting usernames
-    fetch(BASE_URL, {
+    fetch(BuildURI("user_auth"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

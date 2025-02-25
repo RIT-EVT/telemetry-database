@@ -4,11 +4,10 @@ import DataUpload from "./DataUpload/DataUpload.jsx";
 import { LoginPage, SignupPage } from "LoginPage/LoginPage.jsx";
 import "./App.css";
 import Page404 from "./404/404.jsx";
-import { CheckServerStatus } from "./ServerCall/ServerCall.jsx";
 import { useEffect, useState } from "react";
 import { Container, Row, Col } from "reactstrap";
 import { useNavigate, useLocation } from "react-router-dom";
-
+import { CheckServerStatus } from "ServerUtils.jsx";
 function App() {
   const [ServerStatus, setStatus] = useState(false);
   const location = useLocation();
@@ -17,17 +16,18 @@ function App() {
 
   const handleLogin = (loginData) => {
     setToken(loginData);
-    localStorage.setItem("authToken", loginData);
+    sessionStorage.setItem("authToken", loginData);
     navigate("/context-form");
   };
+
   const handleSignup = (signupData) => {
     setToken(signupData);
-    localStorage.setItem("authToken", signupData);
+    sessionStorage.setItem("authToken", signupData);
     navigate("/context-form");
   };
 
   const handleSignout = () => {
-    localStorage.removeItem("authToken");
+    sessionStorage.removeItem("authToken");
     setToken(null);
     navigate("/login");
   };
@@ -37,6 +37,7 @@ function App() {
    */
   const CheckBackendConnection = () => {
     CheckServerStatus().then((response) => {
+      console.log(response);
       setStatus(response);
     });
   };
@@ -56,7 +57,7 @@ function App() {
   }, [ServerStatus, location, navigate]); // Add serverOnline as a dependency to stop interval when it's true
 
   useEffect(() => {
-    const savedToken = localStorage.getItem("authToken");
+    const savedToken = sessionStorage.getItem("authToken");
     console.log(savedToken);
     if (savedToken) {
       setToken(savedToken);

@@ -84,7 +84,7 @@
       "label": "Event Type"
     },
     "location": {
-      "id": "location",
+      "id": "eventLocation",
       "type": "text",
       "required": true,
       "placeHolder": "Where?",
@@ -116,12 +116,6 @@
       "placeHolder": "mL",
       "label": "Coolant Volume",
       "required": false
-    },
-    "configName": {
-      "id": "bikeConfigName",
-      "type": "text",
-      "label": "Saved Name",
-      "required": true
     }
   },
   "bmsConfig": {

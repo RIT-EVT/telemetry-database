@@ -3,6 +3,7 @@ from flask import request, jsonify
 from werkzeug.utils import secure_filename
 import os
 from data_upload_scripts.data_upload import submit_data, get_progress
+from utils import authenticate_user
 
 class DateUploadApi(MethodView):
 
@@ -16,11 +17,17 @@ class DateUploadApi(MethodView):
 
     ## Get the current progress of the
     #  current data upload action
-    def get(self):
+    def get(self, auth_token):
+        if not authenticate_user(auth_token):
+            return jsonify({"error":"unauthenticated user"}), 400
         return jsonify(get_progress()), 200
 
     ## Take in a mf4, dbc, and json object for the run and submit to nrdb
-    def post(self):
+    def post(self, auth_token):
+        
+        if not authenticate_user(auth_token):
+            return jsonify({"error":"unauthenticated user"}), 400
+        
         # Check if the post request has all needed data needed
         if "mf4File" not in request.files:
             return jsonify({"error": "No mf4 file uploaded"}), 400

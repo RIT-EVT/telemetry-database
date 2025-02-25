@@ -1,8 +1,8 @@
 from flask.views import MethodView
 from flask import request, jsonify
-from secrets import token_urlsafe
+
 from os import getenv
-from utils import create_db_connection
+from utils import create_db_connection, create_auth_token, check_expired_tokens, update_expired_token
 from datetime import datetime
 
 
@@ -13,25 +13,36 @@ class UserAuthApi(MethodView):
         user_data = request.get_json()
         
         user_db_connection = create_db_connection()["users"]
-        # Check the username and password against the db to make sure the user
-        # exists and they are who they say they are. Return auth token if the 
-        # values are correct, otherwise return an invalid user error
+    
         if user_data.get("action")=="login":
+            
+            # Check the username and password against the db to make sure the user
+            # exists and they are who they say they are. Return auth token if the 
+            # values are correct, otherwise return an invalid user error
+            
             username = user_data.get("name")
             password = user_data.get("password")
             
             mongo_data = user_db_connection.find_one({"username":username, "password":password.encode()})
             
+            auth_token = mongo_data["auth_token"]
+            
+            if check_expired_tokens( mongo_data["auth_time"]):
+                auth_token = update_expired_token(mongo_data["_id"])
+            
             if mongo_data == None:
                 return jsonify({"error":"Invalid username or password"}), 404        
             else:
-                return jsonify({"auth_token": mongo_data["auth_token"]}), 200
+                return jsonify({"auth_token": auth_token}), 200
             
         elif user_data.get("action") == "signup":
+            
             username = user_data.get("name")
             password = user_data.get("password")  
             secure_num = user_data.get("secureNum")
-            current_date_time = datetime.now()    
+            
+            current_date_time = datetime.now()   
+             
             if secure_num != getenv("CHALLENGE_NUM"):
                 # User value doesn't match the needed value
                 # return an error message
@@ -43,15 +54,8 @@ class UserAuthApi(MethodView):
             elif user_db_connection.find_one({"username":username})!=None:
                 return jsonify({"error":"Duplicate username detected"}), 400
             else:
-                auth_token=token_urlsafe(32)
-                # Very slight chance that there is a duplicate auth token
-                # There are 8e506 total tokens, so it will probably never occur
-                # but still need to check. If this ever catches a duplicate, go buy
-                # a lottery ticket
-                while user_db_connection.find_one({"auth_token":auth_token})!=None:
-                    auth_token=token_urlsafe(32)
-                    print("Go to the lottery!")
-                                
+                
+                auth_token = create_auth_token()    
                 user_db_connection.insert_one({"username" : username, "password" : password.encode(),
                                                "auth_token" : auth_token, "auth_time" : current_date_time})
                 

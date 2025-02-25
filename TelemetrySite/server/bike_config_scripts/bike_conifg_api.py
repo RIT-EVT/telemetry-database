@@ -1,18 +1,21 @@
 from flask.views import MethodView
 from flask import request, jsonify
-import pymongo
+
 import json
 from bson import ObjectId
-import os
-import urllib
-from utils import create_db_connection
+
+
+from utils import create_db_connection, authenticate_user
 
 class BikeConfigApi(MethodView):
     
     BIKE_CONFIG_DOC = '67ae8d01097ab8ae923672f8'
     
     
-    def get(self):
+    def get(self, auth_token):
+       
+        if not authenticate_user(auth_token):
+            return jsonify({"error":"unauthenticated user"}), 400
         
         db_connection = create_db_connection()["configs"]
         config_data = db_connection.find_one({"_id":ObjectId(self.BIKE_CONFIG_DOC)})
@@ -22,7 +25,11 @@ class BikeConfigApi(MethodView):
         
         return jsonify({"data":config_data}), 200
     
-    def post(self):
+    def post(self, auth_token):
+        
+        if not authenticate_user(auth_token):
+            return jsonify({"error":"unauthenticated user"}), 400
+        
         db_connection = create_db_connection()["configs"]
         config_data = request.form["configData"]
     
@@ -32,7 +39,7 @@ class BikeConfigApi(MethodView):
             if len(config_data[key])!=0:
                 db_connection.update_one({"_id":ObjectId(self.BIKE_CONFIG_DOC)}, {"$push":{f"config_data.{key}":config_data[key]}})
 
-        return jsonify({"error": "Not implemented"}), 501
+        return jsonify({"error": "Not implemented"}), 200
     
     
     def delete(self):

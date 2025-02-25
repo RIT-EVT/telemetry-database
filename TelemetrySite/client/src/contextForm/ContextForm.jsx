@@ -22,15 +22,14 @@ import {
 } from "reactstrap";
 import React, { useEffect, useState } from "react";
 
-// List of all id values to pass to backend
 import ContextJSONIdValues from "./jsonFiles/ContextForm.json";
-// All elements to have as input field and their properties
 import ContextJSONFormElements from "./jsonFiles/FormElementFormat.json";
 import { useNavigate, useLocation } from "react-router-dom";
 
 import "./ContextForm.css";
 
-import { PostConfigData, GetConfigData } from "ServerCall/ServerCall";
+import { BuildURI } from "ServerUtils.jsx";
+
 /**
  * Create needed context forms. Return the configured elements
  *
@@ -47,7 +46,7 @@ function ContextForm() {
 
   const [eventData, setEventData] = useState(null);
 
-  //each config form object
+  // Each config form object
   const [configForm, setFormElements] = useState({
     bms: null,
     imu: null,
@@ -83,8 +82,6 @@ function ContextForm() {
     pvc: [],
     mc: [],
   });
-
-  const [bikeSelected, setBikeSelected] = useState(false);
 
   /* -------------------------------------------------------------------------- */
   /* --------------------------- Initialize Constants ------------------------- */
@@ -152,87 +149,83 @@ function ContextForm() {
    * @return {HTMLFormElement} Form group of all the input elements on the json file
    */
   const GenerateFormElement = (jsonValue, optionalSetData) => {
-    // If the event has been loaded based on a past event file
-    // Load that data and use it to create a read only form
+    // Loop through every json element for the current field and
+    // Create a new reactstrap input element for it
+    console.log(jsonValue);
+    console.log(optionalSetData);
+    return (
+      <FormGroup>
+        {Object.values(ContextJSONFormElements[jsonValue]).map(
+          (formElement) => {
+            const idValue = formElement["id"];
+            return (
+              <InputGroup key={idValue} className='FormGroupElement'>
+                <InputGroupText>{formElement["label"]}</InputGroupText>
+                <Input
+                  id={idValue}
+                  type={formElement["type"]}
+                  placeholder={formElement["placeHolder"]}
+                  required={formElement["required"]}
+                  readOnly={
+                    formElement["readOnly"] || optionalSetData ? true : false
+                  }
+                  className='formInput'
+                  value={optionalSetData ? optionalSetData[idValue] : null}
+                >
+                  {formElement["type"] === "select"
+                    ? formElement["selectValues"].map((value) => (
+                        <option key={value} value={value}>
+                          {value}
+                        </option>
+                      ))
+                    : null}
+                </Input>
+              </InputGroup>
+            );
+          }
+        )}
+      </FormGroup>
+    );
+  };
 
-    if (eventData && jsonValue === "Event") {
-      return (
-        <FormGroup>
-          <InputGroup key={"eventName"} className='FormGroupElement'>
-            <InputGroupText>Event Name</InputGroupText>
-            <Input
-              id='eventName'
-              type='string'
-              readOnly
-              value={eventData.eventName}
-            />
-          </InputGroup>
-          <InputGroup key={"eventDate"} className='FormGroupElement'>
-            <InputGroupText>Event Date</InputGroupText>
-            <Input
-              id='eventDate'
-              type='date'
-              readOnly
-              value={eventData.eventDate}
-            />
-          </InputGroup>
-          <InputGroup key={"eventType"} className='FormGroupElement'>
-            <InputGroupText>Event Type</InputGroupText>
-            <Input
-              id='eventType'
-              type='text'
-              readOnly
-              value={eventData.eventType}
-            />
-          </InputGroup>
-          <InputGroup key={"eventLocation"} className='FormGroupElement'>
-            <InputGroupText>Event location</InputGroupText>
-            <Input
-              id='location'
-              type='text'
-              readOnly
-              value={eventData.eventLocation}
-            />
-          </InputGroup>
-        </FormGroup>
+  /**
+   * Get all the saved configs from the backend
+   */
+  const GetConfigData = async () => {
+    try {
+      const response = await fetch(
+        BuildURI("config_data") + "/" + sessionStorage.getItem("authToken"),
+        {
+          method: "GET",
+        }
       );
-    } else {
-      // Loop through every json element for the current field and
-      // Create a new reactstrap input element for it
-      return (
-        <FormGroup>
-          {Object.values(ContextJSONFormElements[jsonValue]).map(
-            (formElement) => {
-              const idValue = formElement["id"];
-              return (
-                <InputGroup key={idValue} className='FormGroupElement'>
-                  <InputGroupText>{formElement["label"]}</InputGroupText>
-                  <Input
-                    id={idValue}
-                    type={formElement["type"]}
-                    placeholder={formElement["placeHolder"]}
-                    required={formElement["required"]}
-                    readOnly={
-                      formElement["readOnly"] || optionalSetData ? true : false
-                    }
-                    className='formInput'
-                    value={optionalSetData ? optionalSetData[idValue] : null}
-                  >
-                    {formElement["type"] === "select"
-                      ? formElement["selectValues"].map((value) => (
-                          <option key={value} value={value}>
-                            {value}
-                          </option>
-                        ))
-                      : null}
-                  </Input>
-                </InputGroup>
-              );
-            }
-          )}
-        </FormGroup>
-      );
+
+      if (!response.ok) {
+        console.error("Network response was not ok: " + response.statusText);
+      }
+      const data = await response.json();
+
+      return data;
+    } catch (e) {
+      console.log(e);
     }
+
+    return null;
+  };
+
+  /**
+   * Post the saved conifg data to the backend
+   */
+  const PostConfigData = async (configData) => {
+    const formData = new FormData();
+    formData.append("configData", configData);
+    await fetch(
+      BuildURI("config_data") + "/" + sessionStorage.getItem("authToken"),
+      {
+        method: "POST",
+        body: formData, // Convert object to JSON string
+      }
+    );
   };
 
   /**
@@ -395,7 +388,6 @@ function ContextForm() {
 
         if (formInputField != null) {
           // Save the to be passed to the backend
-          console.log(formInputField.value);
           firmwareConfigDataToSave[partId] = formInputField.value;
           if (saveConfigData) {
             newConfigItems[firmwareConfigPart.toLowerCase()][partId] =
@@ -403,7 +395,6 @@ function ContextForm() {
           }
         }
       }
-      console.log(firmwareConfigDataToSave);
       // Declare the board name to be saved
       collectedData.event.runs[0].context.bikeConfig.firmwareConfig[
         firmwareConfigPart
@@ -427,11 +418,8 @@ function ContextForm() {
    * form elements.
    */
   const InitializeForms = () => {
-    UpdateContext(
-      GenerateFormElement("MainBody"),
-      eventData ? eventData : null
-    );
-    UpdateEventForm(GenerateFormElement("Event"));
+    UpdateContext(GenerateFormElement("MainBody"));
+    UpdateEventForm(GenerateFormElement("Event", eventData ? eventData : null));
     UpdateBikeForm(GenerateFormElement("BikeConfig"));
   };
 
@@ -458,11 +446,14 @@ function ContextForm() {
    */
   useEffect(() => {
     GetConfigData().then((response) => {
-      setDropdownOptions(response.data.config_data);
+      if ("data" in response && "config_data" in response["data"]) {
+        setDropdownOptions(response.data.config_data);
+      }
     });
 
     if (location.pathname === "/new-run") {
       var eventData;
+
       if (
         (eventData = JSON.parse(sessionStorage.getItem("EventData"))) !== null
       ) {

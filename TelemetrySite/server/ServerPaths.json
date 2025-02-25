@@ -1,5 +1,6 @@
 {
     "context": "/Context",
     "data_upload": "/DataUpload",
-    "config_data": "/ConfigData"
+    "config_data": "/ConfigData",
+    "user_auth": "/Login"
 }

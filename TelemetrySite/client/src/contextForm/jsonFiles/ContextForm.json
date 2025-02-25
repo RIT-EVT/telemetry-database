@@ -3,7 +3,7 @@
         "name": "eventName",
         "date": "eventDate",
         "type": "eventType",
-        "location": "location",
+        "location": "eventLocation",
         "runs": [
             {
                 "orderNumber": [],
@@ -58,8 +58,7 @@
                                 "mcSavedName"
                             ]
                         },
-                        "hardwareConfig": {},
-                        "BikeConfigName": "bikeConfigName"
+                        "hardwareConfig": {}
                     },
                     "riderName": "riderName",
                     "riderWeight": "riderWeight",
