@@ -2,7 +2,7 @@ from flask.views import MethodView
 from flask import request, jsonify
 from werkzeug.utils import secure_filename
 import os
-from data_upload_scripts.data_upload import submit_data, get_progress
+from data_upload_scripts.data_upload import submit_data, get_progress, add_data
 
 class DateUploadApi(MethodView):
 
@@ -32,6 +32,7 @@ class DateUploadApi(MethodView):
         mf4File = request.files["mf4File"]
         dbcFile = request.files["dbcFile"]
         context_data = request.form["contextData"]
+        
 
         # ensure the file actually contains a valid file name and files
         if not mf4File or mf4File.name == "":
@@ -55,14 +56,13 @@ class DateUploadApi(MethodView):
             mf4File.save(mf4_file)
             dbcFile.save(dbc_file)
             
-            # submit the data!
-            submit_data(mf4_file, dbc_file, context_data)
+            document_id = submit_data(mf4_file, dbc_file, context_data)
 
             # remove the file from the sever end
             os.remove(mf4_file)
             os.remove(dbc_file)
             
-            return jsonify({"message": "Data received successfully"}), 201
+            return jsonify({"id": document_id}), 201
         else:
             return (
                 jsonify(

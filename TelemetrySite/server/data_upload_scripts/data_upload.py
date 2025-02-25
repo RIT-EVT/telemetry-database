@@ -11,9 +11,13 @@ import gridfs
 parsing_data_progress = [0]
 uploading_data_progress = [0]
 
+## Create a connection to the Mongo DB
+#
+# @return db connection object
 def create_db_connection():
     connection_string = "mongodb://" + urllib.parse.quote_plus(str(os.getenv("MDB_USER"))) + ":" + urllib.parse.quote_plus(str(os.getenv("MDB_PASSWORD")))  + "@" + str(os.getenv("HOST")) + ":" + str(os.getenv("MDB_PORT"))
     mongo_client = pymongo.MongoClient(connection_string)
+    
     db_access = mongo_client["ernie"]
     return db_access
 
@@ -25,7 +29,6 @@ def create_db_connection():
 def submit_data(mf4_file, dbc_file, context_data):
    
     db_connection = create_db_connection()
-    collection_access_events = db_connection["events"]
     fs = gridfs.GridFS(db_connection)
     
 
@@ -45,14 +48,37 @@ def submit_data(mf4_file, dbc_file, context_data):
     
     context_data["event"]["runs"][0]["mf4File"]=fs.put(mf4_file, encoding="utf-8")
     context_data["event"]["runs"][0]["dbcFile"]=fs.put(dbc_file, encoding="utf-8")
-    # overall upload can not exceed 16 mb
-    # splice data until it is 16 mb then submit it
-    # add data as needed
-    object_id = collection_access_events.insert_one(context_data).inserted_id
+
+    return(upload_data_in_chunks(context_data, data_values_json))
+
+
+def add_data(mf4_file, dbc_file, new_run_data, mongo_doc_id):
+    db_connection = create_db_connection()
+    fs = gridfs.GridFS(db_connection)
+
+    dbc_decoded = cantools.database.load_file(dbc_file)
+
+    # get a dictionary of CAN id -> Board name
+    can_id_values = get_board_names(dbc_decoded)
+    # create an outline of how to read the data
+    config_values = createConfig(can_id_values, dbc_decoded)
+    # turn data from CAN messages -> list
+    data_values_json = parse_data(mf4_file, config_values)
+
+    # get just the needed portion
+    new_run_data = json.loads(new_run_data)["event"]["runs"][0]
+    new_run_data["messages"]=[]
     
-    upload_data_in_chunks(collection_access_events, object_id, data_values_json)
-    # with open("data.json", "w") as f:
-    #     json.dump(context_data, f, indent=4)
+    create_db_connection()["files"]
+    
+    new_run_data["mf4File"]=fs.put(mf4_file, encoding="utf-8")
+    new_run_data["dbcFile"]=fs.put(dbc_file, encoding="utf-8")
+    
+    upload_data_in_chunks(new_run_data, data_values_json)
+    
+    return str(mongo_doc_id)
+    
+    
 
 ## This function uploads the contents of the messages
 # to the NRDB in chunks of ~16 mb. Max size of a document
@@ -63,18 +89,17 @@ def submit_data(mf4_file, dbc_file, context_data):
 # @param collection_access_event reference to the mongo db connection
 # @param id of the main document to which context was uploaded
 # @param data_values_json data to add to the db
-def upload_data_in_chunks(collection_access_event, object_id, data_values_json):
+# @param data_index run index to post the data to
+def upload_data_in_chunks(new_run_data, data_values_json):
     # divide the data into chunks that are less the 16 mb
     # 150_000 ~< 15 mb but always < 16 mb
     sliced_data = list(sliced(data_values_json, 150_000))
     
     collection_access_messages = create_db_connection()["messages"]
-    
     for data_index in range(0, len(sliced_data)):
-        
+        new_run_data["uploadSection"] = data_index
         #update progress of upload bar
-        uploading_data_progress[0]=data_index/(len(sliced_data)-1)
-        
+        uploading_data_progress[0]=data_index/(len(sliced_data))
         data = sliced_data[data_index]
         # add data until it exceeds 16 mb
         # even at 10_000 additions per cycle the data will not get too big 
@@ -84,16 +109,9 @@ def upload_data_in_chunks(collection_access_event, object_id, data_values_json):
                     break
                 data.append(sliced_data[data_index+1].pop())
                 
-        data_to_insert = {"messages":data}
+        data_to_insert = {"context":new_run_data, "messages":data}
         # add data to its own document and get the reference id number 
         new_db_id=collection_access_messages.insert_one(data_to_insert).inserted_id
-        
-        # add the reference id to the main document so the messages can be accessed
-        # in the order they were sent
-        collection_access_event.update_one(
-            {"_id": ObjectId(object_id)},
-            {"$push": {"event.runs.0.messages": new_db_id}}
-        )
         
     uploading_data_progress[0]=1
 
@@ -506,6 +524,7 @@ def createConfig(board_names_json, dbc_file):
 
 ## The function that makes the progress of data upload visible to the frontend
 #
+# @return dictionary with the current state the process is on and its percentage
 def get_progress():
     
     if parsing_data_progress[0]!=1:

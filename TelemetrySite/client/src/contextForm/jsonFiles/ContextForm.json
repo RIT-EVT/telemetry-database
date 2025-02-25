@@ -58,8 +58,7 @@
                                 "mcSavedName"
                             ]
                         },
-                        "hardwareConfig": {},
-                        "BikeConfigName": "bikeConfigName"
+                        "hardwareConfig": {}
                     },
                     "riderName": "riderName",
                     "riderWeight": "riderWeight",
