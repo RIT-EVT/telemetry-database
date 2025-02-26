@@ -12,6 +12,7 @@
                         "platformName": "platformName",
                         "tirePressure": "tirePressure",
                         "coolantVolume": "coolantVolume",
+                        "bikeSavedName": "bikeSavedName",
                         "firmwareConfig": {
                             "BMS": [
                                 "hardwareRevisionBMS",
