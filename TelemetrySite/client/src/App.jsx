@@ -37,7 +37,6 @@ function App() {
    */
   const CheckBackendConnection = () => {
     CheckServerStatus().then((response) => {
-      console.log(response);
       setStatus(response);
     });
   };
@@ -58,15 +57,14 @@ function App() {
 
   useEffect(() => {
     const savedToken = sessionStorage.getItem("authToken");
-    console.log(savedToken);
     if (savedToken) {
       setToken(savedToken);
       if (location.pathname === "/") {
         navigate("/context-form");
       }
     } else if (
-      location.pathname != "/signup" &&
-      location.pathname != "/login"
+      location.pathname !== "/signup" &&
+      location.pathname !== "/login"
     ) {
       navigate("/login");
     }

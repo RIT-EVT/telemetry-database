@@ -5,7 +5,7 @@ import json
 from bson import ObjectId
 
 
-from utils import create_db_connection, authenticate_user
+from utils import create_db_connection, authenticate_user, check_expired_tokens
 
 class BikeConfigApi(MethodView):
     
@@ -15,7 +15,9 @@ class BikeConfigApi(MethodView):
     def get(self, auth_token):
        
         if not authenticate_user(auth_token):
-            return jsonify({"error":"unauthenticated user"}), 400
+            return jsonify({"authError":"unauthenticated user"}), 400
+        elif check_expired_tokens(auth_token):
+            return jsonify({"authError":"expired user token"}), 400
         
         db_connection = create_db_connection()["configs"]
         config_data = db_connection.find_one({"_id":ObjectId(self.BIKE_CONFIG_DOC)})
@@ -28,7 +30,9 @@ class BikeConfigApi(MethodView):
     def post(self, auth_token):
         
         if not authenticate_user(auth_token):
-            return jsonify({"error":"unauthenticated user"}), 400
+            return jsonify({"authError":"unauthenticated user"}), 400
+        elif check_expired_tokens(auth_token):
+            return jsonify({"authError":"expired user token"}), 400
         
         db_connection = create_db_connection()["configs"]
         config_data = request.form["configData"]

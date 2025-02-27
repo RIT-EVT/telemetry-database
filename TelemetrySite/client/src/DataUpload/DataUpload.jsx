@@ -91,9 +91,14 @@ function DataUpload() {
 
       try {
         const response = await CheckData(); // Await the result
-        if (!response) {
-          console.error("CheckData failed or returned an invalid response.");
-          return false; // Stop execution if CheckData fails
+        if (!response.ok) {
+          const responseJson = await response.json();
+          if ("authError" in responseJson) {
+            navigate("/login");
+          } else {
+            console.log(response.statusText);
+          }
+          return;
         }
       } catch (error) {
         console.error("Error in CheckData:", error);
@@ -192,12 +197,12 @@ function DataUpload() {
       //get the progress passed from the backend
       const responseString = Object.keys(data)[0];
 
-      if (responseString != "Finished") {
+      if (responseString !== "Finished") {
         const currentProgress = data[responseString];
         if (
           currentProgress > lastProgress ||
           currentProgress < 0 ||
-          responseString != lastResponseString
+          responseString !== lastResponseString
         ) {
           // Update the UI with the formatted estimated time remaining
           setProgressBar(
@@ -229,7 +234,7 @@ function DataUpload() {
      * with the option of keeping the same event data
      */
     postDataResponse.then((responseValue) => {
-      if (responseValue != false) {
+      if (responseValue !== false) {
         sessionStorage.setItem("DataSubmitted", true);
 
         clearInterval(interval);

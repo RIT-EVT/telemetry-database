@@ -4,6 +4,7 @@ from urllib import parse
 from cryptography.fernet import Fernet
 from datetime import datetime
 from secrets import token_urlsafe
+from bson import ObjectId
 
 
 ## Create a connection to the Mongo DB
@@ -16,7 +17,7 @@ def create_db_connection():
     db_access = mongo_client["ernie"]
     return db_access
 
-def create_auth_token(document_id):
+def create_auth_token():
     user_db_connection = create_db_connection()["users"]
 
     auth_token=token_urlsafe(32)
@@ -48,9 +49,10 @@ def authenticate_user(auth_token):
 ## Check if the user's auth session has expired
 #
 # @param auth_time time the user's auth session started
-# @return boolean
-def check_expired_tokens(auth_time):
-    
+# @return bool if too much time has passed since it was created
+def check_expired_tokens(auth_token):
+    auth_connection = create_db_connection()["users"]
+    auth_time = auth_connection.find_one({"auth_token":auth_token})["auth_time"]
     # only allow an auth token to last a day
     days = (datetime.now()-auth_time).days
     
@@ -58,5 +60,10 @@ def check_expired_tokens(auth_time):
 
 
 def update_expired_token(document_id):
-    return None
     
+    new_auth_token = create_auth_token()
+    auth_connection = create_db_connection()["users"]
+    
+    auth_connection.update_one(  {"_id": ObjectId(document_id)},
+            {"$set": {"auth_token":new_auth_token, "auth_time":datetime.now()}})
+    return new_auth_token

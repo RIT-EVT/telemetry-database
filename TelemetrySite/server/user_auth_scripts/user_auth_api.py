@@ -27,8 +27,8 @@ class UserAuthApi(MethodView):
             
             auth_token = mongo_data["auth_token"]
             
-            if check_expired_tokens( mongo_data["auth_time"]):
-                auth_token = update_expired_token(mongo_data["_id"])
+            # always update auth token on login
+            auth_token = update_expired_token(mongo_data["_id"])
             
             if mongo_data == None:
                 return jsonify({"error":"Invalid username or password"}), 404        

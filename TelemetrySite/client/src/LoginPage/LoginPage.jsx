@@ -12,7 +12,7 @@ import {
   ModalHeader,
   ModalBody,
 } from "reactstrap";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./LoginPage.css";
 import { useNavigate } from "react-router-dom";
 import { BuildURI } from "ServerUtils";
@@ -67,6 +67,12 @@ const LoginPage = ({ onLogin }) => {
       }
     });
   };
+
+  useEffect(() => {
+    if (sessionStorage.getItem("authToken")) {
+      navigate("/context-form");
+    }
+  }, [navigate]);
 
   return (
     <Card className='card'>
@@ -179,6 +185,13 @@ const SignupPage = ({ onSignup }) => {
       }
     });
   };
+
+  useEffect(() => {
+    if (sessionStorage.getItem("authToken")) {
+      navigate("/context-form");
+    }
+  }, [navigate]);
+
   return (
     <Card className='card'>
       <Container>
