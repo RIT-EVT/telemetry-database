@@ -196,7 +196,6 @@ function ContextForm() {
   const GenerateFormElement = (jsonValue, optionalSetData) => {
     // If the event has been loaded based on a past event file
     // Load that data and use it to create a read only form
-    console.log(jsonValue);
     if (eventData && jsonValue === "Event") {
       return (
         <FormGroup>
@@ -284,7 +283,6 @@ function ContextForm() {
    * Get all the saved configs from the backend
    */
   const GetConfigData = async () => {
-    console.log(BuildURI("config_data"));
     const response = await fetch(BuildURI("config_data"), {
       method: "GET",
     });
