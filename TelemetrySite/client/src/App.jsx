@@ -3,11 +3,10 @@ import ContextForm from "./contextForm/ContextForm.jsx"; // Import other compone
 import DataUpload from "./DataUpload/DataUpload.jsx";
 import "./App.css";
 import Page404 from "./404/404.jsx";
-import { CheckServerStatus } from "SeverUtils.jsx"
 import { useEffect, useState } from "react";
 import { Container, Row, Col } from "reactstrap";
 import { useNavigate, useLocation } from "react-router-dom";
-
+import { CheckServerStatus } from "ServerUtils.jsx";
 function App() {
   const [ServerStatus, setStatus] = useState(false);
   const location = useLocation();
@@ -57,6 +56,7 @@ function App() {
               <Routes>
                 <Route path='404Page' element={<Page404 />} />
                 <Route path='/context-form' element={<ContextForm />} />
+                <Route path='/new-run' element={<ContextForm />} />
                 <Route path='/data-upload' element={<DataUpload />} />
                 <Route path='*' element={<Page404 />} />
               </Routes>
