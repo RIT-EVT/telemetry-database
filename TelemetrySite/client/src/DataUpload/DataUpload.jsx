@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import "./DataUpload.css";
-import { BuildURI, CheckData, ServerCalls } from "ServerUtils.jsx";
+import { BuildURI, CheckData, ServerCalls, getRunOrderNumber, incrementRunOrderNumber, resetRunOrderNumber } from "ServerUtils.jsx";
 import {
   Container,
   Col,
@@ -21,7 +21,7 @@ import { useNavigate } from "react-router-dom";
 function DataUpload() {
   const [bodyDisplay, setBodyDisplay] = useState(null);
 
-  const [progressBar, setProgressBar] = useState(null);
+  const [progresssBar, setProgressBar] = useState(null);
 
   let navigate = useNavigate();
 
@@ -31,6 +31,7 @@ function DataUpload() {
    * @param {string} url - url to redirect the user to
    */
   const RedirectToContext = (url) => {
+    resetRunOrderNumber();
     sessionStorage.setItem("DataSubmitted", false);
     sessionStorage.removeItem("BikeData");
     navigate(url);
@@ -85,7 +86,8 @@ function DataUpload() {
       mf4File,
       dbcFile,
       contextData,
-      mongoDbDocId
+      mongoDbDocId,
+      runOrderNumber
     ) => {
       // Ensure CheckData() completes before proceeding
       if (!ServerCalls) {
@@ -105,6 +107,7 @@ function DataUpload() {
       formData.append("mf4File", mf4File);
       formData.append("dbcFile", dbcFile);
       formData.append("contextData", contextData);
+      formData.append("runOrderNumber", runOrderNumber);
 
       if (mongoDbDocId) {
         formData.append("mongoDocID", mongoDbDocId);
@@ -124,6 +127,7 @@ function DataUpload() {
           );
           return false;
         }
+        incrementRunOrderNumber();
         return await response.json();
       } catch (error) {
         console.error("Network or server error:", error);
@@ -135,7 +139,7 @@ function DataUpload() {
     const dbcFile = document.getElementById("fileUploadDBC").files[0];
     const eventData = sessionStorage.getItem("EventData");
     const mongoDocId = eventData ? JSON.parse(eventData)["documentId"] : null;
-    const response = PostDataFile(mf4File, dbcFile, contextData, mongoDocId);
+    const response = PostDataFile(mf4File, dbcFile, contextData, mongoDocId, getRunOrderNumber());
 
     /**
      * Fetch the progress of the current upload

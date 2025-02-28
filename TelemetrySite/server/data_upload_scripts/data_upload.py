@@ -26,7 +26,7 @@ def create_db_connection():
 # @param data_path path to the mf4 file
 # @param dbc_file path to the dbc file
 # @param context_id context id for the data
-def submit_data(mf4_file, dbc_file, context_data):
+def submit_data(mf4_file, dbc_file, context_data, runOrderNumber):
    
     db_connection = create_db_connection()
     fs = gridfs.GridFS(db_connection)
@@ -48,35 +48,10 @@ def submit_data(mf4_file, dbc_file, context_data):
     
     context_data["event"]["runs"][0]["mf4File"]=fs.put(mf4_file, encoding="utf-8")
     context_data["event"]["runs"][0]["dbcFile"]=fs.put(dbc_file, encoding="utf-8")
+    context_data["event"]["runs"][0]["orderNumber"] = runOrderNumber
+    print(runOrderNumber)
 
     return(upload_data_in_chunks(context_data, data_values_json))
-
-
-def add_data(mf4_file, dbc_file, new_run_data, mongo_doc_id):
-    db_connection = create_db_connection()
-    fs = gridfs.GridFS(db_connection)
-
-    dbc_decoded = cantools.database.load_file(dbc_file)
-
-    # get a dictionary of CAN id -> Board name
-    can_id_values = get_board_names(dbc_decoded)
-    # create an outline of how to read the data
-    config_values = createConfig(can_id_values, dbc_decoded)
-    # turn data from CAN messages -> list
-    data_values_json = parse_data(mf4_file, config_values)
-
-    # get just the needed portion
-    new_run_data = json.loads(new_run_data)["event"]["runs"][0]
-    new_run_data["messages"]=[]
-    
-    create_db_connection()["files"]
-    
-    new_run_data["mf4File"]=fs.put(mf4_file, encoding="utf-8")
-    new_run_data["dbcFile"]=fs.put(dbc_file, encoding="utf-8")
-    
-    upload_data_in_chunks(new_run_data, data_values_json)
-    
-    return str(mongo_doc_id)
     
     
 
@@ -108,10 +83,10 @@ def upload_data_in_chunks(new_run_data, data_values_json):
                 if len(sliced_data[data_index+1]) ==0:
                     break
                 data.append(sliced_data[data_index+1].pop())
-                
-        data_to_insert = {"context":new_run_data, "messages":data}
+        new_run_data["event"]["runs"][0]["messages"] = data
+        data_to_insert = {"event": new_run_data}
         # add data to its own document and get the reference id number 
-        new_db_id=collection_access_messages.insert_one(data_to_insert).inserted_id
+        collection_access_messages.insert_one(data_to_insert).inserted_id
         
     uploading_data_progress[0]=1
 
