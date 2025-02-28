@@ -62,9 +62,7 @@ def submit_data(mf4_file, dbc_file, context_data, runOrderNumber):
 # entries long
 #
 # @param collection_access_event reference to the mongo db connection
-# @param id of the main document to which context was uploaded
 # @param data_values_json data to add to the db
-# @param data_index run index to post the data to
 def upload_data_in_chunks(new_run_data, data_values_json):
     # divide the data into chunks that are less the 16 mb
     # 150_000 ~< 15 mb but always < 16 mb
