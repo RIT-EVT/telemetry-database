@@ -28,6 +28,9 @@ def create_db_connection():
 # @param context_id context id for the data
 def submit_data(mf4_file, dbc_file, context_data):
    
+    parsing_data_progress[0]=0
+    uploading_data_progress[0]=0
+   
     db_connection = create_db_connection()
     collection_access_events = db_connection["events"]
     fs = gridfs.GridFS(db_connection)
@@ -44,9 +47,7 @@ def submit_data(mf4_file, dbc_file, context_data):
 
     context_data = json.loads(context_data)
     context_data["event"]["runs"][0]["messages"] = []
-    
-    create_db_connection()["files"]
-    
+        
     context_data["event"]["runs"][0]["mf4File"]=fs.put(mf4_file, encoding="utf-8")
     context_data["event"]["runs"][0]["dbcFile"]=fs.put(dbc_file, encoding="utf-8")
     # overall upload can not exceed 16 mb
