@@ -5,7 +5,7 @@ import os
 from data_upload_scripts.data_upload import submit_data, get_progress
 from utils import authenticate_user, check_expired_tokens
 
-class DateUploadApi(MethodView):
+class DataUploadApi(MethodView):
 
     ALLOWED_EXTENSIONS = {"mf4", "dbc"}
     UPLOAD_FOLDER = os.path.dirname(__file__) + "\\data_upload_file"

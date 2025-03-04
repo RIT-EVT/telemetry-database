@@ -3,7 +3,7 @@ from flask_restful import Api
 from flask_cors import CORS
 import dotenv
 import json
-from data_upload_scripts.data_upload_api import DateUploadApi
+from data_upload_scripts.data_upload_api import DataUploadApi
 from bike_config_scripts.bike_conifg_api import BikeConfigApi
 from user_auth_scripts.user_auth_api import UserAuthApi
 import os
@@ -16,7 +16,7 @@ log = logging.getLogger('werkzeug')
 
 # create views for url rules
 
-user_view = DateUploadApi.as_view("DateUploadApi")
+user_view = DataUploadApi.as_view("DateUploadApi")
 
 
 app.add_url_rule(
