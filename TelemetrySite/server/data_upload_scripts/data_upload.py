@@ -17,10 +17,9 @@ uploading_data_progress = [0]
 # @param data_path path to the mf4 file
 # @param dbc_file path to the dbc file
 # @param context_id context id for the data
-def submit_data(mf4_file, dbc_file, context_data):
+def submit_data(mf4_file, dbc_file, context_data, runOrderNumber):
    
     db_connection = create_db_connection()
-    collection_access_events = db_connection["events"]
     fs = gridfs.GridFS(db_connection)
     
 
@@ -34,64 +33,15 @@ def submit_data(mf4_file, dbc_file, context_data):
     data_values_json = parse_data(mf4_file, config_values)
 
     context_data = json.loads(context_data)
-    context_data["event"]["runs"][0]["messages"] = []
     
     create_db_connection()["files"]
-    
+    if runOrderNumber == None:
+        runOrderNumber=0
     context_data["event"]["runs"][0]["mf4File"]=fs.put(mf4_file, encoding="utf-8")
     context_data["event"]["runs"][0]["dbcFile"]=fs.put(dbc_file, encoding="utf-8")
-    # overall upload can not exceed 16 mb
-    # splice data until it is 16 mb then submit it
-    # add data as needed
-    object_id = collection_access_events.insert_one(context_data).inserted_id
-    
-    upload_data_in_chunks(collection_access_events, object_id, data_values_json, 0)
-    
-    return str(object_id)
+    context_data["event"]["runs"][0]["orderNumber"] = runOrderNumber
 
-
-def add_data(mf4_file, dbc_file, new_run_data, mongo_doc_id):
-    db_connection = create_db_connection()
-    collection_access_events = db_connection["events"]
-    fs = gridfs.GridFS(db_connection)
-
-    dbc_decoded = cantools.database.load_file(dbc_file)
-
-    # get a dictionary of CAN id -> Board name
-    can_id_values = get_board_names(dbc_decoded)
-    # create an outline of how to read the data
-    config_values = createConfig(can_id_values, dbc_decoded)
-    # turn data from CAN messages -> list
-    data_values_json = parse_data(mf4_file, config_values)
-
-    # get just the needed portion
-    new_run_data = json.loads(new_run_data)["event"]["runs"][0]
-    new_run_data["messages"]=[]
-    
-    create_db_connection()["files"]
-    
-    new_run_data["mf4File"]=fs.put(mf4_file, encoding="utf-8")
-    new_run_data["dbcFile"]=fs.put(dbc_file, encoding="utf-8")
-    
-    document=collection_access_events.find_one({"_id":ObjectId(mongo_doc_id)})
-    
-    if document and "event" in document and "runs" in document["event"]:
-        runs_length = len(document["event"]["runs"])  # Get the length of messages
-    else:
-        runs_length = 0  # Default to 0 if messages don't exist
-        return str(mongo_doc_id)
-    
-    # update the run order
-    new_run_data["orderNumber"] = runs_length
-    
-    collection_access_events.update_one(
-    {"_id": ObjectId(mongo_doc_id)},
-    {"$push": {"event.runs": new_run_data}}
-    )
-    
-    upload_data_in_chunks(collection_access_events, mongo_doc_id, data_values_json, runs_length)
-    
-    return str(mongo_doc_id)
+    return(upload_data_in_chunks(context_data, data_values_json))
     
     
 
@@ -102,21 +52,22 @@ def add_data(mf4_file, dbc_file, new_run_data, mongo_doc_id):
 # entries long
 #
 # @param collection_access_event reference to the mongo db connection
-# @param id of the main document to which context was uploaded
 # @param data_values_json data to add to the db
-# @param data_index run index to post the data to
-def upload_data_in_chunks(collection_access_event, object_id, data_values_json, data_mongo_index):
+def upload_data_in_chunks(new_run_data, data_values_json):
     # divide the data into chunks that are less the 16 mb
     # 150_000 ~< 15 mb but always < 16 mb
     sliced_data = list(sliced(data_values_json, 150_000))
     
     collection_access_messages = create_db_connection()["messages"]
-    
     for data_index in range(0, len(sliced_data)):
-        
+        if "_id" in new_run_data:
+            del new_run_data["_id"]
+        data_upload = new_run_data
+        data_upload ["event"]["uploadSection"] = data_index
+        data_upload ["event"]["runs"][0]["messages"] = []
+       
         #update progress of upload bar
-        uploading_data_progress[0]=data_index/(len(sliced_data)-1)
-        
+        uploading_data_progress[0]=data_index/(len(sliced_data))
         data = sliced_data[data_index]
         # add data until it exceeds 16 mb
         # even at 10_000 additions per cycle the data will not get too big 
@@ -125,19 +76,12 @@ def upload_data_in_chunks(collection_access_event, object_id, data_values_json, 
                 if len(sliced_data[data_index+1]) ==0:
                     break
                 data.append(sliced_data[data_index+1].pop())
-                
-        data_to_insert = {"messages":data}
+        data_upload["event"]["runs"][0]["messages"] = data
         # add data to its own document and get the reference id number 
-        new_db_id=collection_access_messages.insert_one(data_to_insert).inserted_id
-        
-        # add the reference id to the main document so the messages can be accessed
-        # in the order they were sent
-        collection_access_event.update_one(
-            {"_id": ObjectId(object_id)},
-            {"$push": {f"event.runs.{data_mongo_index}.messages": new_db_id}}
-        )
+        collection_access_messages.insert_one(data_upload)
         
     uploading_data_progress[0]=1
+    return 0
 
 
 ## The function that corelate frame id to board name

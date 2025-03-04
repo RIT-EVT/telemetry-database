@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
 
 import "./DataUpload.css";
-import { BuildURI, CheckData } from "ServerUtils.jsx";
+import {
+  BuildURI,
+  CheckData,
+  ServerCalls,
+  getRunOrderNumber,
+  incrementRunOrderNumber,
+  resetRunOrderNumber,
+} from "ServerUtils.jsx";
 import {
   Container,
   Col,
@@ -31,6 +38,7 @@ function DataUpload() {
    * @param {string} url - url to redirect the user to
    */
   const RedirectToContext = (url) => {
+    resetRunOrderNumber();
     sessionStorage.setItem("DataSubmitted", false);
     sessionStorage.removeItem("BikeData");
     navigate(url);
@@ -85,13 +93,13 @@ function DataUpload() {
       mf4File,
       dbcFile,
       contextData,
-      mongoDbDocId
+      runOrderNumber
     ) => {
       // Ensure CheckData() completes before proceeding
 
       try {
         const response = await CheckData(); // Await the result
-        if (!response.ok) {
+        if (!response) {
           const responseJson = await response.json();
           if ("authError" in responseJson) {
             navigate("/login");
@@ -104,15 +112,12 @@ function DataUpload() {
         console.error("Error in CheckData:", error);
         return false;
       }
-
+      console.log("submitting data");
       const formData = new FormData();
       formData.append("mf4File", mf4File);
       formData.append("dbcFile", dbcFile);
       formData.append("contextData", contextData);
-
-      if (mongoDbDocId) {
-        formData.append("mongoDocID", mongoDbDocId);
-      }
+      formData.append("runOrderNumber", runOrderNumber);
 
       try {
         const response = await fetch(
@@ -131,6 +136,7 @@ function DataUpload() {
           );
           return false;
         }
+        incrementRunOrderNumber();
         return await response.json();
       } catch (error) {
         console.error("Network or server error:", error);
@@ -140,13 +146,12 @@ function DataUpload() {
 
     const mf4File = document.getElementById("fileUploadMF4").files[0];
     const dbcFile = document.getElementById("fileUploadDBC").files[0];
-    const eventData = sessionStorage.getItem("EventData");
-    const mongoDocId = eventData ? JSON.parse(eventData)["documentId"] : null;
+
     const postDataResponse = PostDataFile(
       mf4File,
       dbcFile,
       contextData,
-      mongoDocId
+      getRunOrderNumber()
     );
 
     /**
@@ -244,7 +249,6 @@ function DataUpload() {
 
         //save the needed event details to be displayed on the next page
         const eventObject = {
-          documentId: responseValue["id"],
           eventName: parsedContextData["event"]["name"],
           eventDate: parsedContextData.event.date,
           eventType: parsedContextData.event.type,

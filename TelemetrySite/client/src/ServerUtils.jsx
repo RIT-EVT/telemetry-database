@@ -8,6 +8,8 @@ var ServerCalls = {};
 
 let BASE_URL = "http://127.0.0.1:5000";
 
+let RunOrderNumber = 0;
+
 // These functions are not immediately used in seperate files, but they
 // are general enough to grant them their own place
 
@@ -15,6 +17,17 @@ const BuildURI = (ServerCallsKey) => {
   return BASE_URL + ServerCalls[ServerCallsKey];
 };
 
+const getRunOrderNumber = () => {
+  return RunOrderNumber;
+}
+
+const incrementRunOrderNumber = () => {
+  RunOrderNumber += 1;
+}
+
+const resetRunOrderNumber = () => {
+  RunOrderNumber = 0;
+}
 /**
  * Check the status of the server.
  * If the server is active, also get the
@@ -54,4 +67,4 @@ const CheckData = async () => {
   return true;
 };
 
-export { BuildURI, CheckServerStatus, CheckData, ServerCalls };
+export { BuildURI, CheckServerStatus, CheckData, ServerCalls, getRunOrderNumber, incrementRunOrderNumber,resetRunOrderNumber};
