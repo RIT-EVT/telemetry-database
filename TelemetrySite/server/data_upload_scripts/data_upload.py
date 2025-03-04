@@ -42,14 +42,13 @@ def submit_data(mf4_file, dbc_file, context_data, runOrderNumber):
     data_values_json = parse_data(mf4_file, config_values)
 
     context_data = json.loads(context_data)
-    context_data["event"]["runs"][0]["messages"] = []
     
     create_db_connection()["files"]
-    
+    if runOrderNumber == None:
+        runOrderNumber=0
     context_data["event"]["runs"][0]["mf4File"]=fs.put(mf4_file, encoding="utf-8")
     context_data["event"]["runs"][0]["dbcFile"]=fs.put(dbc_file, encoding="utf-8")
     context_data["event"]["runs"][0]["orderNumber"] = runOrderNumber
-    print(runOrderNumber)
 
     return(upload_data_in_chunks(context_data, data_values_json))
     
@@ -70,7 +69,12 @@ def upload_data_in_chunks(new_run_data, data_values_json):
     
     collection_access_messages = create_db_connection()["messages"]
     for data_index in range(0, len(sliced_data)):
-        new_run_data["uploadSection"] = data_index
+        if "_id" in new_run_data:
+            del new_run_data["_id"]
+        data_upload = new_run_data
+        data_upload ["event"]["uploadSection"] = data_index
+        data_upload ["event"]["runs"][0]["messages"] = []
+       
         #update progress of upload bar
         uploading_data_progress[0]=data_index/(len(sliced_data))
         data = sliced_data[data_index]
@@ -81,12 +85,12 @@ def upload_data_in_chunks(new_run_data, data_values_json):
                 if len(sliced_data[data_index+1]) ==0:
                     break
                 data.append(sliced_data[data_index+1].pop())
-        new_run_data["event"]["runs"][0]["messages"] = data
-        data_to_insert = {"event": new_run_data}
+        data_upload["event"]["runs"][0]["messages"] = data
         # add data to its own document and get the reference id number 
-        collection_access_messages.insert_one(data_to_insert).inserted_id
+        collection_access_messages.insert_one(data_upload)
         
     uploading_data_progress[0]=1
+    return 0
 
 
 ## The function that corelate frame id to board name

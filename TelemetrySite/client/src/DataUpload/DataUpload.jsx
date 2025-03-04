@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
 
 import "./DataUpload.css";
-import { BuildURI, CheckData, ServerCalls, getRunOrderNumber, incrementRunOrderNumber, resetRunOrderNumber } from "ServerUtils.jsx";
+import {
+  BuildURI,
+  CheckData,
+  ServerCalls,
+  getRunOrderNumber,
+  incrementRunOrderNumber,
+  resetRunOrderNumber,
+} from "ServerUtils.jsx";
 import {
   Container,
   Col,
@@ -21,7 +28,7 @@ import { useNavigate } from "react-router-dom";
 function DataUpload() {
   const [bodyDisplay, setBodyDisplay] = useState(null);
 
-  const [progresssBar, setProgressBar] = useState(null);
+  const [progressBar, setProgressBar] = useState(null);
 
   let navigate = useNavigate();
 
@@ -86,7 +93,6 @@ function DataUpload() {
       mf4File,
       dbcFile,
       contextData,
-      mongoDbDocId,
       runOrderNumber
     ) => {
       // Ensure CheckData() completes before proceeding
@@ -108,10 +114,6 @@ function DataUpload() {
       formData.append("dbcFile", dbcFile);
       formData.append("contextData", contextData);
       formData.append("runOrderNumber", runOrderNumber);
-
-      if (mongoDbDocId) {
-        formData.append("mongoDocID", mongoDbDocId);
-      }
 
       try {
         const response = await fetch(BuildURI("data_upload"), {
@@ -138,8 +140,13 @@ function DataUpload() {
     const mf4File = document.getElementById("fileUploadMF4").files[0];
     const dbcFile = document.getElementById("fileUploadDBC").files[0];
     const eventData = sessionStorage.getItem("EventData");
-    const mongoDocId = eventData ? JSON.parse(eventData)["documentId"] : null;
-    const response = PostDataFile(mf4File, dbcFile, contextData, mongoDocId, getRunOrderNumber());
+
+    const response = PostDataFile(
+      mf4File,
+      dbcFile,
+      contextData,
+      getRunOrderNumber()
+    );
 
     /**
      * Fetch the progress of the current upload
