@@ -13,9 +13,7 @@ app = Flask(__name__)  # Create Flask instance
 api = Api(app)  # API router
 CORS(app)
 log = logging.getLogger('werkzeug')
-# Set the desired log level (e.g., ERROR or CRITICAL)
-# Currently set to only print if something goes wrong internally
-# Does not display every call
+\
 
 # create views for url rules
 

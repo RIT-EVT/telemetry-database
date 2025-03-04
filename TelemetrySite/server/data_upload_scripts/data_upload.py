@@ -35,8 +35,7 @@ def submit_data(mf4_file, dbc_file, context_data, runOrderNumber):
     context_data = json.loads(context_data)
     
     create_db_connection()["files"]
-    if runOrderNumber == None:
-        runOrderNumber=0
+   
     context_data["event"]["runs"][0]["mf4File"]=fs.put(mf4_file, encoding="utf-8")
     context_data["event"]["runs"][0]["dbcFile"]=fs.put(dbc_file, encoding="utf-8")
     context_data["event"]["runs"][0]["orderNumber"] = runOrderNumber

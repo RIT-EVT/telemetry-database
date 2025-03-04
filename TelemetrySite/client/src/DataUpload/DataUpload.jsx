@@ -38,7 +38,6 @@ function DataUpload() {
    * @param {string} url - url to redirect the user to
    */
   const RedirectToContext = (url) => {
-    resetRunOrderNumber();
     sessionStorage.setItem("DataSubmitted", false);
     sessionStorage.removeItem("BikeData");
     navigate(url);
@@ -61,7 +60,8 @@ function DataUpload() {
           <Button
             className='redirectButton'
             onClick={() => {
-              sessionStorage.clear("EventData");
+              sessionStorage.removeItem("EventData");
+              resetRunOrderNumber();
               RedirectToContext("/context-form");
             }}
           >
@@ -104,7 +104,7 @@ function DataUpload() {
           if ("authError" in responseJson) {
             navigate("/login");
           } else {
-            console.log(response.statusText);
+            console.error(response.statusText);
           }
           return;
         }
@@ -112,7 +112,6 @@ function DataUpload() {
         console.error("Error in CheckData:", error);
         return false;
       }
-      console.log("submitting data");
       const formData = new FormData();
       formData.append("mf4File", mf4File);
       formData.append("dbcFile", dbcFile);
@@ -137,6 +136,7 @@ function DataUpload() {
           return false;
         }
         incrementRunOrderNumber();
+
         return await response.json();
       } catch (error) {
         console.error("Network or server error:", error);
@@ -186,6 +186,7 @@ function DataUpload() {
     var lastProgress = -1;
     var lastResponseString = "";
     setBodyDisplay(null);
+    var dataSubmitted = false;
     /**
      * Create an interval to update the progress bar every
      * second. Call to the backend and fetch the value
@@ -210,19 +211,23 @@ function DataUpload() {
           responseString !== lastResponseString
         ) {
           // Update the UI with the formatted estimated time remaining
-          setProgressBar(
-            <center>
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <progress
-                  value={currentProgress}
-                  style={{ marginRight: "10px" }}
-                />
-                <div>
-                  {responseString} : {Math.round(currentProgress * 100)}%
+          if (!dataSubmitted) {
+            setProgressBar(
+              <center>
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <progress
+                    value={currentProgress}
+                    style={{ marginRight: "10px" }}
+                  />
+                  <div>
+                    {responseString} : {Math.round(currentProgress * 100)}%
+                  </div>
                 </div>
-              </div>
-            </center>
-          );
+              </center>
+            );
+          } else {
+            clearInterval(interval);
+          }
           lastProgress = currentProgress;
           lastResponseString = responseString;
         }
@@ -240,6 +245,7 @@ function DataUpload() {
      */
     postDataResponse.then((responseValue) => {
       if (responseValue !== false) {
+        dataSubmitted = true;
         sessionStorage.setItem("DataSubmitted", true);
 
         clearInterval(interval);
@@ -264,9 +270,10 @@ function DataUpload() {
 
   useEffect(() => {
     //make sure a refresh doesn't make the user resubmit data
+
     if (
       sessionStorage.getItem("DataSubmitted") !== null &&
-      sessionStorage.getItem("DataSubmitted") === true
+      sessionStorage.getItem("DataSubmitted") === "true"
     ) {
       DisplayRedirect();
     } else {

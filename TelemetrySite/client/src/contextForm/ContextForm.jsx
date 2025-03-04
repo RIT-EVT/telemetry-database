@@ -249,7 +249,7 @@ function ContextForm() {
 
       return data;
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
 
     return null;
