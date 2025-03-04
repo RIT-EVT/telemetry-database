@@ -48,33 +48,21 @@
 }
 
 /* General button styles */
-.newContext {
-    font-size: 16px;
+.redirectButton {
+    font-size: 25px !important;
     padding: 10px 20px;
     border-radius: 5px;
-    /* Rounded corners */
     transition: background-color 0.3s ease, transform 0.2s ease;
     width: 100%;
-    background-color: #F36917;
+    background-color: #F36917 !important;
     border-color: black;
-    /* Ensure buttons span the column width */
 }
 
 /* Hover effects */
-.newContext:hover {
+.redirectButton:hover {
     transform: scale(1.05);
     /* Slightly enlarge button */
-}
-
-/* Success button hover effect */
-.newContext.btn-success:hover {
-    background-color: #e45f11;
-    border: black;
-
-}
-
-.newContext.btn-primary:hover {
-    background-color: #e45f11;
+    background-color: #ac4b13 !important;
     border: black;
 
 }
