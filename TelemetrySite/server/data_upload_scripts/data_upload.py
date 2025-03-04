@@ -1,25 +1,16 @@
 import cantools
-import pymongo
+
 from asammdf import MDF
 import json
 from more_itertools import sliced
 from bson import ObjectId
-import os
-import urllib
 import gridfs
+
+from utils import create_db_connection
 
 parsing_data_progress = [0]
 uploading_data_progress = [0]
 
-## Create a connection to the Mongo DB
-#
-# @return db connection object
-def create_db_connection():
-    connection_string = "mongodb://" + urllib.parse.quote_plus(str(os.getenv("MDB_USER"))) + ":" + urllib.parse.quote_plus(str(os.getenv("MDB_PASSWORD")))  + "@" + str(os.getenv("HOST")) + ":" + str(os.getenv("MDB_PORT"))
-    mongo_client = pymongo.MongoClient(connection_string)
-    
-    db_access = mongo_client["ernie"]
-    return db_access
 
 ## The function that sends data to the db
 #
@@ -39,13 +30,12 @@ def submit_data(mf4_file, dbc_file, context_data, runOrderNumber):
     # create an outline of how to read the data
     config_values = createConfig(can_id_values, dbc_decoded)
     # turn data from CAN messages -> list
-    data_values_json = parse_data(mf4_file, config_values)
+    data_values_json = parse_data(mf4_file, config_values, can_id_values)
 
     context_data = json.loads(context_data)
     
     create_db_connection()["files"]
-    if runOrderNumber == None:
-        runOrderNumber=0
+   
     context_data["event"]["runs"][0]["mf4File"]=fs.put(mf4_file, encoding="utf-8")
     context_data["event"]["runs"][0]["dbcFile"]=fs.put(dbc_file, encoding="utf-8")
     context_data["event"]["runs"][0]["orderNumber"] = runOrderNumber
@@ -164,7 +154,7 @@ def signed_bin_convert(x, size):
 # @param mdf_path the path to the mf4 file
 #
 # @return list form of CAN data
-def parse_data(mdf_path, config_values):
+def parse_data(mdf_path, config_values, id_to_name):
     # Load the MDF file
     mdf = MDF(mdf_path, memory_map=False)
 
@@ -255,12 +245,17 @@ def parse_data(mdf_path, config_values):
             table_name = config_current["table"]
             if table_name.find("ErrorRegister") != -1 or table_name.find("Manufacturer") != -1:
                 continue
+            
+            if hex(can_id) in id_to_name:
+                board_name = id_to_name[hex(can_id)]
+            else:
+                board_name = "null"
             json_object = {
                 "time": timestamps[index],
                 "signal": table_name,
                 "canID": hex(can_id),
                 "data": decimal_result,
-                "size": data_length_bits,
+                "board": board_name,
             }
 
             # if there is an axis present save it as its own field

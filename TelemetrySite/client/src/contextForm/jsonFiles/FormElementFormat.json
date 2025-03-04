@@ -1,5 +1,5 @@
 {
-  "MainBody": {
+  "mainBody": {
     "airTemp": {
       "id": "airTemp",
       "type": "number",
@@ -63,7 +63,7 @@
       "required": true
     }
   },
-  "Event": {
+  "event": {
     "eventName": {
       "id": "eventName",
       "type": "text",
@@ -84,14 +84,14 @@
       "label": "Event Type"
     },
     "location": {
-      "id": "location",
+      "id": "eventLocation",
       "type": "text",
       "required": true,
       "placeHolder": "Where?",
       "label": "Location"
     }
   },
-  "BikeConfig": {
+  "bikeConfig": {
     "platformName": {
       "id": "platformName",
       "type": "select",
@@ -116,6 +116,12 @@
       "placeHolder": "mL",
       "label": "Coolant Volume",
       "required": false
+    },
+    "bikeSavedName": {
+      "id": "bikeSavedName",
+      "type": "string",
+      "label": "Saved Name",
+      "required": true
     }
   },
   "bmsConfig": {

@@ -41,6 +41,7 @@ const CheckServerStatus = async () => {
       .then((response) => response.json())
       .then((data) => {
         ServerCalls = data;
+
         return true;
       })
       .catch(() => {
@@ -59,8 +60,8 @@ const CheckServerStatus = async () => {
  */
 const CheckData = async () => {
   if (!ServerCalls) {
-    return CheckServerStatus().then(() => {
-      return true;
+    return CheckServerStatus().then((response) => {
+      return response;
     });
   }
   return true;
