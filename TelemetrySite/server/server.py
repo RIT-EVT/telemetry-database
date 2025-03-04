@@ -13,7 +13,6 @@ app = Flask(__name__)  # Create Flask instance
 api = Api(app)  # API router
 CORS(app)
 log = logging.getLogger('werkzeug')
-\
 
 # create views for url rules
 
