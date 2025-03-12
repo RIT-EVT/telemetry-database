@@ -11,6 +11,8 @@ import gridfs
 parsing_data_progress = [0]
 uploading_data_progress = [0]
 
+documents_loaded_id = [] # have ideas of making this thread safe, if needed
+
 ## Create a connection to the Mongo DB
 #
 # @return db connection object
@@ -26,7 +28,7 @@ def create_db_connection():
 # @param data_path path to the mf4 file
 # @param dbc_file path to the dbc file
 # @param context_id context id for the data
-def submit_data(mf4_file, dbc_file, context_data, runOrderNumber):
+def submit_data(mf4_file, dbc_file, context_data, runOrderNumber) -> tuple | str :
    
     db_connection = create_db_connection()
     fs = gridfs.GridFS(db_connection)
@@ -34,23 +36,28 @@ def submit_data(mf4_file, dbc_file, context_data, runOrderNumber):
 
     dbc_decoded = cantools.database.load_file(dbc_file)
 
-    # get a dictionary of CAN id -> Board name
-    can_id_values = get_board_names(dbc_decoded)
-    # create an outline of how to read the data
-    config_values = createConfig(can_id_values, dbc_decoded)
-    # turn data from CAN messages -> list
-    data_values_json = parse_data(mf4_file, config_values)
+    try:
+        # get a dictionary of CAN id -> Board name
+        can_id_values = get_board_names(dbc_decoded)
+        # create an outline of how to read the data
+        config_values = createConfig(can_id_values, dbc_decoded)
+        # turn data from CAN messages -> list
+        data_values_json = parse_data(mf4_file, config_values)
 
-    context_data = json.loads(context_data)
-    
-    create_db_connection()["files"]
-    if runOrderNumber == None:
-        runOrderNumber=0
-    context_data["event"]["runs"][0]["mf4File"]=fs.put(mf4_file, encoding="utf-8")
-    context_data["event"]["runs"][0]["dbcFile"]=fs.put(dbc_file, encoding="utf-8")
-    context_data["event"]["runs"][0]["orderNumber"] = runOrderNumber
+        context_data = json.loads(context_data)
+        
+        create_db_connection()["files"]
+        if runOrderNumber == None:
+            runOrderNumber=0
+        context_data["event"]["runs"][0]["mf4File"]=fs.put(mf4_file, encoding="utf-8")
+        context_data["event"]["runs"][0]["dbcFile"]=fs.put(dbc_file, encoding="utf-8")
+        context_data["event"]["runs"][0]["orderNumber"] = runOrderNumber
 
-    return(upload_data_in_chunks(context_data, data_values_json))
+        return(upload_data_in_chunks(context_data, data_values_json))
+    except Exception as e: 
+        for id in documents_loaded_id: # delete all ids if an error occurs
+            fs.delete(id)
+        return -1, "No information added. Had error: " + str(e) # return as tuple to make sure that the error gets to the front end for display. Stack trace stays server side so we don't scare the EEs
     
     
 
@@ -66,6 +73,8 @@ def upload_data_in_chunks(new_run_data, data_values_json):
     # divide the data into chunks that are less the 16 mb
     # 150_000 ~< 15 mb but always < 16 mb
     sliced_data = list(sliced(data_values_json, 150_000))
+
+    documents_loaded_id.clear()
     
     collection_access_messages = create_db_connection()["messages"]
     for data_index in range(0, len(sliced_data)):
@@ -87,7 +96,8 @@ def upload_data_in_chunks(new_run_data, data_values_json):
                 data.append(sliced_data[data_index+1].pop())
         data_upload["event"]["runs"][0]["messages"] = data
         # add data to its own document and get the reference id number 
-        collection_access_messages.insert_one(data_upload)
+        res = collection_access_messages.insert_one(data_upload)
+        documents_loaded_id.append(res.inserted_id) # adds the inserted id to an array of documents
         
     uploading_data_progress[0]=1
     return 0
@@ -184,7 +194,7 @@ def parse_data(mdf_path, config_values):
 
         config_data = config_values[hex(can_id)]
         
-        data_array = values[index][5]
+        data_array = values[index][5:] # reading from index 5 to the end of values[index]
 
         # save the number of bytes/array indexes used by previous can messages to know where next ones begin
         # also save the number of bits used of the current byte if a message needs bits
@@ -211,14 +221,14 @@ def parse_data(mdf_path, config_values):
                 # get the length in bytes of the needed data
 
                 number_of_needed_bytes = data_length_bits // 8
-                data_list = data_array.tolist()
+                # data_list = data_array.tolist() # arrays are fine so this step is pointless and causes errors. It does not need to be cast to a list
 
                 current_data_list = []
 
                 for data_index in range(
                     previous_bytes_used, previous_bytes_used + number_of_needed_bytes
                 ):
-                    current_data_list.append(data_list[data_index])
+                    current_data_list.append(data_array[data_index]) # changed to data_array from data_list
 
                 raw_binary = combine_binary(*current_data_list)
 
@@ -238,7 +248,7 @@ def parse_data(mdf_path, config_values):
                 # if something uses 7 bits, something else will use the last bit
 
                 raw_result = read_bits(
-                    data_list[previous_bytes_used],
+                    data_array[previous_bytes_used], # swapped data_list with data_array bc they are the same
                     previous_bits_used,
                     previous_bits_used + data_length_bits,
                 )

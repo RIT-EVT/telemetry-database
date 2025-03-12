@@ -61,6 +61,11 @@ class DateUploadApi(MethodView):
             # remove the file from the sever end
             os.remove(mf4_file)
             os.remove(dbc_file)
+
+            
+            if document_id is tuple : # returned as tuple to also contain specfic error to front end
+                if document_id[0] == -1:
+                    return jsonify({"error": document_id[1]}), 400
             
             return jsonify({"id": document_id}), 201
         else:
