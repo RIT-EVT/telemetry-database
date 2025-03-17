@@ -38,7 +38,6 @@ function DataUpload() {
    * @param {string} url - url to redirect the user to
    */
   const RedirectToContext = (url) => {
-    resetRunOrderNumber();
     sessionStorage.setItem("DataSubmitted", false);
     sessionStorage.removeItem("BikeData");
     navigate(url);
@@ -61,7 +60,8 @@ function DataUpload() {
           <Button
             className='redirectButton'
             onClick={() => {
-              sessionStorage.clear("EventData");
+              sessionStorage.removeItem("EventData");
+              resetRunOrderNumber();
               RedirectToContext("/context-form");
             }}
           >
@@ -96,19 +96,22 @@ function DataUpload() {
       runOrderNumber
     ) => {
       // Ensure CheckData() completes before proceeding
-      if (!ServerCalls) {
-        try {
-          const response = await CheckData(); // Await the result
-          if (!response) {
-            console.error("CheckData failed or returned an invalid response.");
-            return false; // Stop execution if CheckData fails
-          }
-        } catch (error) {
-          console.error("Error in CheckData:", error);
-          return false;
-        }
-      }
 
+      try {
+        const response = await CheckData(); // Await the result
+        if (!response) {
+          const responseJson = await response.json();
+          if ("authError" in responseJson) {
+            navigate("/login");
+          } else {
+            console.error(response.statusText);
+          }
+          return;
+        }
+      } catch (error) {
+        console.error("Error in CheckData:", error);
+        return false;
+      }
       const formData = new FormData();
       formData.append("mf4File", mf4File);
       formData.append("dbcFile", dbcFile);
@@ -116,10 +119,13 @@ function DataUpload() {
       formData.append("runOrderNumber", runOrderNumber);
 
       try {
-        const response = await fetch(BuildURI("data_upload"), {
-          method: "POST",
-          body: formData,
-        });
+        const response = await fetch(
+          BuildURI("data_upload") + "/" + sessionStorage.getItem("authToken"),
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
 
         if (!response.ok) {
           const jsonResponse = await response.json();
@@ -130,6 +136,7 @@ function DataUpload() {
           return false;
         }
         incrementRunOrderNumber();
+
         return await response.json();
       } catch (error) {
         console.error("Network or server error:", error);
@@ -139,9 +146,8 @@ function DataUpload() {
 
     const mf4File = document.getElementById("fileUploadMF4").files[0];
     const dbcFile = document.getElementById("fileUploadDBC").files[0];
-    const eventData = sessionStorage.getItem("EventData");
 
-    const response = PostDataFile(
+    const postDataResponse = PostDataFile(
       mf4File,
       dbcFile,
       contextData,
@@ -155,15 +161,20 @@ function DataUpload() {
      */
     const FetchProgress = async () => {
       try {
-        const response = await fetch(BuildURI("data_upload"), {
-          method: "GET",
-        });
+        const fetchProgressResponse = await fetch(
+          BuildURI("data_upload") + "/" + sessionStorage.getItem("authToken"),
+          {
+            method: "GET",
+          }
+        );
 
-        if (!response.ok) {
-          console.error("Network response was not ok: " + response.statusText);
+        if (!fetchProgressResponse.ok) {
+          console.error(
+            "Network response was not ok: " + fetchProgressResponse.statusText
+          );
         }
 
-        const data = await response.json();
+        const data = await fetchProgressResponse.json();
 
         return data;
       } catch (error) {
@@ -175,6 +186,7 @@ function DataUpload() {
     var lastProgress = -1;
     var lastResponseString = "";
     setBodyDisplay(null);
+    var dataSubmitted = false;
     /**
      * Create an interval to update the progress bar every
      * second. Call to the backend and fetch the value
@@ -191,27 +203,31 @@ function DataUpload() {
       //get the progress passed from the backend
       const responseString = Object.keys(data)[0];
 
-      if (responseString != "Finished") {
+      if (responseString !== "Finished") {
         const currentProgress = data[responseString];
         if (
           currentProgress > lastProgress ||
           currentProgress < 0 ||
-          responseString != lastResponseString
+          responseString !== lastResponseString
         ) {
           // Update the UI with the formatted estimated time remaining
-          setProgressBar(
-            <center>
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <progress
-                  value={currentProgress}
-                  style={{ marginRight: "10px" }}
-                />
-                <div>
-                  {responseString}:{Math.round(currentProgress * 100)}%
+          if (!dataSubmitted) {
+            setProgressBar(
+              <center>
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <progress
+                    value={currentProgress}
+                    style={{ marginRight: "10px" }}
+                  />
+                  <div>
+                    {responseString} : {Math.round(currentProgress * 100)}%
+                  </div>
                 </div>
-              </div>
-            </center>
-          );
+              </center>
+            );
+          } else {
+            clearInterval(interval);
+          }
           lastProgress = currentProgress;
           lastResponseString = responseString;
         }
@@ -227,8 +243,9 @@ function DataUpload() {
      * to bring the user back to the context page
      * with the option of keeping the same event data
      */
-    response.then((responseValue) => {
-      if (responseValue != false) {
+    postDataResponse.then((responseValue) => {
+      if (responseValue !== false) {
+        dataSubmitted = true;
         sessionStorage.setItem("DataSubmitted", true);
 
         clearInterval(interval);
@@ -238,7 +255,6 @@ function DataUpload() {
 
         //save the needed event details to be displayed on the next page
         const eventObject = {
-          documentId: responseValue["id"],
           eventName: parsedContextData["event"]["name"],
           eventDate: parsedContextData.event.date,
           eventType: parsedContextData.event.type,
@@ -254,11 +270,11 @@ function DataUpload() {
 
   useEffect(() => {
     //make sure a refresh doesn't make the user resubmit data
+
     if (
       sessionStorage.getItem("DataSubmitted") !== null &&
-      sessionStorage.getItem("DataSubmitted") === true
+      sessionStorage.getItem("DataSubmitted") === "true"
     ) {
-      console.log(sessionStorage.getItem("DataSubmitted"));
       DisplayRedirect();
     } else {
       setBodyDisplay(

@@ -3,7 +3,7 @@
         "name": "eventName",
         "date": "eventDate",
         "type": "eventType",
-        "location": "location",
+        "location": "eventLocation",
         "runs": [
             {
                 "orderNumber": [],
@@ -12,6 +12,7 @@
                         "platformName": "platformName",
                         "tirePressure": "tirePressure",
                         "coolantVolume": "coolantVolume",
+                        "bikeSavedName": "bikeSavedName",
                         "firmwareConfig": {
                             "BMS": [
                                 "hardwareRevisionBMS",
