@@ -55,6 +55,7 @@ def submit_data(mf4_file, dbc_file, context_data, runOrderNumber) -> tuple | str
 
         return(upload_data_in_chunks(context_data, data_values_json))
     except Exception as e: 
+        print(e)
         for id in documents_loaded_id: # delete all ids if an error occurs
             fs.delete(id)
         return -1, "No information added. Had error: " + str(e) # return as tuple to make sure that the error gets to the front end for display. Stack trace stays server side so we don't scare the EEs
@@ -194,7 +195,7 @@ def parse_data(mdf_path, config_values):
 
         config_data = config_values[hex(can_id)]
         
-        data_array = values[index][5:] # reading from index 5 to the end of values[index]
+        data_array = values[index][5]
 
         # save the number of bytes/array indexes used by previous can messages to know where next ones begin
         # also save the number of bits used of the current byte if a message needs bits
@@ -221,14 +222,14 @@ def parse_data(mdf_path, config_values):
                 # get the length in bytes of the needed data
 
                 number_of_needed_bytes = data_length_bits // 8
-                # data_list = data_array.tolist() # arrays are fine so this step is pointless and causes errors. It does not need to be cast to a list
+                data_list = data_array.tolist()
 
                 current_data_list = []
 
                 for data_index in range(
                     previous_bytes_used, previous_bytes_used + number_of_needed_bytes
                 ):
-                    current_data_list.append(data_array[data_index]) # changed to data_array from data_list
+                    current_data_list.append(data_list[data_index])
 
                 raw_binary = combine_binary(*current_data_list)
 
@@ -248,7 +249,7 @@ def parse_data(mdf_path, config_values):
                 # if something uses 7 bits, something else will use the last bit
 
                 raw_result = read_bits(
-                    data_array[previous_bytes_used], # swapped data_list with data_array bc they are the same
+                    data_list[previous_bytes_used], # swapped data_list with data_array bc they are the same
                     previous_bits_used,
                     previous_bits_used + data_length_bits,
                 )
