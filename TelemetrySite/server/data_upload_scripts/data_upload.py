@@ -64,14 +64,13 @@ def upload_data_in_chunks(new_run_data, data_values_json):
         data_upload = new_run_data
         data_upload ["event"]["uploadSection"] = data_index
         data_upload ["event"]["runs"][0]["messages"] = []
-       
         #update progress of upload bar
         uploading_data_progress[0]=data_index/(len(sliced_data))
         data = sliced_data[data_index]
         # add data until it exceeds 16 mb
-        # even at 10_000 additions per cycle the data will not get too big 
+        # even at 1_000 additions per cycle the data will not get too big 
         while len(json.dumps(data).encode('utf-8')) < 16_000_000 and data_index+1 != len(sliced_data) and  len(sliced_data[data_index+1]) !=0:
-            for _ in range(0, 10_000):
+            for _ in range(0, 1_000):
                 if len(sliced_data[data_index+1]) ==0:
                     break
                 data.append(sliced_data[data_index+1].pop())

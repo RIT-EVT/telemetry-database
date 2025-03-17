@@ -24,15 +24,15 @@ class UserAuthApi(MethodView):
             password = user_data.get("password")
             
             mongo_data = user_db_connection.find_one({"username":username, "password":password.encode()})
-            
-            auth_token = mongo_data["auth_token"]
-            
-            # always update auth token on login
-            auth_token = update_expired_token(mongo_data["_id"])
-            
+          
+        
             if mongo_data == None:
                 return jsonify({"error":"Invalid username or password"}), 404        
             else:
+                auth_token = mongo_data["auth_token"]
+                
+                # always update auth token on login
+                auth_token = update_expired_token(mongo_data["_id"])
                 return jsonify({"auth_token": auth_token}), 200
             
         elif user_data.get("action") == "signup":
