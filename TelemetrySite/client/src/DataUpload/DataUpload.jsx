@@ -258,7 +258,6 @@ function DataUpload() {
       sessionStorage.getItem("DataSubmitted") !== null &&
       sessionStorage.getItem("DataSubmitted") === true
     ) {
-      console.log(sessionStorage.getItem("DataSubmitted"));
       DisplayRedirect();
     } else {
       setBodyDisplay(
