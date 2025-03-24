@@ -45,7 +45,6 @@ class DataUploadApi(MethodView):
         mf4File = request.files["mf4File"]
         dbcFile = request.files["dbcFile"]
         context_data = request.form["contextData"]
-
         runOrderNumber = request.form["runOrderNumber"]
         
         # ensure the file actually contains a valid file name and files

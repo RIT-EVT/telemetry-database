@@ -73,7 +73,7 @@ function App() {
   return (
     <div className='MainBody'>
       <Container className='ContextSelect'>
-        <div className='ContextHeader'>
+        <Col className='ContextHeader'>
           <center>
             <div className='ContextHeaderText'>Context Creator</div>
           </center>
@@ -82,7 +82,7 @@ function App() {
               Sign Out
             </button>
           ) : null}
-        </div>
+        </Col>
 
         {ServerStatus ? (
           <Row className='Components'>
