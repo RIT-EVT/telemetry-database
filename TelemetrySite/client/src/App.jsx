@@ -75,7 +75,7 @@ function App() {
       <Container className='ContextSelect'>
         <Col className='ContextHeader'>
           <center>
-            <div className='ContextHeaderText'>Context Creator</div>
+            <Col className='ContextHeaderText'>Context Creator</Col>
           </center>
           {authToken ? (
             <button onClick={handleSignout} className='SignOutButton'>
