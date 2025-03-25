@@ -17,12 +17,9 @@ import {
   Input,
   Button,
   Form,
-  Modal,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
 } from "reactstrap";
 import { useNavigate } from "react-router-dom";
+import ErrorModal from "./ErrorModal";
 
 /**
  * Upload a mf4 file to the backend sever as
@@ -35,38 +32,6 @@ function DataUpload() {
   const [progressBar, setProgressBar] = useState(null);
 
   const [err, setErr] = useState(null);
-  const [isErrorModalActive, setErrorModal] = useState(false);
-  const ModalErrortoggle = () => {
-    console.log("switching to", !isErrorModalActive);
-    setErrorModal(!isErrorModalActive);
-    console.log("after update. ", isErrorModalActive);
-  };
-  const IfError = (error) => {
-    ModalErrortoggle();
-    console.log(isErrorModalActive)
-    console.log(error);
-    if (error == null) {
-      return ;
-    }
-
-    return (
-      <div>
-        <Modal isOpen={isErrorModalActive} toggle={ModalErrortoggle} >
-          <ModalHeader toggle={ModalErrortoggle}>
-            ERROR
-          </ModalHeader>
-          <ModalBody>
-            {error.error.message}
-          </ModalBody>
-          <ModalFooter>
-            <Button color="primary" onClick={ModalErrortoggle}>
-              Acknowledge
-            </Button>
-          </ModalFooter>
-        </Modal>
-      </div>
-    );
-  }
  
   let navigate = useNavigate();
 
@@ -344,7 +309,7 @@ function DataUpload() {
 
   return (
     <Container fluid className='outer-container'>
-      <IfError error={err} />
+      <ErrorModal error={err} />
       <Card className='upload-card'>
         <CardBody fluid className='text-center'>
           {bodyDisplay}
