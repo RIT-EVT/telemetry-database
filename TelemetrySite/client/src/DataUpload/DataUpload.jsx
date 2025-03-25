@@ -17,6 +17,10 @@ import {
   Input,
   Button,
   Form,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
 } from "reactstrap";
 import { useNavigate } from "react-router-dom";
 
@@ -30,6 +34,40 @@ function DataUpload() {
 
   const [progressBar, setProgressBar] = useState(null);
 
+  const [err, setErr] = useState(null);
+  const [isErrorModalActive, setErrorModal] = useState(false);
+  const ModalErrortoggle = () => {
+    console.log("switching to", !isErrorModalActive);
+    setErrorModal(!isErrorModalActive);
+    console.log("after update. ", isErrorModalActive);
+  };
+  const IfError = (error) => {
+    ModalErrortoggle();
+    console.log(isErrorModalActive)
+    console.log(error);
+    if (error == null) {
+      return ;
+    }
+
+    return (
+      <div>
+        <Modal isOpen={isErrorModalActive} toggle={ModalErrortoggle} >
+          <ModalHeader toggle={ModalErrortoggle}>
+            ERROR
+          </ModalHeader>
+          <ModalBody>
+            {error.error.message}
+          </ModalBody>
+          <ModalFooter>
+            <Button color="primary" onClick={ModalErrortoggle}>
+              Acknowledge
+            </Button>
+          </ModalFooter>
+        </Modal>
+      </div>
+    );
+  }
+ 
   let navigate = useNavigate();
 
   /**
@@ -44,7 +82,7 @@ function DataUpload() {
     navigate(url);
   };
 
-  const DisplayRedirect = () => {
+  const DisplayRedirect = (err) => {
     setBodyDisplay(
       <Container className='button-container'>
         <Col>
@@ -100,12 +138,13 @@ function DataUpload() {
         try {
           const response = await CheckData(); // Await the result
           if (!response) {
-            console.error("CheckData failed or returned an invalid response.");
-            return false; // Stop execution if CheckData fails
+            let error_str = "CheckData failed or returned an invalid response.";
+            console.error(error_str);
+            return {val: false, error: error_str}; // Stop execution if CheckData fails
           }
         } catch (error) {
           console.error("Error in CheckData:", error);
-          return false;
+          return {val: false, "error": error};
         }
       }
 
@@ -127,13 +166,13 @@ function DataUpload() {
             "Error occurred on server side. Error message: " +
               jsonResponse.error
           );
-          return false;
+          return {val: false, "error": jsonResponse.error};
         }
         incrementRunOrderNumber();
-        return await response.json();
+        return {val: response.json()};
       } catch (error) {
         console.error("Network or server error:", error);
-        return false;
+        return {val: false, "error": error};
       }
     };
 
@@ -228,11 +267,11 @@ function DataUpload() {
      * with the option of keeping the same event data
      */
     response.then((responseValue) => {
-      if (responseValue != false) {
+      clearInterval(interval);
+      setProgressBar(null);
+      if (responseValue.val != false) {
+        responseValue = responseValue.val;
         sessionStorage.setItem("DataSubmitted", true);
-
-        clearInterval(interval);
-        setProgressBar(null);
 
         const parsedContextData = JSON.parse(contextData);
 
@@ -248,6 +287,10 @@ function DataUpload() {
         sessionStorage.setItem("EventData", JSON.stringify(eventObject));
 
         DisplayRedirect();
+      }
+      else {
+        setErr(responseValue.error);
+        DisplayRedirect(responseValue.error);
       }
     });
   };
@@ -301,6 +344,7 @@ function DataUpload() {
 
   return (
     <Container fluid className='outer-container'>
+      <IfError error={err} />
       <Card className='upload-card'>
         <CardBody fluid className='text-center'>
           {bodyDisplay}

@@ -58,7 +58,7 @@ def submit_data(mf4_file, dbc_file, context_data, runOrderNumber) -> tuple | str
         print(e)
         for id in documents_loaded_id: # delete all ids if an error occurs
             fs.delete(id)
-        return -1, "No information added. Had error: " + str(e) # return as tuple to make sure that the error gets to the front end for display. Stack trace stays server side so we don't scare the EEs
+        return -1, "Upload halted and all uploaded files from this session have been removed. Had error: " + str(e) # return as tuple to make sure that the error gets to the front end for display. Stack trace stays server side so we don't scare the EEs
     
     
 
