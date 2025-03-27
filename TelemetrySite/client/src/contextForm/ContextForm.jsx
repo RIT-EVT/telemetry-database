@@ -123,6 +123,7 @@ function ContextForm() {
    * @param {string} value - New value of select field
    */
   const handleConfigSelectChange = (configName, value) => {
+    // Update the state of the new conifg. Mutates the state rather than creating a new state
     setConfigSelectedValue((prev) => ({ ...prev, [configName]: value }));
   };
 
