@@ -60,7 +60,13 @@ You can chose to follow what is written on this page or you can follow the offic
 14. In the new rampup-client folder navigate to the index.js file and add this to the top with the other imports `import 'bootstrap/dist/css/bootstrap.min.css'`
 15. You have officialy set up your react project, great job! Similar to before you may now stand up, raise both hands once more and say "I have finished Part 1 of rampup!" and someone will come over to check your work.
 
-Reactstrap is the love child of two popular front-end development tools: React, and Bootstrap. Experience with either of these is helpful but certainly not needed.
+### Part 2
+ReactStrap is the love child of two popular front-end development tools: React, and Bootstrap. Experience with either of these is helpful but certainly not needed.<br>
+For Part 2 we will be creating some very simple front end code to familiarize you with ReactStrap please refer to the ReactStrap documentation [here.](https://reactstrap.github.io/?path=/story/home-installation--page)<br>
+
+
+
+
 
 
 
