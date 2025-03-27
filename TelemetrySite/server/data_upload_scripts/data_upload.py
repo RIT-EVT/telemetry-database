@@ -1,10 +1,10 @@
+from utils import create_db_connection
+
 import cantools
 from asammdf import MDF
 import json
 from more_itertools import sliced
-from bson import ObjectId
 import gridfs
-from server_utils import create_db_connection
 
 parsing_data_progress = [0]
 uploading_data_progress = [0]
@@ -27,12 +27,11 @@ def submit_data(mf4_file, dbc_file, context_data, runOrderNumber):
     # create an outline of how to read the data
     config_values = createConfig(can_id_values, dbc_decoded)
     # turn data from CAN messages -> list
-    data_values_json = parse_data(mf4_file, config_values)
+    data_values_json = parse_data(mf4_file, config_values, can_id_values)
 
     context_data = json.loads(context_data)
     
-    if runOrderNumber == None:
-        runOrderNumber=0
+   
     context_data["event"]["runs"][0]["mf4File"]=fs.put(mf4_file, encoding="utf-8")
     context_data["event"]["runs"][0]["dbcFile"]=fs.put(dbc_file, encoding="utf-8")
     context_data["event"]["runs"][0]["orderNumber"] = runOrderNumber
@@ -61,14 +60,13 @@ def upload_data_in_chunks(new_run_data, data_values_json):
         data_upload = new_run_data
         data_upload ["event"]["uploadSection"] = data_index
         data_upload ["event"]["runs"][0]["messages"] = []
-       
         #update progress of upload bar
         uploading_data_progress[0]=data_index/(len(sliced_data))
         data = sliced_data[data_index]
         # add data until it exceeds 16 mb
-        # even at 10_000 additions per cycle the data will not get too big 
+        # even at 1_000 additions per cycle the data will not get too big 
         while len(json.dumps(data).encode('utf-8')) < 16_000_000 and data_index+1 != len(sliced_data) and  len(sliced_data[data_index+1]) !=0:
-            for _ in range(0, 10_000):
+            for _ in range(0, 1_000):
                 if len(sliced_data[data_index+1]) ==0:
                     break
                 data.append(sliced_data[data_index+1].pop())
@@ -151,7 +149,7 @@ def signed_bin_convert(x, size):
 # @param mdf_path the path to the mf4 file
 #
 # @return list form of CAN data
-def parse_data(mdf_path, config_values):
+def parse_data(mdf_path, config_values, id_to_name):
     # Load the MDF file
     mdf = MDF(mdf_path, memory_map=False)
 
@@ -242,12 +240,17 @@ def parse_data(mdf_path, config_values):
             table_name = config_current["table"]
             if table_name.find("ErrorRegister") != -1 or table_name.find("Manufacturer") != -1:
                 continue
+            
+            if hex(can_id) in id_to_name:
+                board_name = id_to_name[hex(can_id)]
+            else:
+                board_name = "null"
             json_object = {
                 "time": timestamps[index],
                 "signal": table_name,
                 "canID": hex(can_id),
                 "data": decimal_result,
-                "size": data_length_bits,
+                "board": board_name,
             }
 
             # if there is an axis present save it as its own field

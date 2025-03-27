@@ -2,26 +2,12 @@
     overflow: hidden;
 }
 
-.ContextHeader {
-
-    background-color: #F36917;
-    width: 100% !important;
-
-    align-content: center;
-    padding-bottom: 5px;
-    margin-bottom: 5px;
-    border-style: solid;
-    display: block;
-
-}
 
 .ContextHeaderText {
     font-size: 60px;
     padding: 5px;
     color: #231F20;
 }
-
-
 
 .MainBody {
     height: 100vh;
@@ -30,4 +16,35 @@
 
 .Components {
     width: 100%;
+}
+
+.ContextHeader {
+    position: relative;
+    background-color: #F36917;
+    width: 100% !important;
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+    border-style: solid;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+.SignOutButton {
+    position: absolute;
+
+    right: 5px;
+    top: 50%;
+
+    background-color: black;
+    color: #F36917;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.SignOutButton:hover {
+    transform: scale(1.05);
 }

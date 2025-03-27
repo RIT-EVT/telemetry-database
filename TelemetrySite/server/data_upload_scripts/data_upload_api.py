@@ -3,8 +3,9 @@ from flask import request, jsonify
 from werkzeug.utils import secure_filename
 import os
 from data_upload_scripts.data_upload import submit_data, get_progress
+from utils import authenticate_user, check_expired_tokens
 
-class DateUploadApi(MethodView):
+class DataUploadApi(MethodView):
 
     ALLOWED_EXTENSIONS = {"mf4", "dbc"}
     UPLOAD_FOLDER = os.path.dirname(__file__) + "\\data_upload_file"
@@ -16,11 +17,23 @@ class DateUploadApi(MethodView):
 
     ## Get the current progress of the
     #  current data upload action
-    def get(self):
+    def get(self, auth_token):
+        
+        if not authenticate_user(auth_token):
+            return jsonify({"authError":"unauthenticated user"}), 400
+        elif check_expired_tokens(auth_token):
+            return jsonify({"authError":"expired user token"}), 400
+        
         return jsonify(get_progress()), 200
 
     ## Take in a mf4, dbc, and json object for the run and submit to nrdb
-    def post(self):
+    def post(self, auth_token):
+        
+        if not authenticate_user(auth_token):
+            return jsonify({"authError":"unauthenticated user"}), 400
+        elif check_expired_tokens(auth_token):
+            return jsonify({"authError":"expired user token"}), 400
+        
         # Check if the post request has all needed data needed
         if "mf4File" not in request.files:
             return jsonify({"error": "No mf4 file uploaded"}), 400
@@ -56,13 +69,14 @@ class DateUploadApi(MethodView):
             mf4File.save(mf4_file)
             dbcFile.save(dbc_file)
             
-            document_id = submit_data(mf4_file, dbc_file, context_data, runOrderNumber)
+            # submit the data!
+            submit_data(mf4_file, dbc_file, context_data, runOrderNumber)
 
             # remove the file from the sever end
             os.remove(mf4_file)
             os.remove(dbc_file)
             
-            return jsonify({"id": document_id}), 201
+            return jsonify({"message": "Data received successfully"}), 201
         else:
             return (
                 jsonify(
