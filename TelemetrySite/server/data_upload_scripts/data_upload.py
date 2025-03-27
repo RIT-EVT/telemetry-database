@@ -1,16 +1,13 @@
-import cantools
+from utils import create_db_connection
 
+import cantools
 from asammdf import MDF
 import json
 from more_itertools import sliced
-from bson import ObjectId
 import gridfs
-
-from utils import create_db_connection
 
 parsing_data_progress = [0]
 uploading_data_progress = [0]
-
 
 ## The function that sends data to the db
 #
@@ -34,7 +31,6 @@ def submit_data(mf4_file, dbc_file, context_data, runOrderNumber):
 
     context_data = json.loads(context_data)
     
-    create_db_connection()["files"]
    
     context_data["event"]["runs"][0]["mf4File"]=fs.put(mf4_file, encoding="utf-8")
     context_data["event"]["runs"][0]["dbcFile"]=fs.put(dbc_file, encoding="utf-8")
