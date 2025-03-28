@@ -61,8 +61,26 @@ You can chose to follow what is written on this page or you can follow the offic
 15. You have officialy set up your react project, great job! Similar to before you may now stand up, raise both hands once more and say "I have finished Part 1 of rampup!" and someone will come over to check your work.
 
 ### Part 2
+#### Starting off
 ReactStrap is the love child of two popular front-end development tools: React, and Bootstrap. Experience with either of these is helpful but certainly not needed.<br>
 For Part 2 we will be creating some very simple front end code to familiarize you with ReactStrap please refer to the ReactStrap documentation [here.](https://reactstrap.github.io/?path=/story/home-installation--page)<br>
+
+To begin we will be making a simple tv color screen using Rows and Cols your screen should look like this:
+![TV color bars](https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/SMPTE_Color_Bars.svg/1200px-SMPTE_Color_Bars.svg.png)<br>
+To do this we will edit the code in App.js. Remove all of the code in there between the parent divs. Create a grid of Cols and Rows then style them to change their sizing and background colors. Dont worry too much about exact coloring we just want something that is recognizable.<br>
+
+To run your site run the command `npm start`. The libraries we use are super cool and allow us to make changes to our sites live simply make the changes in your code. This is a very helpful thing to keep in mind when making changes to get it "just right."<br>
+
+Once you have made something that you feel is good call a senior member over and they will review what you made and let you know how to proceed. <br>
+
+#### Time For More Fun!
+In the hopes of getting you able to make contributions to the code base ASAP we will be doing something a little strange.<br>
+Next, launch the frontend of the actual application by navigating to the client directory and running `npm start`.<br>
+Find some part of the system that you think is ugly (trust me there is plenty) and make some changes to restyle it. <br>
+I recognize how open ended and potentially strange this is but this is a great way to understand our code base and how front end development works. If you need more guidance let someone know and we can help where needed.<br>
+
+
+
 
 
 
