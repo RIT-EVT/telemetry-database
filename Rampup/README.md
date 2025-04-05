@@ -45,15 +45,16 @@ Verify your install on any platform by running:<br>
 
 You can chose to follow what is written on this page or you can follow the official [reactstrap guide](https://reactstrap.github.io/?path=/story/home-installation--page). <br>
 
-1. Create a new folder somewhere in your files for us to clone a repository into. This is where your EVT work will live so make it somewhere easy to get to.
+1. Create a new folder somewhere in your files for us to clone a repository into name it Rampup.
 2. To start open the IDE of your choice (we typically use Visual Studio Code but if you have a different preferred one be my guest.)
 3. Open up a terminal/command line and navigate to the folder we just made. If you are unfamiliar with the terminal or command line take a look at [this.](https://www.freecodecamp.org/news/command-line-commands-cli-tutorial/) You are looking for information on directory navigation.
-4. Now that we are in the proper folder we can clone the project. The github page you are reading this on will help.
-5. Navigate to the main page of the github repo and click the green button that says "< > Code". Make sure the middle option "SSH" is picked.
-6. Click the copy button and return to your command line.
-7. In the cmd write the following: `git clone ` then paste the copied text and hit enter.
-8. Congrats you have cloned the repo. At this point it is customary to stand up, raise your hands above your head and say "I have cloned the repo!"
-10. Now enter the rampup folder in your code. If you do not do this it will definitely break things...
+4. Now that we are in the proper folder we can clone the project. In your github create a new repository. We are making a classic ToDo list so name it thusly.
+5. I recommend making this project public as recruiters love to see project history. I also recommend using a personal email for this as you will not want your school email hooked up to your personal git repo forever (I made this mistake and it makes me sad).
+6. Navigate to the main page of the github repo and click the green button that says "< > Code". Make sure the middle option "SSH" is picked.
+7. Click the copy button and return to your command line.
+8. In the cmd write the following: `git clone ` then paste the copied text and hit enter.
+9. Congrats you have cloned the repo. At this point it is customary to stand up, raise your hands above your head and say "I have cloned the repo!"
+10. Now create and enter a folder named rampup. If you do not do this it will definitely break things...
 11. Run the following command `npx create-react-app rampup-client`. This will create a new react folder called rampup-client and should take a little while sit back and chat with your neighbor if they don't smell too bad.
 12. In the cmd write the following: `npm install reactstrap react react-dom` This will install the npm depenencies we use for development. This can take a while. When it tells you we have vulnerabilities... no we dont (don't worry about it these are expected).
 13. Next run this command `npm install --save bootstrap`.
@@ -74,18 +75,39 @@ To run your site run the command `npm start`. The libraries we use are super coo
 Once you have made something that you feel is good call a senior member over and they will review what you made and let you know how to proceed. <br>
 
 #### Time For More Fun!
-In the hopes of getting you able to make contributions to the code base ASAP we will be doing something a little strange.<br>
-Next, launch the frontend of the actual application by navigating to the client directory and running `npm start`.<br>
-Find some part of the system that you think is ugly (trust me there is plenty) and make some changes to restyle it. <br>
-I recognize how open ended and potentially strange this is but this is a great way to understand our code base and how front end development works. If you need more guidance let someone know and we can help where needed.<br>
+Now we will be making that planner I was talking about earlier.
+1. Create a new folder in the base directory of your project (navigate until you are in the Rampup folder you made at the beginning of this).
+2. We are going to repeat the process from steps 10 - 15. Just use different names for the folders and project names. This is where the ToDo list will be so name it accordingly.
+3. You are welcome to style this in any way you want so long as you meet these requirements:
+    1. TODO items are displayed in an organized manner with a title, description, and a checkbox that allows you to select it.
+    2. There is a method by which to Add, Edit, Complete, and Delete TODOs.
+    3. I do not expect the changes to perpetuate when you reload the page we will make that happen when we hook up the backend.
+    4. Bonus points if you can reorder the TODOs but this is not required.
+4. If you want to follow a more standardized template you can make your page look like this:
+![image](https://github.com/user-attachments/assets/32830620-639c-4323-bf04-c9c7e9f14eee)
+5. This section may take a while especially if you have not used React before, we are happy to help so ask questions and break things. Front-end involves a lot of experimentation and nieche messaging boards from 6+ years ago where someone had the same problem you did, solved it, then did not explain further.
+6. Once you have something that meets the requirements call over a senior member and we will take a look. 
 
+### Part 3
+#### Now, the backend
+A lot of our work on the database team is backend engineering. The front end is important as it provides a means to interact with things but since only EVT members will be looking we aren't *too* concerned with if it looks beautiful. (This is a cry for help, if you like front-end please make our site look pretty).
 
+For the backend section we will be continuing work on the front-end project we began in Part 2.
+We will be completing the following:
+1. Setting up a local hosted MongoDB server (sounds scarier than it is)
+2. Migrating the TODOs to be stored in the local hosted MongoDB
+3. Use RestAPI calls to manage TODOs in the database (this can be scary but is so so cool)
 
+Before we get started lets do some learning time:
+##### Databases (DBs)
+What is a database? If you ask most mechies, they will say a google drive with files named bike_run_test_201831.mf4. This is in fact NOT a database and the reason we exist as a team.<br>
+A database is a place where we can (usually remotely) store data in an organized manner such that any number of people can access and manage it.<br>
+There are two major types of databases: Relational and Non-Relational.<br>
+Historically, relational DBs have been very popular but recently have been overtaken by Non-Relational DBs<br>
+A relational database typically correlates a series of values with an object. For instance a student in a school database might have information about their grade, name, and student id. These values would be stored in a table and each student would be given an assigned (and hopefully single value) for each field.<br>
+Relational databases require structured data schemas and will break if you do not follow them this makes them very fast at the expense of flexibility.<br>
 
-
-
-
-
-
-
-
+A non-relational database is a little different instead of tables, data is stored in "documents". A document is a fancy way of saying a (or many) massive json files.<br>
+At EVT we use non-relational databases because of our unique data structure and need for flexibility.<br>
+Non-relational DBs are used for large amounts of either unstructured or unpredictable data (we tend to fall in the unpredictable group).<br>
+If you are interested in learning more about these DB structures I recommend reading [this](https://www.mongodb.com/resources/compare/relational-vs-non-relational-databases) post by MongoDB.
