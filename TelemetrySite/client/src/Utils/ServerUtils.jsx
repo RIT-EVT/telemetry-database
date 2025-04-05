@@ -19,15 +19,15 @@ const BuildURI = (ServerCallsKey) => {
 
 const getRunOrderNumber = () => {
   return RunOrderNumber;
-}
+};
 
 const incrementRunOrderNumber = () => {
   RunOrderNumber += 1;
-}
+};
 
 const resetRunOrderNumber = () => {
   RunOrderNumber = 0;
-}
+};
 /**
  * Check the status of the server.
  * If the server is active, also get the
@@ -67,4 +67,12 @@ const CheckData = async () => {
   return true;
 };
 
-export { BuildURI, CheckServerStatus, CheckData, ServerCalls, getRunOrderNumber, incrementRunOrderNumber,resetRunOrderNumber};
+export {
+  BuildURI,
+  CheckServerStatus,
+  CheckData,
+  ServerCalls,
+  getRunOrderNumber,
+  incrementRunOrderNumber,
+  resetRunOrderNumber,
+};

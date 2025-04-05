@@ -63,6 +63,7 @@
                     },
                     "riderName": "riderName",
                     "riderWeight": "riderWeight",
+                    "humidity": "humidity",
                     "airTemp": "airTemp",
                     "windSpeed": "windSpeed",
                     "windDirection": "windAngle",

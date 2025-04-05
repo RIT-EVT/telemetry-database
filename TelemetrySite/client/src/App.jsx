@@ -7,7 +7,7 @@ import Page404 from "./404/404.jsx";
 import { useEffect, useState } from "react";
 import { Container, Row, Col } from "reactstrap";
 import { useNavigate, useLocation } from "react-router-dom";
-import { CheckServerStatus } from "ServerUtils.jsx";
+import { CheckServerStatus } from "Utils/ServerUtils.jsx";
 function App() {
   const [ServerStatus, setStatus] = useState(false);
   const location = useLocation();

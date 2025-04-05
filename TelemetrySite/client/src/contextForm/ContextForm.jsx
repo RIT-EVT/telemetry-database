@@ -28,7 +28,13 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 import "./ContextForm.css";
 
-import { BuildURI } from "ServerUtils.jsx";
+import { BuildURI } from "Utils/ServerUtils.jsx";
+
+import {
+  startKeyboardTracking,
+  stopKeyboardTracking,
+  isKeyComboPressed,
+} from "Utils/KeyboardTracker.js";
 
 /**
  * Create needed context forms. Return the configured elements
@@ -357,6 +363,7 @@ function ContextForm() {
               riderName: document.getElementById(contextValues.riderName).value,
               riderWeight: document.getElementById(contextValues.riderWeight)
                 .value,
+              humidity: document.getElementById(contextValues.humidity).value,
               airTemp: document.getElementById(contextValues.airTemp).value,
               windSpeed: document.getElementById(contextValues.windSpeed).value,
               windDirection: document.getElementById(
@@ -542,6 +549,51 @@ function ContextForm() {
       sessionStorage.removeItem("EventData");
     }
   }, [location.pathname]);
+
+  useEffect(() => {
+    startKeyboardTracking();
+
+    const interval = setInterval(() => {
+      if (isKeyComboPressed(["Control", "Shift", "f"])) {
+        // Add default values
+
+        const date = new Date();
+        const offset = date.getTimezoneOffset();
+        const local = new Date(date.getTime() - offset * 60 * 1000);
+
+        const configIDs = ContextJSONIdValues.event.runs[0].context;
+        const eventIDs = ContextJSONIdValues.event;
+
+        document.getElementById(eventIDs.name).value = "TEST";
+        document.getElementById(eventIDs.date).value = date
+          .toISOString()
+          .slice(0, 10);
+        document.getElementById(eventIDs.type).value = "TEST";
+        document.getElementById(eventIDs.location).value = "TEST";
+
+        document.getElementById(configIDs.airTemp).value = 0;
+        document.getElementById(configIDs.humidity).value = 0;
+        document.getElementById(configIDs.airTemp).value = 0;
+        document.getElementById(configIDs.windSpeed).value = 0;
+        document.getElementById(configIDs.windDirection).value = 0;
+        document.getElementById(configIDs.riderFeedback).value = "TEST";
+        document.getElementById(configIDs.riderName).value = "TEST";
+        document.getElementById(configIDs.riderWeight).value = 0;
+        document.getElementById(configIDs.distanceCovered).value = 0;
+        document.getElementById(configIDs.startTime).value = local
+          .toISOString()
+          .slice(0, 16);
+
+        document.getElementById("bikeSelect").value = "TEST_BIKE";
+        handleConfigFormChange("TEST_BIKE", "bike", true);
+      }
+    }, 100); // check every 100ms
+
+    return () => {
+      clearInterval(interval);
+      stopKeyboardTracking();
+    };
+  }, [dropDownOptions]);
 
   /* -------------------------------------------------------------------------- */
   /* ---------------------------- Return Final Form --------------------------- */
