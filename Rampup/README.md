@@ -100,14 +100,29 @@ We will be completing the following:
 
 Before we get started lets do some learning time:
 ##### Databases (DBs)
-What is a database? If you ask most mechies, they will say a google drive with files named bike_run_test_201831.mf4. This is in fact NOT a database and the reason we exist as a team.<br>
+What is a database? If you ask most mechies, they will say a google drive with files named bike_run_test_201831.mf4. This is in fact NOT a database and is also the reason we exist as a team.<br>
+<br>
 A database is a place where we can (usually remotely) store data in an organized manner such that any number of people can access and manage it.<br>
 There are two major types of databases: Relational and Non-Relational.<br>
+<br>
 Historically, relational DBs have been very popular but recently have been overtaken by Non-Relational DBs<br>
+<br>
 A relational database typically correlates a series of values with an object. For instance a student in a school database might have information about their grade, name, and student id. These values would be stored in a table and each student would be given an assigned (and hopefully single value) for each field.<br>
+<br>
 Relational databases require structured data schemas and will break if you do not follow them this makes them very fast at the expense of flexibility.<br>
+<br>
 
 A non-relational database is a little different instead of tables, data is stored in "documents". A document is a fancy way of saying a (or many) massive json files.<br>
+<br>
 At EVT we use non-relational databases because of our unique data structure and need for flexibility.<br>
+<br>
 Non-relational DBs are used for large amounts of either unstructured or unpredictable data (we tend to fall in the unpredictable group).<br>
-If you are interested in learning more about these DB structures I recommend reading [this](https://www.mongodb.com/resources/compare/relational-vs-non-relational-databases) post by MongoDB.
+<br>
+If you are interested in learning more about these DB structures I recommend reading [this](https://www.mongodb.com/resources/compare/relational-vs-non-relational-databases) post by MongoDB.<br>
+<br>
+Admittedly, a non-relational DB is probably a terrible method to manage TODO lists as they are predictable and usually well structured but this is the rampup for EVT so we want you to learn what we do and how.<br>
+<br>
+##### Getting started
+1. To start this off you will need to install MongoDB on your computer. Do so at [this link](https://www.mongodb.com/docs/manual/installation/)
+2. You will also want to install Studio 3T, a program used to view and manage non-relational DBs. Install that at [this link](https://studio3t.com/free/). Make sure to enable cookies because they will not let you breathe on that website without them.
+3. 
