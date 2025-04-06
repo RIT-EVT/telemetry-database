@@ -1,4 +1,3 @@
-// src/utils/keyboardState.js
 const pressedKeys = new Set();
 
 function handleKeyDown(event) {
