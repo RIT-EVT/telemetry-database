@@ -15,7 +15,7 @@ import {
 import { useEffect, useState } from "react";
 import "./LoginPage.css";
 import { useNavigate } from "react-router-dom";
-import { BuildURI } from "ServerUtils";
+import { BuildURI } from "Utils/ServerUtils";
 
 const styles = {
   container: {

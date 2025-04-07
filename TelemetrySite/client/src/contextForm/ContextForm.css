@@ -106,6 +106,27 @@ Label {
   scale: 1.05;
 }
 
+/* Button styling */
+.autoFill {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #F36917;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  position: fixed;
+  display: block;
+  left: 10px;
+  bottom: 10px;
+  transition: 10ms;
+}
+
+.autoFill:hover {
+  background-color: #9d4614;
+  scale: 1.05;
+}
+
 .ConfigDropdown {
   background-color: #ffffff;
   color: #000000;
