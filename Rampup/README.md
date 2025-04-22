@@ -126,7 +126,7 @@ Admittedly, a non-relational DB is probably a terrible method to manage TODO lis
 1. To start this off you will need to install MongoDB on your computer. Do so at [this link](https://www.mongodb.com/docs/manual/installation/)
 2. You will also want to install Studio 3T, a program used to view and manage non-relational DBs. Install that at [this link](https://studio3t.com/free/). Make sure to enable cookies because they will not let you breathe on that website without them.
 3. Now that the things we need are installed we need to create the server side of our application. Make a new folder at the same level as the client folder and name it server.
-4. Within the server folder create a file and name it server.py. In the Rampup folder of the EVT github there is is a file called server.py. You can copy paste that into your new file.
+4. Within the server folder create a file and name it server.py. In the Rampup folder of the EVT github there is is a file also called server.py. You can copy paste that into your new file.
 5. You will also need to copy the requirements.txt from the Rampup folder into your own then in the terminal run `pip install -r requirements.txt`. If you run into problems with this it is likely a versioning issue with your Python. You may need to manually call `pip install <library name here>`
 6. Your server logic will have one endpoint but with 4 methods "GET", "PUT", "POST", "DELETE". Some wack jobs will tell you to add "PATCH", the proper response is to smile, wave, nod your head and pretend to listen. They are in enough pain as is, no reason to make it worse.
 7. Each of these methods maps to a different general goal
@@ -139,4 +139,4 @@ Admittedly, a non-relational DB is probably a terrible method to manage TODO lis
     1. Take a look at the sample endpoint that was provided ours will look very similar
     2. Create a new endpoint, following the design of the sample but name it "todo_manager" and with the 4 methods listed above in the methods array
     3. Your function name SHOULD match the endpoint name and you will want to include the if statements to check each of the methods.
-10. Now comes the actual logic. We will start with the GET.  
+10. Now comes the actual logic. We will start with the GET.
