@@ -1,0 +1,8 @@
+asammdf==7.4.5
+cantools==39.4.13
+Flask==3.1.0
+Flask_Cors==5.0.0
+Flask_RESTful==0.3.10
+more_itertools==10.6.0
+pymongo==4.11.1
+Werkzeug==3.1.3
