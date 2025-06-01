@@ -29,6 +29,9 @@ const styles = {
  * Display a username password prompt to verify who the user is
  */
 const LoginPage = ({ onLogin }) => {
+  fetch("http://127.0.0.1:5000/saml2/login").then(async (response) => {
+    console.log(response);
+  });
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 

@@ -1,15 +1,17 @@
 from flask.views import MethodView
 from flask import request, jsonify
 
-from os import getenv
+from os import getenv, path
 from utils import create_db_connection, create_auth_token, check_expired_tokens, update_expired_token
 from datetime import datetime
 
+folder_path=""
 
 class UserAuthApi(MethodView):   
    
     def post(self):
-        
+    
+                
         user_data = request.get_json()
         
         user_db_connection = create_db_connection()["users"]
