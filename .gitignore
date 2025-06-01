@@ -3,6 +3,7 @@
 .idea/
 *.env
 *.dbc
+*.crt
 *.cpython-312.pyc
 /.vscode
 __pycache__/
