@@ -8,8 +8,19 @@ import { useEffect, useState } from "react";
 import { Container, Row, Col } from "reactstrap";
 import { useNavigate, useLocation } from "react-router-dom";
 import { CheckServerStatus } from "Utils/ServerUtils.jsx";
+import ErrorModal from "Modal/Error/Error.jsx";
+import Header from "./Header/Header.jsx"
+
+/**
+ * Render the main application and contain all the logic for what to display
+ */
 function App() {
   const [ServerStatus, setStatus] = useState(false);
+
+  const [isErrorOpen, setIsErrorOpen] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  const [ignoreError, setIgnoreError] = useState(false);
+
   const location = useLocation();
   const navigate = useNavigate();
   const [authToken, setToken] = useState(null);
@@ -33,27 +44,34 @@ function App() {
   };
 
   /**
-   * Call to the backend and ensure the server is online
+   * Call to the backend and ensure the server is online.
    */
   const CheckBackendConnection = () => {
     CheckServerStatus().then((response) => {
+      if (!response) {
+        setErrorMsg("Server is offline");
+        setIsErrorOpen(true);
+      }
       setStatus(response);
     });
   };
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Only check backend if the server is offline
-      if (!ServerStatus) {
-        CheckBackendConnection();
-      } else {
-        clearInterval(interval); // Stop interval when server is online
-      }
-    }, 1000);
+  const toggleErrorModal = () => setIsErrorOpen(!isErrorOpen);
+  const ignoreErrorModal = () => { setIgnoreError(true); toggleErrorModal(); }
 
-    // Cleanup interval when component unmounts
-    return () => clearInterval(interval);
-  }, [ServerStatus, location, navigate]); // Add serverOnline as a dependency to stop interval when it's true
+
+  // Run this effect until the server is online
+  useEffect(() => {
+
+    // Only check backend if the server is offline
+    if (!ServerStatus && !ignoreError) {
+      CheckBackendConnection();
+      // TODO remove overide
+      //setStatus(true);
+    }
+
+
+  }, [ServerStatus, ignoreError, location, navigate]);
 
   useEffect(() => {
     const savedToken = sessionStorage.getItem("authToken");
@@ -72,39 +90,36 @@ function App() {
 
   return (
     <div className='MainBody'>
-      <Container className='ContextSelect'>
-        <Col className='ContextHeader'>
-          <center>
-            <Col className='ContextHeaderText'>Context Creator</Col>
-          </center>
-          {authToken ? (
-            <button onClick={handleSignout} className='SignOutButton'>
-              Sign Out
-            </button>
-          ) : null}
-        </Col>
+      <Header onLogout={handleSignout} authToken={authToken} />
 
-        {ServerStatus ? (
-          <Row className='Components'>
-            <Col>
-              <Routes>
-                <Route path='/context-form' element={<ContextForm />} />
-                <Route path='/new-run' element={<ContextForm />} />
-                <Route path='/data-upload' element={<DataUpload />} />
-                <Route
-                  path='/login'
-                  element={<LoginPage onLogin={handleLogin} />}
-                />
-                <Route
-                  path='/signup'
-                  element={<SignupPage onSignup={handleSignup} />}
-                />
-                <Route path='*' element={<Page404 />} />
-              </Routes>
-            </Col>
-          </Row>
-        ) : null}
+      <Container className='ContextSelect'>
+        {/*TODO uncomment when done testing {ServerStatus ? ( } */}
+        <Row className='Components'>
+          <Col>
+            <Routes>
+              <Route path='/context-form' element={<ContextForm />} />
+              <Route path='/new-run' element={<ContextForm />} />
+              <Route path='/data-upload' element={<DataUpload />} />
+              <Route
+                path='/login'
+                element={<LoginPage onLogin={handleLogin} />}
+              />
+              <Route
+                path='/signup'
+                element={<SignupPage onSignup={handleSignup} />}
+              />
+              <Route path='*' element={<Page404 />} />
+            </Routes>
+          </Col>
+        </Row>
+        {/*TODO uncomment when done testing  ) : null}*/}
       </Container>
+      <ErrorModal
+        isOpen={isErrorOpen}
+        toggle={toggleErrorModal}
+        ignore={ignoreErrorModal}
+        errorMessage={errorMsg}
+      />
     </div>
   );
 }

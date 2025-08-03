@@ -21,7 +21,7 @@
 .ContextHeader {
     position: relative;
     background-color: #F36917;
-    width: 100% !important;
+    width: 100%;
     padding-bottom: 5px;
     margin-bottom: 5px;
     border-style: solid;
