@@ -8,7 +8,6 @@
 
 import {
   Form,
-  FormGroup,
   Input,
   Button,
   Card,
@@ -17,15 +16,15 @@ import {
   CardTitle,
   CardBody,
   Container,
-  InputGroup,
-  InputGroupText,
 } from "reactstrap";
 import React, { useEffect, useState } from "react";
 
-import ContextJSONIdValues from "./jsonFiles/ContextForm.json";
-import ContextJSONFormElements from "./jsonFiles/FormElementFormat.json";
+import ContextJSONIdValues from "./JsonFiles/ContextForm.json";
 import { useNavigate, useLocation } from "react-router-dom";
+import DynamicForm from "./DynamicForm";
+import SelectCreator from "./SelectorCreator";
 
+import "bootstrap/dist/css/bootstrap.min.css";
 import "./ContextForm.css";
 
 import { BuildURI } from "Utils/ServerUtils.jsx";
@@ -35,12 +34,11 @@ import { BuildURI } from "Utils/ServerUtils.jsx";
  *
  * @return {HTMLFormElement} Form element for all the needed fields
  */
-function ContextForm() {
+function ContextForm(props) {
   /* -------------------------------------------------------------------------- */
   /* -------------------------- Establish State Hooks ------------------------- */
   /* -------------------------------------------------------------------------- */
   const [mainContextForm, UpdateContext] = useState("");
-
   const [eventContextForm, UpdateEventForm] = useState(null);
   const [bikeContextForm, UpdateBikeForm] = useState(null);
   const [bikeSelect, UpdateBikeSelect] = useState(null);
@@ -86,33 +84,21 @@ function ContextForm() {
     bike: [],
   });
 
-  /* -------------------------------------------------------------------------- */
-  /* --------------------------- Initialize Constants ------------------------- */
-  /* -------------------------------------------------------------------------- */
+
 
   /**
    * All possible config types
    */
   let ConfigName = ["bms", "imu", "tmu", "tms", "pvc", "mc", "bike"];
 
-  // Which config selects are optional
-  let RequiredSelects = {
-    bms: true,
-    tms: true,
-    imu: false,
-    tmu: false,
-    pvc: true,
-    mc: true,
-    bike: true,
-  };
+
+
 
   let FormId = "ContextForm";
 
   let navigate = useNavigate();
   let location = useLocation();
-  /* -------------------------------------------------------------------------- */
-  /* ----------------------------- Const Functions ---------------------------- */
-  /* -------------------------------------------------------------------------- */
+
 
   /**
    * When a select field for the config forms updates,
@@ -137,8 +123,8 @@ function ContextForm() {
    * @param {boolean} bikeLoaded - if the change is coming from the bike
    */
   const handleConfigFormChange = async (
-    event,
     configName,
+    event,
     bikeLoaded = false
   ) => {
     // Get the config that has been changed
@@ -146,7 +132,7 @@ function ContextForm() {
     handleConfigSelectChange(configName, newConfigName);
 
     if (newConfigName === "Custom") {
-      const formElement = GenerateFormElement(`${configName}Config`);
+      const formElement = DynamicForm(`${configName}Config`);
       if (configName === "bike") {
         UpdateBikeForm(formElement);
       } else {
@@ -157,7 +143,7 @@ function ContextForm() {
         (obj) => obj[configName + "SavedName"] === newConfigName
       );
 
-      const formElement = GenerateFormElement(
+      const formElement = DynamicForm(
         `${configName}Config`,
         targetConfig
       );
@@ -184,60 +170,12 @@ function ContextForm() {
   };
 
   /**
-   * Create a form group based off of the json key passed in.
-   * Loop through all elements in the json object and create that
-   * many input and label objects.
-   *
-   * @param {string} jsonValue - Key for the element in the FormElementFormat.json file
-   * @param {json} optionalSetData - Predefined data for config inputs
-   * @return {HTMLFormElement} Form group of all the input elements on the json file
-   */
-  const GenerateFormElement = (jsonValue, optionalSetData) => {
-    // Loop through every json element for the current field and
-    // Create a new reactstrap input element for it
-
-    return (
-      <FormGroup>
-        {Object.values(ContextJSONFormElements[jsonValue]).map(
-          (formElement) => {
-            const idValue = formElement["id"];
-            return (
-              <InputGroup key={idValue} className='FormGroupElement'>
-                <InputGroupText>{formElement["label"]}</InputGroupText>
-                <Input
-                  id={idValue}
-                  type={formElement["type"]}
-                  placeholder={formElement["placeHolder"]}
-                  required={formElement["required"]}
-                  readOnly={
-                    formElement["readOnly"] || optionalSetData ? true : false
-                  }
-                  className='formInput'
-                  value={optionalSetData ? optionalSetData[idValue] : undefined}
-                >
-                  {formElement["type"] === "select"
-                    ? formElement["selectValues"].map((value) => (
-                        <option key={value} value={value}>
-                          {value}
-                        </option>
-                      ))
-                    : null}
-                </Input>
-              </InputGroup>
-            );
-          }
-        )}
-      </FormGroup>
-    );
-  };
-
-  /**
    * Get all the saved configs from the backend
    */
   const GetConfigData = async () => {
     try {
       const response = await fetch(
-        BuildURI("config_data") + "/" + sessionStorage.getItem("authToken"),
+        BuildURI("config_data") + "/" + props.authToken,
         {
           method: "GET",
         }
@@ -263,50 +201,11 @@ function ContextForm() {
     const formData = new FormData();
     formData.append("configData", configData);
     await fetch(
-      BuildURI("config_data") + "/" + sessionStorage.getItem("authToken"),
+      BuildURI("config_data") + "/" + props.authToken,
       {
         method: "POST",
         body: formData, // Convert object to JSON string
       }
-    );
-  };
-
-  /**
-   * Create the select dropdowns for the config forms
-   * on change check if value is Custom
-   * if it is then display the normal form
-   *
-   * @param {string} displayValues - Options to display in select
-   * @param {string} name - Name of config form
-   * @return {HTMLInputElement} - HTML Select Input
-   */
-  const SelectCreator = (displayValues, name) => {
-    return (
-      <Input
-        type='select'
-        onChange={(e) => handleConfigFormChange(e, name)}
-        placeholder='Select a config'
-        required={RequiredSelects[name]}
-        className='ConfigDropdown'
-        id={`${name}Select`}
-        defaultValue={
-          configSelectedValue[name] !== null ? configSelectedValue[name] : ""
-        }
-        disabled={name !== "bike" && configSelectedValue["bike"] !== "Custom"}
-      >
-        <option value='' disabled hidden>
-          Select an option
-        </option>
-        {displayValues.map((configNameValue) => {
-          let savedName = configNameValue[name + "SavedName"];
-          return (
-            <option key={savedName} value={savedName}>
-              {savedName}
-            </option>
-          );
-        })}
-        <option value='Custom'>Custom</option>
-      </Input>
     );
   };
 
@@ -490,8 +389,8 @@ function ContextForm() {
    * form elements.
    */
   const InitializeForms = () => {
-    UpdateContext(GenerateFormElement("mainBody"));
-    UpdateEventForm(GenerateFormElement("event", eventData ? eventData : null));
+    UpdateContext(DynamicForm("mainBody"));
+    UpdateEventForm(DynamicForm("event", eventData ? eventData : null));
   };
 
   /**
@@ -529,9 +428,6 @@ function ContextForm() {
     handleConfigFormChange("TEST_BIKE", "bike", true);
   };
 
-  /* -------------------------------------------------------------------------- */
-  /* ----------------------- Establish Use Effect Hooks ----------------------- */
-  /* -------------------------------------------------------------------------- */
 
   /**
    * Create all form elements for the main, bike, and event
@@ -541,7 +437,7 @@ function ContextForm() {
   useEffect(() => {
     // Create each select value
     ConfigName.forEach((name) => {
-      const dropDown = SelectCreator(dropDownOptions[name], name);
+      const dropDown = SelectCreator(dropDownOptions[name], name, handleConfigFormChange, configSelectedValue);
       if (name === "bike") {
         UpdateBikeSelect(dropDown);
       } else if (bikeContextForm) {
@@ -579,9 +475,6 @@ function ContextForm() {
     }
   }, [location.pathname]);
 
-  /* -------------------------------------------------------------------------- */
-  /* ---------------------------- Return Final Form --------------------------- */
-  /* -------------------------------------------------------------------------- */
 
   return (
     <Form
@@ -626,24 +519,24 @@ function ContextForm() {
       <Container className='grid-container'>
         {bikeContextForm
           ? ConfigName.map((name) => {
-              if (name === "bike") {
-                return;
-              }
-              return (
-                <Card className='grid-item'>
-                  <CardTitle className='grid-header'>
-                    {/*
+            if (name === "bike") {
+              return;
+            }
+            return (
+              <Card className='grid-item'>
+                <CardTitle className='grid-header'>
+                  {/*
                      *Create each element of the grid. Initially each has the name
                      *of the config and a dropdown. Dropdown is populated by past
                      *configs of the same type that have been saved. Allow user to also
                      *create a new one with the option to save it with a name
                      */}
-                    {name.toLocaleUpperCase()} Configuration: {dropDowns[name]}
-                  </CardTitle>
-                  <CardBody>{configForm[name]}</CardBody>
-                </Card>
-              );
-            })
+                  {name.toLocaleUpperCase()} Configuration: {dropDowns[name]}
+                </CardTitle>
+                <CardBody>{configForm[name]}</CardBody>
+              </Card>
+            );
+          })
           : null}
       </Container>
 

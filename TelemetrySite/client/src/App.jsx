@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-import ContextForm from "./contextForm/ContextForm.jsx"; // Import other components
+import ContextForm from "./ContextForm/ContextForm.jsx"; // Import other components
 import DataUpload from "./DataUpload/DataUpload.jsx";
 import { LoginPage, SignupPage } from "LoginPage/LoginPage.jsx";
 import "./App.css";
@@ -99,8 +99,8 @@ function App() {
         <Row className='Components'>
 
           <Routes>
-            <Route path='/context-form' element={<ContextForm />} />
-            <Route path='/new-run' element={<ContextForm />} />
+            <Route path='/context-form' element={<ContextForm authToken={authToken} />} />
+            <Route path='/new-run' element={<ContextForm authToken={authToken} />} />
             <Route path='/data-upload' element={<DataUpload />} />
             <Route
               path='/login'
