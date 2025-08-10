@@ -19,6 +19,8 @@ let RequiredSelects = {
    *
    * @param {string} displayValues - Options to display in select
    * @param {string} name - Name of config form
+   * @param {function} onChange - Callback function for when the dropdown is updateed
+   * @param {Dictionary} configSelectedValue - The current value of the dropdowns
    * @return {HTMLInputElement} - HTML Select Input
    */
 export default function SelectCreator(displayValues, name, onChange, configSelectedValue) {
@@ -26,7 +28,7 @@ export default function SelectCreator(displayValues, name, onChange, configSelec
     return (
         <Input
             type='select'
-            onChange={(e) => onChange(name, e)}
+            onChange={(e) => onChange(name, e.target.value)}
             placeholder='Select a config'
             required={RequiredSelects[name]}
             className='ConfigDropdown'

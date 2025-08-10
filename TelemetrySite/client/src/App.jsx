@@ -15,33 +15,33 @@ import Header from "./Header/Header.jsx"
  * Render the main application and contain all the logic for what to display
  */
 function App() {
-  const [ServerStatus, setStatus] = useState(false);
+  const [ServerStatus, SetStatus] = useState(false);
 
-  const [isErrorOpen, setIsErrorOpen] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
+  const [IsErrorOpen, SetIsErrorOpen] = useState(false);
+  const [ErrorMsg, SetErrorMsg] = useState('');
   // Allow the user to ignore server error
   // Mostly for testing reasons
-  const [ignoreError, setIgnoreError] = useState(false);
+  const [IgnoreError, SetIgnoreError] = useState(false);
 
   const location = useLocation();
   const navigate = useNavigate();
-  const [authToken, setToken] = useState(null);
+  const [AuthToken, SetToken] = useState(null);
 
-  const handleLogin = (loginData) => {
-    setToken(loginData);
+  function HandleLogin(loginData) {
+    SetToken(loginData);
     sessionStorage.setItem("authToken", loginData);
     navigate("/context-form");
   };
 
-  const handleSignup = (signupData) => {
-    setToken(signupData);
+  function HandleSignup(signupData) {
+    SetToken(signupData);
     sessionStorage.setItem("authToken", signupData);
     navigate("/context-form");
   };
 
-  const handleSignout = () => {
+  function HandleSignout() {
     sessionStorage.removeItem("authToken");
-    setToken(null);
+    SetToken(null);
     navigate("/login");
   };
 
@@ -49,37 +49,34 @@ function App() {
    * Call to the backend and ensure the server is online.
    */
   const CheckBackendConnection = useCallback(() => {
-    if (!ignoreError) {
+    if (!IgnoreError) {
       CheckServerStatus().then((response) => {
         if (!response) {
-          setErrorMsg("Server is offline");
-          setIsErrorOpen(true);
+          SetErrorMsg("Server is offline");
+          SetIsErrorOpen(true);
         }
-        setStatus(response);
+        SetStatus(response);
       });
     }
-  }, [ignoreError, setErrorMsg, setIsErrorOpen, setStatus]);
+  }, [IgnoreError, SetErrorMsg, SetIsErrorOpen, SetStatus]);
 
-  const toggleErrorModal = () => setIsErrorOpen(!isErrorOpen);
-  const ignoreErrorModal = () => { setIgnoreError(true); toggleErrorModal(); }
+  const toggleErrorModal = () => SetIsErrorOpen(!IsErrorOpen);
+  const ignoreErrorModal = () => { SetIgnoreError(true); toggleErrorModal(); }
 
 
   // Run this effect until the server is online
   useEffect(() => {
-
-    // Only check backend if the server is offline
-    if (!ServerStatus && !ignoreError) {
+    // Only check backend if the server is offline or the user has ignored the warning
+    if (ServerStatus && !IgnoreError) {
       CheckBackendConnection();
     }
-
-
-  }, [ServerStatus, ignoreError, location, navigate, CheckBackendConnection]);
+  }, [ServerStatus, IgnoreError, location, navigate, CheckBackendConnection]);
 
   useEffect(() => {
-    const savedToken = "testing";//TODO uncomment when done testing sessionStorage.getItem("authToken");
+    const savedToken = "testing";//TODO uncomment when done testing const savedToken = sessionStorage.getItem("authToken");
 
     if (savedToken) {
-      setToken(savedToken);
+      SetToken(savedToken);
       if (location.pathname === "/") {
         navigate("/context-form");
       }
@@ -93,22 +90,22 @@ function App() {
 
   return (
     <div className='MainBody'>
-      <Header onLogout={handleSignout} authToken={authToken} />
+      <Header onLogout={HandleSignout} authToken={AuthToken} />
       <Container className='ContextSelect'>
         {/*TODO uncomment when done testing {ServerStatus ? ( } */}
         <Row className='Components'>
 
           <Routes>
-            <Route path='/context-form' element={<ContextForm authToken={authToken} />} />
-            <Route path='/new-run' element={<ContextForm authToken={authToken} />} />
+            <Route path='/context-form' element={<ContextForm authToken={AuthToken} />} />
+            <Route path='/new-run' element={<ContextForm authToken={AuthToken} />} />
             <Route path='/data-upload' element={<DataUpload />} />
             <Route
               path='/login'
-              element={<LoginPage onLogin={handleLogin} />}
+              element={<LoginPage onLogin={HandleLogin} />}
             />
             <Route
               path='/signup'
-              element={<SignupPage onSignup={handleSignup} />}
+              element={<SignupPage onSignup={HandleSignup} />}
             />
             <Route path='*' element={<Page404 />} />
           </Routes>
@@ -117,10 +114,10 @@ function App() {
         {/*TODO uncomment when done testing  ) : null}*/}
       </Container>
       <ErrorModal
-        isOpen={isErrorOpen}
+        isOpen={IsErrorOpen}
         toggle={toggleErrorModal}
         ignore={ignoreErrorModal}
-        errorMessage={errorMsg}
+        errorMessage={ErrorMsg}
       />
     </div>
   );

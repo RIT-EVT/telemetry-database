@@ -16,7 +16,7 @@ import ContextJSONFormElements from "./JsonFiles/FormElementFormat.json";
 export default function DynamicForm(jsonValue, optionalSetData) {
   // Loop through every json element for the current field and
   // Create a new reactstrap input element for it
-  // TODO we may want to talk later about changing the way we approach this logic, but for now I like this better
+  // TODO we may want to talk later about changing the way we approach this logic, but for now this function
   return (
     <FormGroup>
       {Object.values(ContextJSONFormElements[jsonValue]).map(
