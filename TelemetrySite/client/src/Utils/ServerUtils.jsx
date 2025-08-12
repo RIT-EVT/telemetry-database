@@ -55,7 +55,7 @@ const CheckServerStatus = async () => {
 };
 
 /**
- * Check if the server us active
+ * Check if the server is active
  *
  * @return {Boolean} If the server is online
  */
