@@ -16,7 +16,7 @@ import {
   CardBody,
   Container,
 } from "reactstrap";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
 import ContextJSONIdValues from "./JsonFiles/ContextForm.json";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -35,7 +35,7 @@ import { BuildURI } from "Utils/ServerUtils.jsx";
  */
 function ContextForm(props) {
 
-  const [MainContextForm, SetContextForm] = useState("");
+  const [MainContextForm, SetContextForm] = useState(null);
   const [EventContextForm, SetEventForm] = useState(null);
   const [BikeContextForm, SetBikeForm] = useState(null);
   const [BikeSelect, SetBikeSelect] = useState(null);
@@ -140,10 +140,6 @@ function ContextForm(props) {
           const configKey = configEntry[0];
           const configValue = configEntry[1];
           if (configKey in DropDowns) {
-            SetConfigSelectedValue((prev) => ({
-              ...prev,
-              [configKey]: configValue,
-            }));
             HandleConfigFormChange(configValue, configKey);
           }
         }
@@ -392,9 +388,7 @@ function ContextForm(props) {
     const eventIDs = ContextJSONIdValues.event;
 
     document.getElementById(eventIDs.name).value = "TEST";
-    document.getElementById(eventIDs.date).value = date
-      .toISOString()
-      .slice(0, 10);
+    document.getElementById(eventIDs.date).value = date.toISOString().slice(0, 10);
     document.getElementById(eventIDs.type).value = "TEST";
     document.getElementById(eventIDs.location).value = "TEST";
 
@@ -407,9 +401,7 @@ function ContextForm(props) {
     document.getElementById(configIDs.riderName).value = "TEST";
     document.getElementById(configIDs.riderWeight).value = 0;
     document.getElementById(configIDs.distanceCovered).value = 0;
-    document.getElementById(configIDs.startTime).value = local
-      .toISOString()
-      .slice(0, 16);
+    document.getElementById(configIDs.startTime).value = local.toISOString().slice(0, 16);
 
     document.getElementById("bikeSelect").value = "TEST_BIKE";
     HandleConfigFormChange("TEST_BIKE", "bike");
