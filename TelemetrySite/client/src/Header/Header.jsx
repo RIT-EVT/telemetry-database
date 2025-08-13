@@ -1,4 +1,6 @@
 
+import "./Header.css"
+
 /**
  * Generate a header element that displays a logout button can calls back to a function when pressed
  */
