@@ -54,7 +54,6 @@ if __name__ == "__main__":
     # from the current file
     two_up = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
     dotenv.load_dotenv(two_up + "/credentials.env")
-    dotenv.load_dotenv(two_up+"/encryption.env")
     print("Starting flask")
 
     app.run(debug=True)  # Starts Flask
