@@ -13,13 +13,11 @@ import {
   ModalBody,
 } from "reactstrap";
 import { useEffect, useState } from "react";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import "bootstrap/dist/css/bootstrap.min.css";
 
 import "./LoginPage.css";
 import { useNavigate } from "react-router-dom";
 import { BuildURI } from "Utils/ServerUtils";
-
-
 
 /**
  * Display a username password prompt to verify who the user is
@@ -190,8 +188,6 @@ const SignupPage = ({ onSignup }) => {
 
   return (
     <Card className='card'>
-
-
       <center>
         <h2>Signup</h2>
       </center>
@@ -199,19 +195,17 @@ const SignupPage = ({ onSignup }) => {
         <Container>
           <Col>
             <Row>
-
               <InputGroup className='InputGroup'>
                 <Input
                   type='text'
                   id='username'
                   className='Input'
                   value={username}
-                  placeholder="Username"
+                  placeholder='Username'
                   onChange={(e) => setUsername(e.target.value)}
                   required
                 />
               </InputGroup>
-
             </Row>
 
             <Row>
@@ -221,29 +215,26 @@ const SignupPage = ({ onSignup }) => {
                   id='challenge-value'
                   className='Input'
                   value={challengeInt}
-                  placeholder="Challange Value"
+                  placeholder='Challenge Value'
                   onChange={(e) => setChallengeInt(e.target.value)}
                   required
                 />
               </InputGroup>
-
             </Row>
           </Col>
           <Col>
             <Row>
-
               <InputGroup className='InputGroup'>
                 <Input
                   type='password'
                   id='password'
                   className='Input'
                   value={password}
-                  placeholder="Create Password"
+                  placeholder='Create Password'
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
               </InputGroup>
-
             </Row>
             <Row>
               <InputGroup className='InputGroup'>
@@ -252,7 +243,7 @@ const SignupPage = ({ onSignup }) => {
                   id='confirm-password'
                   className='Input'
                   value={confirmPassword}
-                  placeholder="Confirm Password"
+                  placeholder='Confirm Password'
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                 />
@@ -265,11 +256,7 @@ const SignupPage = ({ onSignup }) => {
             Signup
           </Button>
 
-          <Button
-            className='SwitchButton'
-
-            onClick={() => navigate("/login")}
-          >
+          <Button className='SwitchButton' onClick={() => navigate("/login")}>
             Login
           </Button>
         </center>
@@ -292,8 +279,7 @@ const SignupPage = ({ onSignup }) => {
           Your inputted challenge value does not match the expected value
         </ModalBody>
       </Modal>
-
-    </Card >
+    </Card>
   );
 };
 
