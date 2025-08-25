@@ -56,10 +56,10 @@ You can chose to follow what is written on this page or you can follow the offic
 9. Congrats you have cloned the repo. At this point it is customary to stand up, raise your hands above your head and say "I have cloned the repo!"
 10. Now create and enter a folder named rampup. If you do not do this it will definitely break things...
 11. Run the following command `npx create-react-app rampup-client`. This will create a new react folder called rampup-client and should take a little while sit back and chat with your neighbor if they don't smell too bad.
-12. In the cmd write the following: `npm install reactstrap react react-dom` This will install the npm depenencies we use for development. This can take a while. When it tells you we have vulnerabilities... no we dont (don't worry about it these are expected).
+12. In the cmd write the following: `npm install reactstrap react react-dom` This will install the npm dependencies we use for development. This can take a while. When it tells you we have vulnerabilities... no we don't (don't worry about it these are expected).
 13. Next run this command `npm install --save bootstrap`.
 14. In the new rampup-client folder navigate to the index.js file and add this to the top with the other imports `import 'bootstrap/dist/css/bootstrap.min.css'`
-15. You have officialy set up your react project, great job! Similar to before you may now stand up, raise both hands once more and say "I have finished Part 1 of rampup!" and someone will come over to check your work.
+15. You have officially set up your react project, great job! Similar to before you may now stand up, raise both hands once more and say "I have finished Part 1 of rampup!" and someone will come over to check your work.
 
 ### Part 2
 #### Starting off
@@ -68,7 +68,7 @@ For Part 2 we will be creating some very simple front end code to familiarize yo
 
 To begin we will be making a simple tv color screen using Rows and Cols your screen should look like this:
 ![TV color bars](https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/SMPTE_Color_Bars.svg/1200px-SMPTE_Color_Bars.svg.png)<br>
-To do this we will edit the code in App.js. Remove all of the code in there between the parent divs. Create a grid of Cols and Rows then style them to change their sizing and background colors. Dont worry too much about exact coloring we just want something that is recognizable.<br>
+To do this we will edit the code in App.js. Remove all of the code in there between the parent divs. Create a grid of Cols and Rows then style them to change their sizing and background colors. Don't worry too much about exact coloring we just want something that is recognizable.<br>
 
 To run your site run the command `npm start`. The libraries we use are super cool and allow us to make changes to our sites live simply make the changes in your code. This is a very helpful thing to keep in mind when making changes to get it "just right."<br>
 
@@ -85,7 +85,7 @@ Now we will be making that planner I was talking about earlier.
     4. Bonus points if you can reorder the TODOs but this is not required.
 4. If you want to follow a more standardized template you can make your page look like this:
 ![image](https://github.com/user-attachments/assets/32830620-639c-4323-bf04-c9c7e9f14eee)
-5. This section may take a while especially if you have not used React before, we are happy to help so ask questions and break things. Front-end involves a lot of experimentation and nieche messaging boards from 6+ years ago where someone had the same problem you did, solved it, then did not explain further.
+5. This section may take a while especially if you have not used React before, we are happy to help so ask questions and break things. Front-end involves a lot of experimentation and niche messaging boards from 6+ years ago where someone had the same problem you did, solved it, then did not explain further.
 6. Once you have something that meets the requirements call over a senior member and we will take a look. 
 
 ### Part 3
@@ -140,6 +140,7 @@ Admittedly, a non-relational DB is probably a terrible method to manage TODO lis
     2. Create a new endpoint, following the design of the sample but name it "todo_manager" and with the 4 methods listed above in the methods array
     3. Your function name SHOULD match the endpoint name and you will want to include the if statements to check each of the methods.
 10. Now comes the actual logic. We will start with the GET.
+11. To turn your server on, cd into the folder with sever.py and run `python .\server.py`
 ##### Get Request
 As stated above, a get request needs to get data (duh), so for our purposes we're going to use it to get all the events the user currently has to do. 
 <br>
@@ -152,13 +153,49 @@ To save yourself a headache later, I would recommend setting up a way to test yo
 
 #### POST
 Now that we have a get endpoint, lets make a POST endpoint. To make this simple, we're going to make each new task be its own document.
-    1. Create the POST endpoint if statement in server.py
-    2. Read incoming data. For this, we're going to use something called request, which is a feature of Flask
-    3. Format the data how you want it (I would highly recommend some key: pair system)
-    4. Submit the data to the db
-    5. Return the new event to the frontend
-13. 
-
+<br>
+1. Create the POST endpoint if statement in server.py
+2. Read incoming data. For this, we're going to use something called request, which is a feature of Flask
+3. Format the data how you want it (I would highly recommend some key: pair system)
+4. Submit the data to the db
+5. Return the new event to the frontend with code 201
  
+#### PUT 
+We have reached the point where we now want to modify an existing element.
+<br>
+
+Per normal comp sci practices, we almost always want to keep all data we are given, so rather than removing a task when the user finish it, we're just going to give it a flag of "Complete". How you actually do this is up to you (but please use a boolean)
+1. Create the endpoint in code (you're going to be doing this a lot)
+2. Figure out how to identify individual tasks in the db. There are two main ways to do this. Create some id property for each task or use the id number each document has in mongodb.
+3. Add a flag to the task
+4. Save task and return 200 code
+
+#### DELETE
+For this part, we are going to violate the comp sci practice we followed above. 
+<br>
+Mainly because you should know how to delete something from a mongo db.  
+But pls pls pls, don't just delete data from our db 😨
+
+1. Create endpoint (last time for now)
+2. Identify target for deletion
+3. Delete element
+4. Return code 204 
+
+<b>CONGRATULATIONS</b>
+<br>
+You have officially built an api!
+<br>
+Unfortunately, the work isn't done yet. You still have the fun experience of integrating it with the frontend!
+<br>
+This process is often as enjoyable as a 8 am math lecture, but it has to be done
+
+### Putting It All Together
+
+On the frontend, we need to start making some fetch calls to the backend for data.
+<br>
+If you don't know what a fetch call is, please refer to [this](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch) website for more info
+<br>
+From here, all you have to do is set it up so the frontend so it will make the correct request to the backend 
+
 
 
