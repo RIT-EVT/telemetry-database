@@ -10,9 +10,9 @@ BASE_URL = "http://127.0.0.1:5000/"
 #TODO figure out what to populate this with
 SP_ENTITY_ID = f"{BASE_URL}login/"
 # path to a base64 encoded private key (PEM) for the SP
-SP_KEY_PATH = f"{folder_path}/login_data/service.key"
+SP_KEY_PATH = f"{folder_path}/login_data/saml.pem"
 # path to a base64 encoded certificate (PEM) for the SP
-SP_CERT_PATH = f"{folder_path}/login_data/service.crt"
+SP_CERT_PATH = f"{folder_path}/login_data/saml.crt"
 # End SP Section
 
 # IdP Section
