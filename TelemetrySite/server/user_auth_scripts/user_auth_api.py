@@ -59,7 +59,7 @@ class UserAuthApi(MethodView):
                 user_db_connection.insert_one({"username" : username, "password" : password.encode(),
                                                "auth_token" : auth_token, "auth_time" : current_date_time})
                 
-                return jsonify({"auth_token":auth_token})
+                return jsonify({"auth_token":auth_token}), 200
                     
             
         return jsonify({"error":"Code reached the end of the call"}), 400
