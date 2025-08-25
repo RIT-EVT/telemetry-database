@@ -12,7 +12,12 @@ from bson import ObjectId
 # @return db connection object
 def create_db_connection():
     connection_string = "mongodb://" + parse.quote_plus(str(getenv("MDB_USER"))) + ":" + parse.quote_plus(str(getenv("MDB_PASSWORD")))  + "@" + str(getenv("HOST")) + ":" + str(getenv("MDB_PORT"))
-    mongo_client = MongoClient(connection_string)
+    mongo_client = MongoClient(
+        connection_string,
+         serverSelectionTimeoutMS=2000,  # total time to find a suitable server
+        connectTimeoutMS=1000,           # time to establish TCP connection
+        socketTimeoutMS=1000             # time to wait for response on socket
+    )
     
     db_access = mongo_client["ernie"]
     return db_access
@@ -41,9 +46,8 @@ def authenticate_user(auth_token):
     # Query the db to see if the user's token is on it
     # If it is then allow the operation to continue
     # Otherwise return an error
-    
-    auth_connection = create_db_connection()["users"]
-    
+    auth_connection = create_db_connection()["users"]    
+    auth_token=convert_to_int(auth_token)
     return (auth_connection.find_one({"auth_token":auth_token})!=None)
 
 ## Check if the user's auth session has expired
@@ -51,7 +55,9 @@ def authenticate_user(auth_token):
 # @param auth_time time the user's auth session started
 # @return bool if too much time has passed since it was created
 def check_expired_tokens(auth_token):
+    print("checking expired token")
     auth_connection = create_db_connection()["users"]
+    auth_token=convert_to_int(auth_token)
     auth_time = auth_connection.find_one({"auth_token":auth_token})["auth_time"]
     # only allow an auth token to last a day
     days = (datetime.now()-auth_time).days
@@ -67,3 +73,9 @@ def update_expired_token(document_id):
     auth_connection.update_one(  {"_id": ObjectId(document_id)},
             {"$set": {"auth_token":new_auth_token, "auth_time":datetime.now()}})
     return new_auth_token
+
+def convert_to_int(value):
+    
+    if type(value) == str:
+        return int(value)
+    return value

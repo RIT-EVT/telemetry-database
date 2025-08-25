@@ -22,9 +22,22 @@ This database has a few goals:
   - Again, pipe dream, I want to have data streamed live from the bike to the database so we have a live feed of the state of the bike.
 - Ease of Access
   - Prior to any database set up, you had to give away your right arm and first born to get any of our data.
-  - Providing the database will give the MechEs and the Integration team greater access to data which (allegedly) they need.
+  - Providing the database will give the MECEs and the Integration team greater access to data which (allegedly) they need.
 
 ---
+
+## Documentation for MECEs
+
+Hello MECEs, if you are here this means you have been tasked with either uploading data or accessing the data in the database. Whichever you wish to do, this section of the readme should set you up.
+
+### Uploading Data
+
+In the very near future, we will have a dedicated RIT website for uploading data, but for now that dream is not fully realized. For now, if you wish to upload data, you can either contact a member of the database team to upload it for you or you can follow the instructions 
+[here](#download-instructions) to download and run the website on your computer.
+
+### Data Access
+
+
 
 ## Documentation
 
@@ -45,6 +58,7 @@ I want to move this off of Lucid Chart but for now there it shall lie.<br>
 
 
 
+
 ## Data Upload Script
 
 The script which is responsible for streaming the raw CAN data into the database.<br>
@@ -56,28 +70,14 @@ As we do not have means to collect context data yet, we use a dummy context with
 
 ## Accessing Data
 
-Data access on Matlab is possible using the Database Explorer Application (found in the Apps subtab). This should come native with your Matlab installation but if not please add the toolbox.<br>
-
-Once in the Database Explorer, to set up a connection for the first time do the following:<br>
-1. Click the dropdown "Configure Data Source" in the top left.
-2. In the dropdown select "PostgreSQL"
-3. Now you will need to fill out the form that appears. Use the image below to do so:
-![image](MatlabDBSetup.png)
-4. You will need to set your credentials now. If you do not know them you will need to ask for them. Find the Database Lead and ask them.
-<br>
-Now that a config is established you will need to connect to the DB.<br>
-Select the "Connect" dropdown next to "Configure Data Source" in the top left of the Database Explorer<br>
-In the pop-up open the schema dropdown and select "public"<br>
-Congrats you are now connected to the DB!<br>
-<br>
-I recommend using the automatic Matlab export in order to start your queries as it will configure accessing the DB for you.
+As of right now, we have no established way to interact with the data. Eventually, we are going to create a system to streamline the process of accessing the data, but for now you can read data by making queries directly to the database in python.
 
 
 ## Web UI 
 
 This react-strap-based website allows users to input context and configuration information and to upload CAN data files.<br>
 
-Ideally, MECE's will just download the files and run it on their computer. This includes running both the website and backend api that goes along with it.<br>
+Ideally, MECEs will just download the files and run it on their computer. This includes running both the website and backend api that goes along with it.<br>
 
 In the future, I hope to host at least the backend restful api, and eventually the website itself, on a web server, but that is not going to happen for a long time. To anyone that works on this in the future, if this message is still here, that means I never went back and fixed the mess I made, and for that I sincerely apologize for. This was meant to be quick and dirty, but I attempted to follow best practices and self document the code where I could. <br>
 
@@ -115,7 +115,7 @@ Verify your install on any platform by running:<br>
 
 After Node JS has been installed, the next step is to clone the repo and all needed components. <br>
 
-Open your command terminal and 'cd' into the desired folder location and run the following commands <br>
+Open your command terminal and `cd` into the desired folder location and run the following commands <br>
 
 `git clone https://github.com/RIT-EVT/telemetry-database.git` <br>
 `npm install react`<br>
