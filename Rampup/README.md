@@ -133,10 +133,32 @@ Admittedly, a non-relational DB is probably a terrible method to manage TODO lis
    1. GET is focused on retrieving data from the server but not modifying it in any way. THERE ARE NO BODIES IN A GET CALL 💀. (Terrifying out of context)
    2. PUT allows us to modify data in the server/DB
    3. POST is used to send new data objects to the server/DB
-   4. DELETE is used to remove data objects from the server/DB
+   4. DELETE is used to remove data objects from the server/DB 
 8. Note, there is literally nothing holding you to upkeeping these rules but I *BEG* you to follow them lest yee be judged harshly
 9. Lets start by making our endpoint:
     1. Take a look at the sample endpoint that was provided ours will look very similar
     2. Create a new endpoint, following the design of the sample but name it "todo_manager" and with the 4 methods listed above in the methods array
     3. Your function name SHOULD match the endpoint name and you will want to include the if statements to check each of the methods.
 10. Now comes the actual logic. We will start with the GET.
+##### Get Request
+As stated above, a get request needs to get data (duh), so for our purposes we're going to use it to get all the events the user currently has to do. 
+<br>
+To save yourself a headache later, I would recommend setting up a way to test your queries outside of a server (test.py) so you can easily print the results. To actually establish a connection to the db, checkout `create_db_connection()` in server.py
+<br>
+1. Make the get request (follow format in the example server.py)
+2. Build your query. Check out [this link](https://www.mongodb.com/docs/manual/reference/method/db.collection.find/) for help building a query. You may also want to familiarize yourself with how collections work
+3. Return all data found in the collection along with code 200 (See [this link](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status) for http response code info)
+4. As of now, don't worry to much about how the front end receives the data, we'll work on that in a minute
+
+#### POST
+Now that we have a get endpoint, lets make a POST endpoint. To make this simple, we're going to make each new task be its own document.
+    1. Create the POST endpoint if statement in server.py
+    2. Read incoming data. For this, we're going to use something called request, which is a feature of Flask
+    3. Format the data how you want it (I would highly recommend some key: pair system)
+    4. Submit the data to the db
+    5. Return the new event to the frontend
+13. 
+
+ 
+
+
