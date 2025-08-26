@@ -195,7 +195,13 @@ On the frontend, we need to start making some fetch calls to the backend for dat
 <br>
 If you don't know what a fetch call is, please refer to [this](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch) website for more info
 <br>
-From here, all you have to do is set it up so the frontend so it will make the correct request to the backend 
+From here, all you have to do is set it up so the frontend so it will make the correct request to the backend!
+<br>
+And with that, you have finished the rampup!
+<br>
+It is now customary to walk up to the current head of the club (Magee) and give them a big hug!
+<br>
+Just make sure you get checkoff and you're officially ready to start adding your own special touch to our beautiful database.
 
 
 
