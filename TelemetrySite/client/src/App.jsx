@@ -9,7 +9,7 @@ import { Container, Row } from "reactstrap";
 import { useNavigate, useLocation } from "react-router-dom";
 import { CheckServerStatus } from "Utils/ServerUtils.jsx";
 import ErrorModal from "Modal/Error/Error.jsx";
-import Header from "./Header/Header.jsx"
+import Header from "./Header/Header.jsx";
 
 /**
  * Render the main application and contain all the logic for what to display
@@ -18,7 +18,7 @@ function App() {
   const [ServerStatus, SetStatus] = useState(false);
 
   const [IsErrorOpen, SetIsErrorOpen] = useState(false);
-  const [ErrorMsg, SetErrorMsg] = useState('');
+  const [ErrorMsg, SetErrorMsg] = useState("");
   // Allow the user to ignore server error
   // Mostly for testing reasons
   const [IgnoreError, SetIgnoreError] = useState(false);
@@ -31,19 +31,19 @@ function App() {
     SetToken(loginData);
     sessionStorage.setItem("authToken", loginData);
     navigate("/context-form");
-  };
+  }
 
   function HandleSignup(signupData) {
     SetToken(signupData);
     sessionStorage.setItem("authToken", signupData);
     navigate("/context-form");
-  };
+  }
 
   function HandleSignout() {
     sessionStorage.removeItem("authToken");
     SetToken(null);
     navigate("/login");
-  };
+  }
 
   /**
    * Call to the backend and ensure the server is online.
@@ -61,19 +61,21 @@ function App() {
   }, [IgnoreError, SetErrorMsg, SetIsErrorOpen, SetStatus]);
 
   const toggleErrorModal = () => SetIsErrorOpen(!IsErrorOpen);
-  const ignoreErrorModal = () => { SetIgnoreError(true); toggleErrorModal(); }
-
+  const ignoreErrorModal = () => {
+    SetIgnoreError(true);
+    toggleErrorModal();
+  };
 
   // Run this effect until the server is online
   useEffect(() => {
     // Only check backend if the server is offline or the user has ignored the warning
-    if (ServerStatus && !IgnoreError) {
+    if (!ServerStatus && !IgnoreError) {
       CheckBackendConnection();
     }
   }, [ServerStatus, IgnoreError, location, navigate, CheckBackendConnection]);
 
   useEffect(() => {
-    const savedToken = "testing";//TODO uncomment when done testing const savedToken = sessionStorage.getItem("authToken");
+    const savedToken = sessionStorage.getItem("authToken");
 
     if (savedToken) {
       SetToken(savedToken);
@@ -92,26 +94,30 @@ function App() {
     <div className='MainBody'>
       <Header onLogout={HandleSignout} authToken={AuthToken} />
       <Container className='ContextSelect'>
-        {/*TODO uncomment when done testing {ServerStatus ? ( } */}
-        <Row className='Components'>
-
-          <Routes>
-            <Route path='/context-form' element={<ContextForm authToken={AuthToken} />} />
-            <Route path='/new-run' element={<ContextForm authToken={AuthToken} />} />
-            <Route path='/data-upload' element={<DataUpload />} />
-            <Route
-              path='/login'
-              element={<LoginPage onLogin={HandleLogin} />}
-            />
-            <Route
-              path='/signup'
-              element={<SignupPage onSignup={HandleSignup} />}
-            />
-            <Route path='*' element={<Page404 />} />
-          </Routes>
-
-        </Row>
-        {/*TODO uncomment when done testing  ) : null}*/}
+        {ServerStatus ? (
+          <Row className='Components'>
+            <Routes>
+              <Route
+                path='/context-form'
+                element={<ContextForm authToken={AuthToken} />}
+              />
+              <Route
+                path='/new-run'
+                element={<ContextForm authToken={AuthToken} />}
+              />
+              <Route path='/data-upload' element={<DataUpload />} />
+              <Route
+                path='/login'
+                element={<LoginPage onLogin={HandleLogin} />}
+              />
+              <Route
+                path='/signup'
+                element={<SignupPage onSignup={HandleSignup} />}
+              />
+              <Route path='*' element={<Page404 />} />
+            </Routes>
+          </Row>
+        ) : null}
       </Container>
       <ErrorModal
         isOpen={IsErrorOpen}
