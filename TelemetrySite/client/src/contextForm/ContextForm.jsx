@@ -22,8 +22,8 @@ import {
 } from "reactstrap";
 import React, { useEffect, useState } from "react";
 
-import ContextJSONIdValues from "./jsonFiles/ContextForm.json";
-import ContextJSONFormElements from "./jsonFiles/FormElementFormat.json";
+import ContextJSONIdValues from "./JsonFiles/ContextForm.json";
+import ContextJSONFormElements from "./JsonFiles/FormElementFormat.json";
 import { useNavigate, useLocation } from "react-router-dom";
 
 import "./ContextForm.css";
