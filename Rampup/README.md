@@ -141,7 +141,9 @@ Admittedly, a non-relational DB is probably a terrible method to manage TODO lis
     3. Your function name SHOULD match the endpoint name and you will want to include the if statements to check each of the methods.
 10. Now comes the actual logic. We will start with the GET.
 11. To turn your server on, cd into the folder with sever.py and run `python .\server.py`
-##### Get Request
+
+#### GET
+
 As stated above, a get request needs to get data (duh), so for our purposes we're going to use it to get all the events the user currently has to do. 
 <br>
 To save yourself a headache later, I would recommend setting up a way to test your queries outside of a server (test.py) so you can easily print the results. To actually establish a connection to the db, checkout `create_db_connection()` in server.py
@@ -189,14 +191,24 @@ Unfortunately, the work isn't done yet. You still have the fun experience of int
 <br>
 This process is often as enjoyable as a 8 am math lecture, but it has to be done
 
-### Putting It All Together
+#### Putting It All Together
 
-On the frontend, we need to start making some fetch calls to the backend for data.
+On the frontend, we need to start making some fetch calls to the backend for data. As part of this, you will have to process each request and decide what to do.
 <br>
-If you don't know what a fetch call is, please refer to [this](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch) website for more info
+If you don't know what a fetch call is, please refer to [this](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch) website for more info.
 <br>
 From here, all you have to do is set it up so the frontend so it will make the correct request to the backend!
 <br>
+This is often the part when you have to completly rewrite your api (Oh JOY)!
+<br>
+But once this is all done, you should have a todo web app that fully functions and can save user information! (Now go post it on linkedin like ever other comp sci major)
+
+### Part 4
+
+Ok, now that you have a basic idea of how to build a web app and an api, lets move on to 
+
+
+## You're all done!
 And with that, you have finished the rampup!
 <br>
 It is now customary to walk up to the current head of the club (Magee) and give them a big hug!
