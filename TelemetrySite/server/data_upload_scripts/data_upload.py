@@ -1,10 +1,10 @@
 from utils import create_db_connection
-
 import cantools
 from asammdf import MDF
 import json
 from more_itertools import sliced
 import gridfs
+import os
 
 parsing_data_progress = [0]
 uploading_data_progress = [0]
@@ -32,8 +32,11 @@ def submit_data(mf4_file, dbc_file, context_data, runOrderNumber):
     context_data = json.loads(context_data)
     
    
-    context_data["event"]["runs"][0]["mf4File"]=fs.put(mf4_file, encoding="utf-8")
-    context_data["event"]["runs"][0]["dbcFile"]=fs.put(dbc_file, encoding="utf-8")
+    with open(mf4_file, "rb") as f:
+        context_data["event"]["runs"][0]["mf4File"] = fs.put(f, filename=os.path.basename(mf4_file))
+
+    with open(dbc_file, "rb") as f:
+        context_data["event"]["runs"][0]["dbcFile"] = fs.put(f, filename=os.path.basename(dbc_file))
     context_data["event"]["runs"][0]["orderNumber"] = runOrderNumber
 
     return(upload_data_in_chunks(context_data, data_values_json))
