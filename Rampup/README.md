@@ -287,7 +287,7 @@ Why would we do that when there is a perfectly good python library to do it for 
 I would recommend looking at `.database.load_file` from cantools and `MDF` from asammdf
 <br>
 
-For your challenge, I want you to use the provided DBC-MF4 file pair to decode the list of messages in the form 
+For your challenge, I want you to use the provided DBC-MF4 file pair to decode the list of messages in the form:
 
 
     {
@@ -304,8 +304,9 @@ For your challenge, I want you to use the provided DBC-MF4 file pair to decode t
      
     },
 
-Save this to a json file and show a member of the database team.
-
+Save the result to a json file and show a member of the database team.
+<br>
+Remember, some CAN messages send multiple pieces of data in a single CAN message and some data is unsigned, so you need to account for that
 
 
 
