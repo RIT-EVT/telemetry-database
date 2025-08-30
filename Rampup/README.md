@@ -4,11 +4,10 @@ The purpose of this document is to walk you through and give you an understandin
 
 By the end of rampup you will have:
 1. Created a new React project.
-2. Gained an understanding of basic front-end development (very basic).
-3. Connected a front-end application to back-end logic.
-4. Implemented a RestAPI to standardize interactions between front and back-end components.
-5. Dissected .MF4 files using .DBC files (Don't worry I don't know what they stand for either)
-6. Manipulated data from Controller Area Network (CAN) messages (it is less scary than it sounds I promise)
+2. Connected a front-end application to back-end logic.
+3. Implemented a RestAPI to standardize interactions between front and back-end components.
+4. Dissected .MF4 files using .DBC files (Don't worry I don't know what they stand for either)
+5. Manipulated data from Controller Area Network (CAN) messages (it is less scary than it sounds I promise)
 
 This is a basic idea of the things we do here and after you have completed the tasks described below you should be ready for anything the DB team throws at you.<br>
 Or at least equally as ready as anyone else...<br>
@@ -199,14 +198,22 @@ If you don't know what a fetch call is, please refer to [this](https://developer
 <br>
 From here, all you have to do is set it up so the frontend so it will make the correct request to the backend!
 <br>
-This is often the part when you have to completly rewrite your api (Oh JOY)!
+This is often the part when you have to completely rewrite your api (Oh JOY)!
 <br>
-But once this is all done, you should have a todo web app that fully functions and can save user information! (Now go post it on linkedin like ever other comp sci major)
+But once this is all done, you should have a todo web app that fully functions and can save user information! (Now go post it on linkedin like ever other web dev)
 
 ### Part 4
 
-Ok, now that you have a basic idea of how to build a web app and an api, lets move on to 
+Ok, now that you have a basic idea of how to build a web app and an api, lets move on to how we do our main job... decoding CAN messages!
 
+#### What Is CAN?
+Controller Area Network (CAN) is a communication protocol used by most automotive vehicles, including ours. 
+<br>
+Before CAN, each electric component was connect to each other via individual wires and used different communications protocols. Picture a spaghetti of wires that is different for every vehicle. PURE CHAOS!
+<br>
+Now picture the beauty of CAN, one high wire and one low wire connecting all the devices onto one network!
+
+![image](https://blog.seeedstudio.com/wp-content/uploads/2019/11/image-158.png)
 
 ## You're all done!
 And with that, you have finished the rampup!
