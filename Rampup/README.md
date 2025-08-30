@@ -215,6 +215,64 @@ Now picture the beauty of CAN, one high wire and one low wire connecting all the
 
 ![image](https://blog.seeedstudio.com/wp-content/uploads/2019/11/image-158.png)
 
+<br>
+Don't worry why there is a 120 Ohm resistor, no one knows why it exists. It just does.
+<br>
+
+#### How Does CANA Function?
+
+So CAN allows for communication, but how does it actually function?
+<br>
+In the case of our bikes, we use CAN to communicate between our boards. Since you are a part of our database team, you should be familiar with the boards we are collecting data on. As of writing this documentation, we have 5 (6?) things we are collecting data from (you'll understand the 6 in a second).
+
+1. BMS - Battery Management System
+<br>Controls the battery and reports voltage data 
+
+2. TMS - Thermal Management System
+<br>Controls our cooling loop and temperature monitors
+
+3. TMU - Thermocouple Measurement Unit
+<br>Reporting temperature data from thermocouples around the bike
+
+4. PVC - Powertrain Voltage Controller
+<br>Controls high voltage discharge from battery (ON/OFF)
+
+5. MC - Motor Controller
+<br>Controls the motor (duh) and describes power draw and torque output.
+
+6. IMU - Inertial Management Unit (?)
+<br>Measures things like acceleration and rotation. Some of our bikes have it and some don't. As a team, we may remove it as well
+
+<br>
+<br>
+To communicate, each board sends a CAN frame, which sounds fancy, but its just a special order of bits (Don't worry, you won't need to interact with these directly). All CAN frames are saved by our bike and are exported to a .mf4 file for us to read after
+<br>
+We only care about a few sections of the CAN frame.
+<br>
+
+1. Time
+<br>How many seconds have passed since the bike started
+2. Signal
+<br>Name of the message/type (Pack_1_Voltage, Pack_1_Temp, etc)
+3. CanId
+<br>Unique id for each message type
+4. Data 
+<br>Value sent. Each can message can send up to 8 bytes/64 bits of data 
+
+<br>
+<br>
+This sounds super simple right? Well, you're partially right. There is another piece to this puzzle that we haven't talked about yet. 
+<br>
+
+#### DBC Files
+A DBC file is a fancy little file that tells both the bike and people how to decode different CAN frames. As part of making CAN frames more efficient, they can patrician parts of the bits of their data for certain things. For example, the TMU will send one message, where the first 2 bytes are Temp_0, second 2 bytes are Temp_1, third 2 bytes are Temp_2, and fourth 2 bytes are Temp_3. 
+<br>
+<br>
+The DBC files describes how each CAN frame is formatted, whether the data is signed or unsigned, and which board is sending the message. 
+<br>
+The good news is, this process is made fairly simple for us.
+
+
 ## You're all done!
 And with that, you have finished the rampup!
 <br>
