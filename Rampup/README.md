@@ -270,7 +270,43 @@ A DBC file is a fancy little file that tells both the bike and people how to dec
 <br>
 The DBC files describes how each CAN frame is formatted, whether the data is signed or unsigned, and which board is sending the message. 
 <br>
-The good news is, this process is made fairly simple for us.
+The good news is, this process is made fairly simple for us. We'll talk about how we do this in the next section
+
+#### Decoding Time!
+
+If I were really evil, I would make you do what we originally did at the beginning of the life of this db. You'd have to decide a mf4 file by looking at the individual bits of data, figure out how to organize them for a SQL database, and how to decode the DBC file.
+
+<br>
+<b>BUT...</b>
+<br>
+
+Why would we do that when there is a perfectly good python library to do it for us!
+<br>
+[asammdf](https://asammdf.readthedocs.io/en/latest/) is the industry standard for doing anything with automotive measurement data and [cantools](https://github.com/cantools/cantools) is my personal preference for decoding the dbc file
+
+I would recommend looking at `.database.load_file` from cantools and `MDF` from asammdf
+<br>
+
+For your challenge, I want you to use the provided DBC-MF4 file pair to decode the list of messages in the form 
+
+
+    {
+
+        "time": xxx,
+
+        "signal": xxx,
+
+        "canID": xxx,
+
+        "data": xxx,
+
+        "board": xxx,
+     
+    },
+
+Save this to a json file and show a member of the database team.
+
+
 
 
 ## You're all done!
