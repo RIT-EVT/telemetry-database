@@ -173,10 +173,9 @@ Per normal comp sci practices, we almost always want to keep all data we are giv
 4. Save task and return 200 code
 
 #### DELETE
-For this part, we are going to violate the comp sci practice we followed above. 
+For this part, we are going to violate the comp sci practice we followed above and actually delete data from the database. 
 <br>
-Mainly because you should know how to delete something from a mongo db.  
-But pls pls pls, don't just delete data from our db 😨
+We're doing this since you should know how to delete something from a mongo db, but pls pls pls, don't just delete data from our db 😨
 
 1. Create endpoint (last time for now)
 2. Identify target for deletion
