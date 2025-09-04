@@ -53,12 +53,13 @@ You can chose to follow what is written on this page or you can follow the offic
 7. Click the copy button and return to your command line.
 8. In the cmd write the following: `git clone ` then paste the copied text and hit enter.
 9. Congrats you have cloned the repo. At this point it is customary to stand up, raise your hands above your head and say "I have cloned the repo!"
-10. Now create and enter a folder named rampup. If you do not do this it will definitely break things...
-11. Run the following command `npx create-react-app rampup-client`. This will create a new react folder called rampup-client and should take a little while sit back and chat with your neighbor if they don't smell too bad.
-12. In the cmd write the following: `npm install reactstrap react react-dom` This will install the npm dependencies we use for development. This can take a while. When it tells you we have vulnerabilities... no we don't (don't worry about it these are expected).
-13. Next run this command `npm install --save bootstrap`.
-14. In the new rampup-client folder navigate to the index.js file and add this to the top with the other imports `import 'bootstrap/dist/css/bootstrap.min.css'`
-15. You have officially set up your react project, great job! Similar to before you may now stand up, raise both hands once more and say "I have finished Part 1 of rampup!" and someone will come over to check your work.
+10. Before we go any further, lets setup your local branch, in your console, type `git checkout rampup` followed by `git branch my_special_project`. One more step, type `git checkout my_special_project`.
+11. Now create and enter a folder named rampup. If you do not do this it will definitely break things... (You can make this wherever you want, but I would recommend entering the Rampup folder first)
+12. Run the following command `npx create-react-app rampup-client`. This will create a new react folder called rampup-client and should take a little while sit back and chat with your neighbor if they don't smell too bad.
+13. In the cmd write the following: `npm install reactstrap react react-dom` This will install the npm dependencies we use for development. This can take a while. When it tells you we have vulnerabilities... no we don't (don't worry about it these are expected).
+14. Next run this command `npm install --save bootstrap`.
+15. In the new rampup-client folder navigate to the index.js file and add this to the top with the other imports `import 'bootstrap/dist/css/bootstrap.min.css'`
+16. You have officially set up your react project, great job! Similar to before you may now stand up, raise both hands once more and say "I have finished Part 1 of rampup!" and someone will come over to check your work.
 
 ### Part 2
 #### Starting off
@@ -274,7 +275,7 @@ The good news is, this process is made fairly simple for us. We'll talk about ho
 
 #### Decoding Time!
 
-If I were really evil, I would make you do what we originally did at the beginning of the life of this db. You'd have to decide a mf4 file by looking at the individual bits of data, figure out how to organize them for a SQL database, and how to decode the DBC file.
+If I were really evil, I would make you do what we originally did at the beginning of the life of this db. You'd have to decode a mf4 file by looking at the individual bits of data, figure out how to organize them for a SQL database (this was the original plan), and how to decode the DBC file.
 
 <br>
 <b>BUT...</b>
@@ -284,10 +285,17 @@ Why would we do that when there is a perfectly good python library to do it for 
 <br>
 [asammdf](https://asammdf.readthedocs.io/en/latest/) is the industry standard for doing anything with automotive measurement data and [cantools](https://github.com/cantools/cantools) is my personal preference for decoding the dbc file
 
-I would recommend looking at `.database.load_file` from cantools and `MDF` from asammdf
+I would recommend looking at `.database.load_file` from cantools and `MDF` from asammdf.
 <br>
 
-For your challenge, I want you to use the provided DBC-MF4 file pair to decode the list of messages in the form:
+Once you have figured out how to read data, now we get to play with it.
+
+### Part 4
+
+This section is short (I promise).
+<br>
+
+For your challenge, I want you to use the decoded data you generated, and parse the list of messages in the form:
 
 
     {
@@ -306,14 +314,13 @@ For your challenge, I want you to use the provided DBC-MF4 file pair to decode t
 
 Save the result to a json file and show a member of the database team.
 <br>
-Remember, some CAN messages send multiple pieces of data in a single CAN message and some data is unsigned, so you need to account for that
-
+Remember, some CAN messages send multiple pieces of data in a single CAN message and some data is unsigned, so you need to account for that. If you want more information about what this means, talk to the super cool lead of the Database team for more info.
 
 
 ## You're all done!
 And with that, you have finished the rampup!
 <br>
-It is now customary to walk up to the current head of the club (Magee) and give them a big hug!
+It is now customary to walk up to the current head of the club (Magee) and give him a big hug! It is heavily preferred that he's busy when you do this, so don't worry if it looks like he's in an important meeting.
 <br>
 Just make sure you get checkoff and you're officially ready to start adding your own special touch to our beautiful database.
 
