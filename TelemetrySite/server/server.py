@@ -32,7 +32,7 @@ app.add_url_rule("/ConfigData/<auth_token>", view_func = user_view, methods=["GE
 user_view = UserAuthApi.as_view("UserAuthApi")
 
 app.add_url_rule("/Login", view_func=user_view, methods=["POST"])
-
+file_path = os.path.dirname(__file__)
 ## Get all the url paths
 #
 # @return JSON file of path values
@@ -40,7 +40,7 @@ app.add_url_rule("/Login", view_func=user_view, methods=["POST"])
 def MainContext():
     # Open the JSON file and load its contents
     try:
-        with open("ServerPaths.json", "r") as json_file:
+        with open(os.path.join(file_path, "ServerPaths.json"), "r") as json_file:
             data = json.load(json_file)
         return jsonify(data), 200
     except FileNotFoundError:
@@ -52,7 +52,8 @@ def MainContext():
 if __name__ == "__main__":
     # credential file exists two levels up
     # from the current file
-    two_up = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+    
+    two_up = os.path.dirname(os.path.dirname(file_path))
     dotenv.load_dotenv(two_up + "/credentials.env")
     print("Starting flask")
 
