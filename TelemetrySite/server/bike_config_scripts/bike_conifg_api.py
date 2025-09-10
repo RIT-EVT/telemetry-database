@@ -32,7 +32,7 @@ class BikeConfigApi(MethodView):
         
         if config_data:
             config_data["_id"] = str(config_data["_id"])  # Convert ObjectId to string
-        
+
         return jsonify({"data":config_data}), 200
     
     def post(self, auth_token):

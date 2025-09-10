@@ -120,7 +120,6 @@ function ContextForm(props) {
         SetFormElements((prev) => ({ ...prev, [configName]: formElement }));
       }
     } else if (newConfigName !== "") {
-      // Get the pre saved values for the config
       const targetConfig = DropDownOptions[configName].find(
         (savedNames) => savedNames[configName + "SavedName"] === newConfigName
       );
@@ -130,11 +129,11 @@ function ContextForm(props) {
       if (configName === "bike") {
         // Parse the dictionary targetConfig into an array of [key, data] for easier looping
         for (const configEntry of Object.entries(targetConfig)) {
-          // Sprate the key and value
+          // Separate the key and value
           const configKey = configEntry[0];
           const configValue = configEntry[1];
           if (configKey in DropDowns) {
-            HandleConfigFormChange(configValue, configKey);
+            HandleConfigFormChange(configKey, configValue);
           }
         }
 
@@ -218,10 +217,10 @@ function ContextForm(props) {
     // will never throw an error but may have the value of null if they are not required to be filled out
     const collectedData = {
       event: {
-        name: EventContextForm[0].value,
-        date: EventContextForm[1].value,
-        type: EventContextForm[2].value,
-        location: EventContextForm[3].value,
+        name: document.getElementById(contextValues.event.eventName).value,
+        date: document.getElementById(contextValues.event.eventDate).value,
+        type: document.getElementById(contextValues.event.eventType).value,
+        location: document.getElementById(contextValues.event.location).value,
         runs: [
           {
             //this number may be updated by the backend if this is not the first run
@@ -398,7 +397,7 @@ function ContextForm(props) {
       .slice(0, 16);
 
     document.getElementById("bikeSelect").value = "TEST_BIKE";
-    HandleConfigFormChange("TEST_BIKE", "bike");
+    HandleConfigFormChange("bike", "TEST_BIKE");
   }
 
   /**
@@ -439,7 +438,9 @@ function ContextForm(props) {
     if (location.pathname === "/new-run") {
       var eventData;
 
-      if ((eventData = JSON.parse(sessionStorage.getItem("EventData"))) !== null) {
+      if (
+        (eventData = JSON.parse(sessionStorage.getItem("EventData"))) !== null
+      ) {
         SetEventData(eventData);
       } else {
         console.error("Data for event was unsaved");
