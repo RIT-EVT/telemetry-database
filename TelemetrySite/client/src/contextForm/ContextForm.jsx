@@ -217,10 +217,11 @@ function ContextForm(props) {
     // will never throw an error but may have the value of null if they are not required to be filled out
     const collectedData = {
       event: {
-        name: document.getElementById(contextValues.event.eventName).value,
-        date: document.getElementById(contextValues.event.eventDate).value,
-        type: document.getElementById(contextValues.event.eventType).value,
-        location: document.getElementById(contextValues.event.location).value,
+        name: document.getElementById(ContextJSONIdValues.event.name).value,
+        date: document.getElementById(ContextJSONIdValues.event.date).value,
+        type: document.getElementById(ContextJSONIdValues.event.type).value,
+        location: document.getElementById(ContextJSONIdValues.event.location)
+          .value,
         runs: [
           {
             //this number may be updated by the backend if this is not the first run

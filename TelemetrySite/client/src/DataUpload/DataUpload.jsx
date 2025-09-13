@@ -40,7 +40,7 @@ function DataUpload() {
     sessionStorage.setItem("DataSubmitted", false);
     sessionStorage.removeItem("BikeData");
     navigate(url);
-  };
+  }
 
   function DisplayRedirect() {
     setBodyDisplay(
@@ -69,7 +69,7 @@ function DataUpload() {
         </Col>
       </Container>
     );
-  };
+  }
 
   /**
    * Submit the current file selected by the user.
@@ -130,7 +130,7 @@ function DataUpload() {
           const jsonResponse = await response.json();
           console.error(
             "Error occurred on server side. Error message: " +
-            jsonResponse.error
+              jsonResponse.error
           );
           return false;
         }
@@ -265,7 +265,7 @@ function DataUpload() {
         DisplayRedirect();
       }
     });
-  };
+  }
 
   useEffect(() => {
     //make sure a refresh doesn't make the user resubmit data
