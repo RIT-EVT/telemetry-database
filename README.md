@@ -43,19 +43,7 @@ In the very near future, we will have a dedicated RIT website for uploading data
 
 The documentation for this system will be provided anywhere I can put it but I would like for this readme to have everything we could ever want or need.<br>
 <br>
-This should at **minimum** include the Entity Relationship(ER) Diagram, Data Definition Language(DDL) Diagram, and the Reduction to Tables document.<br>
-<br>
-To the poor soul who takes my place; I beg of you, keep this up to date. It will be so much cooler when I put it on my resume and show it to future employers.<br>
-<br>
-
-Entity Relationship Diagram:<br>
-I want to move this off of Lucid Chart but for now there it shall lie.<br>
-[Entity Relationship Diagram](https://lucid.app/lucidchart/ff611a92-9484-4606-a11d-d142f54ee428/edit?viewport_loc=-2095%2C-830%2C4919%2C2456%2CMMHz0DLYv6yU&invitationId=inv_5c98f0bf-e268-4e23-afe7-0b5b771f8459)<br>
-
-[Reduction to Tables](https://docs.google.com/document/d/1Dq0fAyz-GOTDRLL4TS9-DYxf0agS83yGcmjXoaB-jjU/edit?usp=sharing)<br>
-
-[Software Design Document](https://docs.google.com/document/d/1QV6rSz8Uj5yaqdDihSC-XkMlvNX5aUmDrTravnWL-ts/edit?usp=sharing)<br>
-
+This should, at minimum, include a diagram/document detailing how our data will look in our database.
 
 
 
@@ -63,14 +51,16 @@ I want to move this off of Lucid Chart but for now there it shall lie.<br>
 
 The script which is responsible for streaming the raw CAN data into the database.<br>
 
-Currently to use the script run main and when prompted input the path to the .mf4 file you want to have uploaded.<br>
+Currently, our backend has the ability to take in data, process it, then upload it to our database.
 
-As we do not have means to collect context data yet, we use a dummy context with an id of 1. This is gross and bad. We will be removing that as soon as we have a way to query the user for context data.<br>
+<br>
 
 
 ## Accessing Data
 
-As of right now, we have no established way to interact with the data. Eventually, we are going to create a system to streamline the process of accessing the data, but for now you can read data by making queries directly to the database in python.
+Data access is currently done via direct queries to the database, mostly done via python. The good news about working with a MongoDB is that we get to use pyplot to display any data we want!
+
+Before too long, the database team is going to make a custom application to allow for smooth data access, but that is at least two semester down the line.
 
 
 ## Web UI 

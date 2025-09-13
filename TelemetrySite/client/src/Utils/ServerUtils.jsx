@@ -37,24 +37,25 @@ const resetRunOrderNumber = () => {
  */
 const CheckServerStatus = async () => {
   try {
-    return await fetch(BASE_URL + "/")
-      .then((response) => response.json())
-      .then((data) => {
-        ServerCalls = data;
+    const response = await fetch(BASE_URL + "/", { method: "GET" });
 
-        return true;
-      })
-      .catch(() => {
-        return false;
-      });
-  } catch {
-    //if there is an error
+    // If server responds but status is not 200-299
+    if (!response.ok) {
+      return false;
+    }
+
+    const data = await response.json();
+    ServerCalls = data;
+    return true;
+
+  } catch (error) {
+    // This runs if the server is offline or network request fails
     return false;
   }
 };
 
 /**
- * Check if the server us active
+ * Check if the server is active
  *
  * @return {Boolean} If the server is online
  */

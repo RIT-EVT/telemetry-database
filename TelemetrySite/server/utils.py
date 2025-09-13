@@ -1,16 +1,17 @@
 from pymongo import MongoClient
 from os import getenv
 from urllib import parse
-from cryptography.fernet import Fernet
 from datetime import datetime
 from secrets import token_urlsafe
 from bson import ObjectId
 
-
-## Create a connection to the Mongo DB
-#
-# @return db connection object
 def create_db_connection():
+    """
+        Create a connection to the database
+
+    Returns:
+        Database: Database connection
+    """
     connection_string = "mongodb://" + parse.quote_plus(str(getenv("MDB_USER"))) + ":" + parse.quote_plus(str(getenv("MDB_PASSWORD")))  + "@" + str(getenv("HOST")) + ":" + str(getenv("MDB_PORT"))
     mongo_client = MongoClient(
         connection_string,
@@ -23,6 +24,12 @@ def create_db_connection():
     return db_access
 
 def create_auth_token():
+    """
+        Generate a 32 byte long auth token
+
+    Returns:
+        string: Auth token
+    """
     user_db_connection = create_db_connection()["users"]
 
     auth_token=token_urlsafe(32)
@@ -36,12 +43,17 @@ def create_auth_token():
             
     return auth_token
 
-## Make sure the user passes a valid auth_token that exists in the db
-# In essence, make sure the user has logged in 
-#
-# @param auth_token token to query against the db
-# @return bool if the auth_token exists
 def authenticate_user(auth_token):
+    """
+        Make sure the user passes a valid auth_token that exists in the db.
+        In essence, make sure the user has logged in 
+
+    Args:
+        auth_token (String): Auth token to check
+
+    Returns:
+        Boolean: If the auth token is valid
+    """
     
     # Query the db to see if the user's token is on it
     # If it is then allow the operation to continue
@@ -50,12 +62,17 @@ def authenticate_user(auth_token):
     auth_token=convert_to_int(auth_token)
     return (auth_connection.find_one({"auth_token":auth_token})!=None)
 
-## Check if the user's auth session has expired
-#
-# @param auth_time time the user's auth session started
-# @return bool if too much time has passed since it was created
 def check_expired_tokens(auth_token):
-    print("checking expired token")
+    """
+        Check if the user's token is expired
+
+    Args:
+        auth_token (String): User's auth token to check
+
+    Returns:
+        Boolean: If the user's session is expired
+    """
+    
     auth_connection = create_db_connection()["users"]
     auth_token=convert_to_int(auth_token)
     auth_time = auth_connection.find_one({"auth_token":auth_token})["auth_time"]
@@ -64,8 +81,16 @@ def check_expired_tokens(auth_token):
     
     return (days>1)
 
-
 def update_expired_token(document_id):
+    """
+        Generate a new token for the user if its expired
+
+    Args:
+        document_id (String): Id for the document
+
+    Returns:
+        String: Updated auth token
+    """
     
     new_auth_token = create_auth_token()
     auth_connection = create_db_connection()["users"]

@@ -8,3 +8,6 @@
 /.vscode
 __pycache__/
 data_upload_file/
+*.crt
+*.pem
+/.pytest_cache

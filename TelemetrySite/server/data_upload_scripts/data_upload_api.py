@@ -15,10 +15,17 @@ class DataUploadApi(MethodView):
         if not os.path.exists(self.UPLOAD_FOLDER):
             os.makedirs(self.UPLOAD_FOLDER)
 
-    ## Get the current progress of the
-    #  current data upload action
+ 
     def get(self, auth_token):
-        
+        """
+            Get the current progress of a data upload
+
+        Args:
+            auth_token (string): The user's unique authentication string
+
+        Returns:
+            tuple: Progress value
+        """
         if not authenticate_user(auth_token):
             return jsonify({"authError":"unauthenticated user"}), 400
         elif check_expired_tokens(auth_token):
@@ -26,8 +33,16 @@ class DataUploadApi(MethodView):
         
         return jsonify(get_progress()), 200
 
-    ## Take in a mf4, dbc, and json object for the run and submit to nrdb
     def post(self, auth_token):
+        """
+            Decode incoming MF4 and DBC file and add the results to the DB
+
+        Args:
+            auth_token (string): The user's unique authentication string
+
+        Returns:
+            tuple: success message
+        """
         
         if not authenticate_user(auth_token):
             return jsonify({"authError":"unauthenticated user"}), 400
@@ -85,12 +100,16 @@ class DataUploadApi(MethodView):
                 400,
             )
 
-    ## Ensure the uploaded file types match the expected files
-    #
-    # @param self instance of the object
-    # @param filename name of the file to check
-    # @return boolean of if the name matches
     def file_type_check(self, filename):
+        """
+        Verify the the files are valid types
+
+        Args:
+            filename (string): File name to check
+
+        Returns:
+            boolean: If the file type is valid
+        """
         return (
             "." in filename
             and filename.rsplit(".", 1)[1].lower() in self.ALLOWED_EXTENSIONS
