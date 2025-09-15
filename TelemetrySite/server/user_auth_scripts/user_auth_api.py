@@ -9,13 +9,10 @@ from datetime import datetime
 class UserAuthApi(MethodView):   
    
     def post(self):
-        
         user_data = request.get_json()
         
         user_db_connection = create_db_connection()["users"]
-    
         if user_data.get("action")=="login":
-            
             # Check the username and password against the db to make sure the user
             # exists and they are who they say they are. Return auth token if the 
             # values are correct, otherwise return an invalid user error
@@ -27,13 +24,12 @@ class UserAuthApi(MethodView):
           
         
             if mongo_data == None:
-                return jsonify({"error":"Invalid username or password"}), 404        
+                return {"error":"Invalid username or password"}, 404        
             else:
                 auth_token = mongo_data["auth_token"]
-                
                 # always update auth token on login
                 auth_token = update_expired_token(mongo_data["_id"])
-                return jsonify({"auth_token": auth_token}), 200
+                return {"auth_token": auth_token}, 200
             
         elif user_data.get("action") == "signup":
             
@@ -59,7 +55,7 @@ class UserAuthApi(MethodView):
                 user_db_connection.insert_one({"username" : username, "password" : password.encode(),
                                                "auth_token" : auth_token, "auth_time" : current_date_time})
                 
-                return jsonify({"auth_token":auth_token}), 200
+                return {"auth_token":auth_token}, 200
                     
             
-        return jsonify({"error":"Code reached the end of the call"}), 400
+        return {"error":"Code reached the end of the call"}, 400

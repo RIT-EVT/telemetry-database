@@ -45,11 +45,6 @@ def create_app():
 
 
 if __name__ == "__main__":
-    # credential file exists two levels up
-    # from the current file
-    
-    two_up = os.path.dirname(os.path.dirname(file_path))
-    dotenv.load_dotenv(two_up + "/credentials.env")
     print("Starting flask")
     app = create_app()
     app.run(debug=True)

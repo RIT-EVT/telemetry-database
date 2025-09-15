@@ -22,10 +22,10 @@ class BikeConfigApi(MethodView):
         
         if not authenticate_user(auth_token):
             return jsonify({"authError":"unauthenticated user"}), 400
-        elif utils.check_expired_tokens(auth_token):
+        elif check_expired_tokens(auth_token):
             return jsonify({"authError":"expired user token"}), 400
 
-        db_connection = utils.create_db_connection()["configs"]
+        db_connection = create_db_connection()["configs"]
 
         config_data = db_connection.find_one({"_id":ObjectId(self.BIKE_CONFIG_DOC)})
 
@@ -45,12 +45,12 @@ class BikeConfigApi(MethodView):
             tuple: success message
         """
         
-        if not utils.authenticate_user(auth_token):
+        if not authenticate_user(auth_token):
             return jsonify({"authError":"unauthenticated user"}), 400
-        elif utils.check_expired_tokens(auth_token):
+        elif check_expired_tokens(auth_token):
             return jsonify({"authError":"expired user token"}), 400
         
-        db_connection = utils.create_db_connection()["configs"]
+        db_connection = create_db_connection()["configs"]
         config_data = request.form["configData"]
     
         config_data = json.loads(config_data)
