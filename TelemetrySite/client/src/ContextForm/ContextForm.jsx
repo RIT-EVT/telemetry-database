@@ -16,10 +16,9 @@ import {
   CardBody,
   Container,
 } from "reactstrap";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 
 import ContextJSONIdValues from "./JsonFiles/ContextForm.json";
-import ContextJSONFormElements from "./JsonFiles/FormElementFormat.json";
 import { useNavigate, useLocation } from "react-router-dom";
 import DynamicForm from "./DynamicForm";
 import SelectCreator from "./SelectorCreator";
@@ -84,7 +83,9 @@ function ContextForm(props) {
   /**
    * All possible config types
    */
-  let ConfigName = ["bms", "imu", "tmu", "tms", "pvc", "mc", "bike"];
+  let ConfigName = useMemo(() => {
+    return ["bms", "imu", "tmu", "tms", "pvc", "mc", "bike"];
+  }, []);
 
   let navigate = useNavigate();
   let location = useLocation();
@@ -110,45 +111,48 @@ function ContextForm(props) {
    * @param {string} configName - name of config being updated
    * @param {formElement.event} newConfigName - event that occurred to the select element
    */
-  async function HandleConfigFormChange(configName, newConfigName) {
-    HandleConfigSelectChange(configName, newConfigName);
+  const HandleConfigFormChange = useCallback(
+    async (configName, newConfigName) => {
+      HandleConfigSelectChange(configName, newConfigName);
 
-    if (newConfigName === "Custom") {
-      const formElement = DynamicForm(`${configName}Config`);
-      if (configName === "bike") {
-        SetBikeForm(formElement);
-      } else {
-        SetFormElements((prev) => ({ ...prev, [configName]: formElement }));
-      }
-    } else if (newConfigName !== "") {
-      const targetConfig = DropDownOptions[configName].find(
-        (savedNames) => savedNames[configName + "SavedName"] === newConfigName
-      );
-      // Generate the new form and pass in values to assign
-      const formElement = DynamicForm(`${configName}Config`, targetConfig);
-      // If the saved name is a bike, we also need to fill in all the board configs
-      if (configName === "bike") {
-        // Parse the dictionary targetConfig into an array of [key, data] for easier looping
-        for (const configEntry of Object.entries(targetConfig)) {
-          // Separate the key and value
-          const configKey = configEntry[0];
-          const configValue = configEntry[1];
-          if (configKey in DropDowns) {
-            HandleConfigFormChange(configKey, configValue);
-          }
+      if (newConfigName === "Custom") {
+        const formElement = DynamicForm(`${configName}Config`);
+        if (configName === "bike") {
+          SetBikeForm(formElement);
+        } else {
+          SetFormElements((prev) => ({ ...prev, [configName]: formElement }));
         }
+      } else if (newConfigName !== "") {
+        const targetConfig = DropDownOptions[configName].find(
+          (savedNames) => savedNames[configName + "SavedName"] === newConfigName
+        );
+        // Generate the new form and pass in values to assign
+        const formElement = DynamicForm(`${configName}Config`, targetConfig);
+        // If the saved name is a bike, we also need to fill in all the board configs
+        if (configName === "bike") {
+          // Parse the dictionary targetConfig into an array of [key, data] for easier looping
+          for (const configEntry of Object.entries(targetConfig)) {
+            // Separate the key and value
+            const configKey = configEntry[0];
+            const configValue = configEntry[1];
+            if (configKey in DropDowns) {
+              HandleConfigFormChange(configKey, configValue);
+            }
+          }
 
-        SetBikeForm(formElement);
-      } else {
-        SetFormElements((prev) => ({ ...prev, [configName]: formElement }));
+          SetBikeForm(formElement);
+        } else {
+          SetFormElements((prev) => ({ ...prev, [configName]: formElement }));
+        }
       }
-    }
-  }
+    },
+    [DropDownOptions, DropDowns]
+  );
 
   /**
    * Get all the saved configs from the backend
    */
-  async function GetConfigData() {
+  const GetConfigData = useMemo(async () => {
     try {
       const response = await fetch(
         BuildURI("config_data") + "/" + props.authToken,
@@ -168,7 +172,7 @@ function ContextForm(props) {
     }
 
     return null;
-  }
+  }, [props.authToken]);
 
   /**
    * Post the saved conifg data to the backend
@@ -362,10 +366,10 @@ function ContextForm(props) {
    * Called to initialize Main Body and Event
    * form elements.
    */
-  function InitializeForms() {
+  const InitializeForms = useCallback(() => {
     SetContextForm(DynamicForm("mainBody"));
     SetEventForm(DynamicForm("event", EventData ? EventData : null));
-  }
+  }, [EventData]);
 
   /**
    * Auto complete the data field
@@ -425,13 +429,21 @@ function ContextForm(props) {
     });
 
     InitializeForms();
-  }, [DropDownOptions, EventData, BikeContextForm]);
+  }, [
+    DropDownOptions,
+    EventData,
+    BikeContextForm,
+    ConfigName,
+    ConfigSelectedValue,
+    HandleConfigFormChange,
+    InitializeForms,
+  ]);
   /**
    * Fetch all the saved configs on the first load
    * and check if this is a new run
    */
   useEffect(() => {
-    GetConfigData().then((response) => {
+    GetConfigData.then((response) => {
       if (response && "data" in response && "config_data" in response["data"]) {
         SetDropdownOptions(response.data.config_data);
       }
@@ -451,7 +463,7 @@ function ContextForm(props) {
       //ensure no data leaks from past runs
       sessionStorage.removeItem("EventData");
     }
-  }, [location.pathname]);
+  }, [location.pathname, GetConfigData]);
   return (
     <Form
       className='ContextForm'
@@ -496,7 +508,7 @@ function ContextForm(props) {
         {BikeContextForm
           ? ConfigName.map((name) => {
               if (name === "bike") {
-                return;
+                return <div></div>;
               }
               return (
                 <Card className='grid-item'>
