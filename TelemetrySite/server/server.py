@@ -14,29 +14,33 @@ api = Api(app)  # API router
 CORS(app)
 log = logging.getLogger('werkzeug')
 
+# credential file exists two levels up from the current file
+two_up = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+dotenv.load_dotenv(two_up + "/credentials.env")
+
 # create views for url rules
 
 user_view = DataUploadApi.as_view("DateUploadApi")
 
 
 app.add_url_rule(
-    "/DataUpload/<auth_token>",
+    "/api/DataUpload/<auth_token>",
     view_func=user_view,
     methods=["GET", "POST"],
 )
 
 user_view =BikeConfigApi.as_view("BikeConfigApi")
 
-app.add_url_rule("/ConfigData/<auth_token>", view_func = user_view, methods=["GET", "POST", "DELETE"])
+app.add_url_rule("/api/ConfigData/<auth_token>", view_func = user_view, methods=["GET", "POST", "DELETE"])
 
 user_view = UserAuthApi.as_view("UserAuthApi")
 
-app.add_url_rule("/Login", view_func=user_view, methods=["POST"])
+app.add_url_rule("/api/Login", view_func=user_view, methods=["POST"])
 
 ## Get all the url paths
 #
 # @return JSON file of path values
-@app.route("/")
+@app.route("/api/")
 def MainContext():
     # Open the JSON file and load its contents
     try:
@@ -49,12 +53,8 @@ def MainContext():
         return jsonify({"error": "Error decoding JSON"}), 500
 
 
-if __name__ == "__main__":
-    # credential file exists two levels up
-    # from the current file
-    two_up = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-    dotenv.load_dotenv(two_up + "/credentials.env")
-    dotenv.load_dotenv(two_up+"/encryption.env")
-    print("Starting flask")
 
-    app.run(debug=True)  # Starts Flask
+
+if __name__ == "__main__":
+    # Only run Flask's dev server when starting manually:
+    app.run(host="127.0.0.1", port=5000, debug=True)
