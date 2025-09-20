@@ -6,7 +6,7 @@
  */
 var ServerCalls = {};
 
-let BASE_URL = "http://127.0.0.1:5000";
+let BASE_URL = "http://129.21.157.17/api";
 
 let RunOrderNumber = 0;
 
