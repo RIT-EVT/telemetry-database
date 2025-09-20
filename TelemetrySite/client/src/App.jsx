@@ -4,61 +4,81 @@ import DataUpload from "./DataUpload/DataUpload.jsx";
 import { LoginPage, SignupPage } from "LoginPage/LoginPage.jsx";
 import "./App.css";
 import Page404 from "./404/404.jsx";
-import { useEffect, useState } from "react";
-import { Container, Row, Col } from "reactstrap";
+import { useEffect, useState, useCallback } from "react";
+import { Container, Row } from "reactstrap";
 import { useNavigate, useLocation } from "react-router-dom";
 import { CheckServerStatus } from "Utils/ServerUtils.jsx";
+import ErrorModal from "Modal/Error/Error.jsx";
+import Header from "./Header/Header.jsx";
+
+/**
+ * Render the main application and contain all the logic for what to display
+ */
 function App() {
-  const [ServerStatus, setStatus] = useState(false);
+  const [ServerStatus, SetStatus] = useState(false);
+
+  const [IsErrorOpen, SetIsErrorOpen] = useState(false);
+  const [ErrorMsg, SetErrorMsg] = useState("");
+  // Allow the user to ignore server error
+  // Mostly for testing reasons
+  const [IgnoreError, SetIgnoreError] = useState(false);
+
   const location = useLocation();
   const navigate = useNavigate();
-  const [authToken, setToken] = useState(null);
+  const [AuthToken, SetToken] = useState(null);
 
-  const handleLogin = (loginData) => {
-    setToken(loginData);
+  function HandleLogin(loginData) {
+    SetToken(loginData);
     sessionStorage.setItem("authToken", loginData);
     navigate("/context-form");
-  };
+  }
 
-  const handleSignup = (signupData) => {
-    setToken(signupData);
+  function HandleSignup(signupData) {
+    SetToken(signupData);
     sessionStorage.setItem("authToken", signupData);
     navigate("/context-form");
-  };
+  }
 
-  const handleSignout = () => {
+  function HandleSignout() {
     sessionStorage.removeItem("authToken");
-    setToken(null);
+    SetToken(null);
     navigate("/login");
-  };
+  }
 
   /**
-   * Call to the backend and ensure the server is online
+   * Call to the backend and ensure the server is online.
    */
-  const CheckBackendConnection = () => {
-    CheckServerStatus().then((response) => {
-      setStatus(response);
-    });
+  const CheckBackendConnection = useCallback(() => {
+    if (!IgnoreError) {
+      CheckServerStatus().then((response) => {
+        if (!response) {
+          SetErrorMsg("Server is offline");
+          SetIsErrorOpen(true);
+        }
+        SetStatus(response);
+      });
+    }
+  }, [IgnoreError, SetErrorMsg, SetIsErrorOpen, SetStatus]);
+
+  const toggleErrorModal = () => SetIsErrorOpen(!IsErrorOpen);
+  const ignoreErrorModal = () => {
+    SetIgnoreError(true);
+    toggleErrorModal();
   };
 
+  // Run this effect until the server is online
   useEffect(() => {
-    const interval = setInterval(() => {
-      // Only check backend if the server is offline
-      if (!ServerStatus) {
-        CheckBackendConnection();
-      } else {
-        clearInterval(interval); // Stop interval when server is online
-      }
-    }, 1000);
-
-    // Cleanup interval when component unmounts
-    return () => clearInterval(interval);
-  }, [ServerStatus, location, navigate]); // Add serverOnline as a dependency to stop interval when it's true
+    // Only check backend if the server is offline or the user has ignored the warning
+    if (!ServerStatus && !IgnoreError) {
+      CheckBackendConnection();
+    }
+  }, [ServerStatus, IgnoreError, location, navigate, CheckBackendConnection]);
 
   useEffect(() => {
     const savedToken = sessionStorage.getItem("authToken");
+
     if (savedToken) {
-      setToken(savedToken);
+      SetToken(savedToken);
       if (location.pathname === "/") {
         navigate("/context-form");
       }
@@ -72,39 +92,39 @@ function App() {
 
   return (
     <div className='MainBody'>
+      <Header onLogout={HandleSignout} authToken={AuthToken} />
       <Container className='ContextSelect'>
-        <Col className='ContextHeader'>
-          <center>
-            <Col className='ContextHeaderText'>Context Creator</Col>
-          </center>
-          {authToken ? (
-            <button onClick={handleSignout} className='SignOutButton'>
-              Sign Out
-            </button>
-          ) : null}
-        </Col>
-
         {ServerStatus ? (
           <Row className='Components'>
-            <Col>
-              <Routes>
-                <Route path='/context-form' element={<ContextForm />} />
-                <Route path='/new-run' element={<ContextForm />} />
-                <Route path='/data-upload' element={<DataUpload />} />
-                <Route
-                  path='/login'
-                  element={<LoginPage onLogin={handleLogin} />}
-                />
-                <Route
-                  path='/signup'
-                  element={<SignupPage onSignup={handleSignup} />}
-                />
-                <Route path='*' element={<Page404 />} />
-              </Routes>
-            </Col>
+            <Routes>
+              <Route
+                path='/context-form'
+                element={<ContextForm authToken={AuthToken} />}
+              />
+              <Route
+                path='/new-run'
+                element={<ContextForm authToken={AuthToken} />}
+              />
+              <Route path='/data-upload' element={<DataUpload />} />
+              <Route
+                path='/login'
+                element={<LoginPage onLogin={HandleLogin} />}
+              />
+              <Route
+                path='/signup'
+                element={<SignupPage onSignup={HandleSignup} />}
+              />
+              <Route path='*' element={<Page404 />} />
+            </Routes>
           </Row>
         ) : null}
       </Container>
+      <ErrorModal
+        isOpen={IsErrorOpen}
+        toggle={toggleErrorModal}
+        ignore={ignoreErrorModal}
+        errorMessage={ErrorMsg}
+      />
     </div>
   );
 }

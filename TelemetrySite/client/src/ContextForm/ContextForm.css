@@ -32,17 +32,16 @@ Label {
   /* Space between panels */
 }
 
-.left-panel, .right-panel {
+.left-panel,
+.right-panel {
   display: flex;
   flex-direction: column;
   flex: 1;
-
-  /* Equal width */
 }
 
-.right-panel .top-right-panel, .right-panel {
+.right-panel .top-right-panel,
+.bottom-right-panel .right-panel {
   margin-bottom: 20px;
-  /* Ensure spacing between the stacked cards */
 }
 
 .panel-header {
@@ -52,11 +51,11 @@ Label {
 }
 
 .panel-content {
-  flex-grow: 1 !important;
-  padding: 10px !important;
-  background-color: #504A43 !important;
-  border: 1px solid #181617 !important;
-  color: #ffffff !important;
+  flex-grow: 1;
+  padding: 10px;
+  background-color: #504A43;
+  border: 1px solid #181617;
+  color: #ffffff;
 }
 
 
