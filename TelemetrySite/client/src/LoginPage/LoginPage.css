@@ -22,41 +22,40 @@
 
 .SubmitButton {
     margin-top: 20px;
-    font-size: 20px !important;
+    font-size: 20px;
     padding: 7px 20px;
     border-radius: 5px;
     transition: background-color 0.3s ease, transform 0.2s ease;
 
-    background-color: #F36917 !important;
-    border-color: black !important;
+    background-color: #F36917;
+    border-color: black;
     cursor: pointer;
 }
 
 /* Hover effects */
 .SubmitButton:hover {
     transform: scale(1.05);
-    /* Slightly enlarge button */
-    background-color: #ac4b13 !important;
+    background-color: #ac4b13;
     border: black;
 }
 
 .SwitchButton {
     margin-top: 20px;
     margin-left: 20px;
-    font-size: 20px !important;
+    font-size: 20px;
     padding: 7px 20px;
     border-radius: 5px;
     transition: background-color 0.3s ease, transform 0.2s ease;
 
-    background-color: black !important;
-    color: #F36917 !important;
-    border-color: black !important;
+    background-color: black;
+    color: #F36917;
+    border-color: whitesmoke;
 
     cursor: pointer;
 }
 
 .SwitchButton:hover {
     transform: scale(1.05);
-    background-color: rgb(36, 34, 34) !important;
-    border-color: white;
+    background-color: rgb(36, 34, 34);
+    border: white;
 }

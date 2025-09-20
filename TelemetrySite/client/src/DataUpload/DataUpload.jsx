@@ -4,7 +4,6 @@ import "./DataUpload.css";
 import {
   BuildURI,
   CheckData,
-  ServerCalls,
   getRunOrderNumber,
   incrementRunOrderNumber,
   resetRunOrderNumber,
@@ -37,13 +36,13 @@ function DataUpload() {
    * to create a new context or a new run with the same event
    * @param {string} url - url to redirect the user to
    */
-  const RedirectToContext = (url) => {
+  function RedirectToContext(url) {
     sessionStorage.setItem("DataSubmitted", false);
     sessionStorage.removeItem("BikeData");
     navigate(url);
-  };
+  }
 
-  const DisplayRedirect = () => {
+  function DisplayRedirect() {
     setBodyDisplay(
       <Container className='button-container'>
         <Col>
@@ -70,7 +69,7 @@ function DataUpload() {
         </Col>
       </Container>
     );
-  };
+  }
 
   /**
    * Submit the current file selected by the user.
@@ -80,7 +79,7 @@ function DataUpload() {
    *
    * @param {Event} event -Event details from the form
    */
-  const SubmitFile = async (event) => {
+  async function SubmitFile(event) {
     event.preventDefault(); // Prevent page reload
     const contextData = sessionStorage.getItem("BikeData");
 
@@ -266,7 +265,7 @@ function DataUpload() {
         DisplayRedirect();
       }
     });
-  };
+  }
 
   useEffect(() => {
     //make sure a refresh doesn't make the user resubmit data
