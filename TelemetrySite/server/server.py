@@ -58,11 +58,3 @@ def MainContext():
 if __name__ == "__main__":
     # Only run Flask's dev server when starting manually:
     app.run(host="127.0.0.1", port=5000, debug=True)
-    # credential file exists two levels up
-    # from the current file
-    
-    two_up = os.path.dirname(os.path.dirname(file_path))
-    dotenv.load_dotenv(two_up + "/credentials.env")
-    print("Starting flask")
-
-    app.run(debug=True)  # Starts Flask

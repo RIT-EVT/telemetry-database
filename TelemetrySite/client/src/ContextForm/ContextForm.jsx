@@ -477,7 +477,9 @@ function ContextForm(props) {
         {/* Left Panel */}
         <Col className='left-panel'>
           <Card className='panel-content '>
-            <CardTitle className='panel-header'>Main Context</CardTitle>
+            <CardTitle className='panel-header'>
+              <h2>Main Context</h2>
+            </CardTitle>
             <CardBody>{MainContextForm}</CardBody>
           </Card>
         </Col>
@@ -487,7 +489,9 @@ function ContextForm(props) {
           <Row>
             <Col className='top-right-panel'>
               <Card className='panel-content'>
-                <CardTitle className='panel-header'>Event Context</CardTitle>
+                <CardTitle className='panel-header'>
+                  <h2>Event Context</h2>
+                </CardTitle>
                 <CardBody>{EventContextForm}</CardBody>
               </Card>
             </Col>
@@ -496,9 +500,12 @@ function ContextForm(props) {
             <Col className='bottom-right-panel'>
               <Card className='panel-content'>
                 <CardTitle className='panel-header'>
-                  Bike Context: {BikeSelect}
+                  <h2>Bike Context: </h2>
                 </CardTitle>
-                <CardBody>{BikeContextForm}</CardBody>
+                <CardBody>
+                  {BikeSelect}
+                  {BikeContextForm}
+                </CardBody>
               </Card>
             </Col>
           </Row>
@@ -519,7 +526,10 @@ function ContextForm(props) {
                      *configs of the same type that have been saved. Allow user to also
                      *create a new one with the option to save it with a name
                      */}
-                    {name.toLocaleUpperCase()} Configuration: {DropDowns[name]}
+                    <h2>
+                      {name.toLocaleUpperCase()} Configuration:{" "}
+                      {DropDowns[name]}
+                    </h2>
                   </CardTitle>
                   <CardBody>{ConfigForm[name]}</CardBody>
                 </Card>

@@ -6,11 +6,11 @@
  */
 var ServerCalls = {};
 
-let BASE_URL = "http://129.21.157.17/api";
+let BASE_URL = "http://192.168.1.200/api";
 
 let RunOrderNumber = 0;
 
-// These functions are not immediately used in seperate files, but they
+// These functions are not immediately used in separate files, but they
 // are general enough to grant them their own place
 
 const BuildURI = (ServerCallsKey) => {
@@ -47,7 +47,6 @@ const CheckServerStatus = async () => {
     const data = await response.json();
     ServerCalls = data;
     return true;
-
   } catch (error) {
     // This runs if the server is offline or network request fails
     return false;

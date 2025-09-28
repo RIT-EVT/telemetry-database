@@ -284,7 +284,9 @@ function DataUpload() {
         >
           <Container>
             <Col>
-              <h4 className='mb-3'>Upload MF4 File</h4>
+              <h4 className='mb-3'>
+                <label for='fileUploadMF4'>Upload MF4 File</label>
+              </h4>
               <Input
                 type='file'
                 id='fileUploadMF4'
@@ -295,7 +297,9 @@ function DataUpload() {
               />
             </Col>
             <Col>
-              <h4 className='mb-3'>Upload DBC File</h4>
+              <h4 className='mb-3'>
+                <label for='fileUploadDBC'>Upload DBC File</label>
+              </h4>
               <Input
                 type='file'
                 id='fileUploadDBC'

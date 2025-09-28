@@ -1,8 +1,7 @@
 import React from "react";
 import { FormGroup, Input, InputGroup, InputGroupText } from "reactstrap";
-import "./ContextForm.css"
+import "./ContextForm.css";
 import ContextJSONFormElements from "./JsonFiles/FormElementFormat.json";
-
 
 /**
  * Create a form group based off of the json key passed in.
@@ -19,35 +18,37 @@ export default function DynamicForm(jsonValue, optionalSetData) {
   // TODO we may want to talk later about changing the way we approach this logic, but for now this function
   return (
     <FormGroup>
-      {Object.values(ContextJSONFormElements[jsonValue]).map(
-        (formElement) => {
-          const idValue = formElement["id"];
-          return (
-            <InputGroup key={idValue} className='FormGroupElement'>
-              <InputGroupText>{formElement["label"]}</InputGroupText>
-              <Input
-                id={idValue}
-                type={formElement["type"]}
-                placeholder={formElement["placeHolder"]}
-                required={formElement["required"]}
-                readOnly={
-                  formElement["readOnly"] || optionalSetData ? true : false
-                }
-                className='formInput'
-                value={optionalSetData ? optionalSetData[idValue] : undefined}
-              >
-                {formElement["type"] === "select"
-                  ? formElement["selectValues"].map((value) => (
+      {Object.values(ContextJSONFormElements[jsonValue]).map((formElement) => {
+        const idValue = formElement["id"];
+        return (
+          <InputGroup key={idValue} className='FormGroupElement'>
+            <InputGroupText>
+              <label htmlFor={idValue} className='mb-0'>
+                {formElement["label"]}
+              </label>
+            </InputGroupText>
+            <Input
+              id={idValue}
+              type={formElement["type"]}
+              placeholder={formElement["placeHolder"]}
+              required={formElement["required"]}
+              readOnly={
+                formElement["readOnly"] || optionalSetData ? true : false
+              }
+              className='formInput'
+              value={optionalSetData ? optionalSetData[idValue] : undefined}
+            >
+              {formElement["type"] === "select"
+                ? formElement["selectValues"].map((value) => (
                     <option key={value} value={value}>
                       {value}
                     </option>
                   ))
-                  : null}
-              </Input>
-            </InputGroup>
-          );
-        }
-      )}
+                : null}
+            </Input>
+          </InputGroup>
+        );
+      })}
     </FormGroup>
   );
-};
+}
