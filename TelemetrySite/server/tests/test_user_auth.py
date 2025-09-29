@@ -1,10 +1,8 @@
-import json
-
 def test_user_auth_login(client):
     login_payload={
         
         "action":"login",
-        "name":"test_user_valid3",
+        "name":"test_user_valid",
         "password":"123"
     }
     
