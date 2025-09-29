@@ -25,6 +25,9 @@ jobs:
           pip install -r requirements.txt
         working-directory: TelemetrySite/server
 
+      - name: Install pytest
+        run: pip install pytest
+
       - name: Run tests
         run: pytest tests/
         working-directory: TelemetrySite/server
