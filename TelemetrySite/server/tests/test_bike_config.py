@@ -27,12 +27,12 @@ def test_bike_config_write(client, mock_db):
         content_type="application/x-www-form-urlencoded"
     )
 
-    assert response.status_code == 200
+    assert response.status_code == 201
     
     response = client.get("/ConfigData/0")
     assert response.status_code == 200
     json_data = response.get_json()
-   
+
     assert "data" in json_data
     assert "config_data" in json_data["data"]
     assert "bms" in json_data["data"]["config_data"]

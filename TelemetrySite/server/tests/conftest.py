@@ -16,11 +16,14 @@ from server import create_app
 #  developers know if they broke the system when changing it. Additionally,
 #  if you are not connected to an RIT network when you execute the test,
 #  test_utils.py will auto fail since it checks the connection to real mongo db.
- 
+
+import pytest
+import mongomock
+from server import create_app
 
 @pytest.fixture
-def app():
-    app = create_app()
+def app(mock_db):
+    app = create_app(db=mock_db)
     app.config.update({
         "TESTING": True,
     })

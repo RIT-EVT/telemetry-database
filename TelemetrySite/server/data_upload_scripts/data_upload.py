@@ -1,5 +1,3 @@
-from utils import create_db_connection
-
 import cantools
 from asammdf import MDF
 import json
@@ -9,7 +7,7 @@ import gridfs
 parsing_data_progress = [0]
 uploading_data_progress = [0]
 
-def submit_data(mf4_file, dbc_file, context_data, runOrderNumber):
+def submit_data(mf4_file, dbc_file, context_data, runOrderNumber, db):
     """
         Parse the data from binary to a readable state and begin upload 
 
@@ -19,7 +17,7 @@ def submit_data(mf4_file, dbc_file, context_data, runOrderNumber):
         context_data (Dictionary): context id for the data
         runOrderNumber (int): Which run this is in a larger group of runs
     """
-    fs = gridfs.GridFS(create_db_connection())
+    fs = gridfs.GridFS(db)
 
     dbc_decoded = cantools.database.load_file(dbc_file)
 
@@ -36,9 +34,9 @@ def submit_data(mf4_file, dbc_file, context_data, runOrderNumber):
     context_data["event"]["runs"][0]["dbcFile"]=fs.put(dbc_file, encoding="utf-8")
     
     context_data["event"]["runs"][0]["orderNumber"] = runOrderNumber
-    upload_data_in_chunks(context_data, data_values_json)
+    upload_data_in_chunks(context_data, data_values_json, db)
     
-def upload_data_in_chunks(new_run_data, data_values_json):
+def upload_data_in_chunks(new_run_data, data_values_json, db):
     """
         Upload the data in chunks that are less than 17 mb.
         MongoDB does not allow any files to be above this value,
@@ -52,7 +50,7 @@ def upload_data_in_chunks(new_run_data, data_values_json):
     # 150_000 ~< 15 mb but always < 16 mb
     sliced_data = list(sliced(data_values_json, 150_000))
     
-    collection_access_messages = create_db_connection()["messages"]
+    collection_access_messages = db["messages"]
     for data_index in range(0, len(sliced_data)):
         if "_id" in new_run_data:
             del new_run_data["_id"]
@@ -546,9 +544,9 @@ def get_progress():
         Int: Current progress of an upload
     """
     if parsing_data_progress[0]!=1:
-       return {"Parsing Data": parsing_data_progress[0]}
+        return {"Parsing Data": parsing_data_progress[0]}
     elif uploading_data_progress[0]!=1:
-       return {"uploading data": uploading_data_progress[0]}
+        return {"uploading data": uploading_data_progress[0]}
     
     parsing_data_progress[0]=0
     uploading_data_progress[0]=0

@@ -10,12 +10,12 @@ class DataUploadApi(MethodView):
     ALLOWED_EXTENSIONS = {"mf4", "dbc"}
     UPLOAD_FOLDER = os.path.dirname(__file__) + "\\data_upload_file"
 
-    def __init__(self):
+    def __init__(self, db):
+        self.db = db
         # Create upload folder if it doesn't exist
         if not os.path.exists(self.UPLOAD_FOLDER):
             os.makedirs(self.UPLOAD_FOLDER)
 
- 
     def get(self, auth_token):
         """
             Get the current progress of a data upload
@@ -26,9 +26,9 @@ class DataUploadApi(MethodView):
         Returns:
             tuple: Progress value
         """
-        if not authenticate_user(auth_token):
+        if not authenticate_user(auth_token, self.db):
             return jsonify({"authError":"unauthenticated user"}), 400
-        elif check_expired_tokens(auth_token):
+        elif check_expired_tokens(auth_token, self.db):
             return jsonify({"authError":"expired user token"}), 400
         
         return jsonify(get_progress()), 200
@@ -44,9 +44,9 @@ class DataUploadApi(MethodView):
             tuple: success message
         """
         
-        if not authenticate_user(auth_token):
+        if not authenticate_user(auth_token, self.db):
             return jsonify({"authError":"unauthenticated user"}), 400
-        elif check_expired_tokens(auth_token):
+        elif check_expired_tokens(auth_token, self.db):
             return jsonify({"authError":"expired user token"}), 400
         
         # Check if the post request has all needed data needed
@@ -56,7 +56,7 @@ class DataUploadApi(MethodView):
             return jsonify({"error": "No dbc file uploaded"}), 400
         elif "contextData" not in request.form:
             return jsonify({"error": "No context data passed"}), 400
-       # save all needed data to local variables
+        # save all needed data to local variables
         mf4File = request.files["mf4File"]
         dbcFile = request.files["dbcFile"]
         context_data = request.form["contextData"]
@@ -85,7 +85,7 @@ class DataUploadApi(MethodView):
             dbcFile.save(dbc_file)
             
             # submit the data!
-            submit_data(mf4_file, dbc_file, context_data, runOrderNumber)
+            submit_data(mf4_file, dbc_file, context_data, runOrderNumber, self.db)
 
             # remove the file from the sever end
             os.remove(mf4_file)
