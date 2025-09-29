@@ -2,6 +2,7 @@ import pytest
 import sys
 import os
 from datetime import datetime
+import dotenv
 import mongomock
 from bson import ObjectId
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -17,10 +18,6 @@ from server import create_app
 #  if you are not connected to an RIT network when you execute the test,
 #  test_utils.py will auto fail since it checks the connection to real mongo db.
 
-import pytest
-import mongomock
-from server import create_app
-
 @pytest.fixture
 def app(mock_db):
     app = create_app(db=mock_db)
@@ -28,6 +25,11 @@ def app(mock_db):
         "TESTING": True,
     })
     return app
+
+@pytest.fixture(autouse=True, scope="session")
+def load_test_env():
+    # Force-load the fake test env instead of real one
+    dotenv.load_dotenv(os.path.join(os.path.dirname(__file__), ".env.test"), override=True)
 
 @pytest.fixture(autouse=True)
 def mock_db(monkeypatch):
@@ -61,10 +63,17 @@ def setup_config_doc(mock_db):
     users = mock_db["users"]
 
     users.insert_one({
-        "username": "test",
+        "username": "test_user_valid",
         "password": "123".encode(),
         "auth_token": 0,
         "auth_time": datetime.now()
+    })
+    
+    users.insert_one({
+        "username": "outdated_user",
+        "password": "123".encode(),
+        "auth_token": 1,
+        "auth_time": datetime.min
     })
     
     return 0

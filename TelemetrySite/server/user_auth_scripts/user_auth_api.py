@@ -13,7 +13,8 @@ class UserAuthApi(MethodView):
     def post(self):
         user_data = request.get_json()
         
-        user_db_connection = self.db()["users"]
+        user_db_connection = self.db["users"]
+        
         if user_data.get("action")=="login":
             # Check the username and password against the db to make sure the user
             # exists and they are who they say they are. Return auth token if the 
@@ -30,8 +31,7 @@ class UserAuthApi(MethodView):
                 auth_token = mongo_data["auth_token"]
                 # always update auth token on login
                 auth_token = update_expired_token(mongo_data["_id"], self.db)
-                return {"auth_token": auth_token}, 200
-            
+                return {"auth_token": auth_token}, 200   
         elif user_data.get("action") == "signup":
             
             username = user_data.get("name")
@@ -43,20 +43,19 @@ class UserAuthApi(MethodView):
             if secure_num != getenv("CHALLENGE_NUM"):
                 # User value doesn't match the needed value
                 # return an error message
-                return jsonify({"error":"Incorrect challenge number"}), 400   
+                return {"error":"Incorrect challenge number"}, 400   
             # Ensure all data submitted exists to prevent any empty users
             elif username == "" or password == "":
-                return jsonify({"error":"Invalid username or password"}), 400
+                return {"error":"Invalid username or password"}, 400
             # Ensure there isn't any duplicate usernames
             elif user_db_connection.find_one({"username":username})!=None:
-                return jsonify({"error":"Duplicate username detected"}), 400
+                return {"error":"Duplicate username detected"}, 400
             else:
                 
                 auth_token = create_auth_token(self.db)    
                 user_db_connection.insert_one({"username" : username, "password" : password.encode(),
                                                 "auth_token" : auth_token, "auth_time" : current_date_time})
                 
-                return {"auth_token":auth_token}, 200
-                    
-            
-        return {"error":"Code reached the end of the call"}, 400
+                return {"auth_token":auth_token}, 200   
+        else:
+            return{"error":"Invalid action"}, 400

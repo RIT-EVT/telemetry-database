@@ -23,14 +23,14 @@ def create_db_connection():
     db_access = mongo_client["ernie"]
     return db_access
 
-def create_auth_token():
+def create_auth_token(db):
     """
         Generate a 32 byte long auth token
 
     Returns:
         string: Auth token
     """
-    user_db_connection = create_db_connection()["users"]
+    user_db_connection = db["users"]
 
     auth_token=token_urlsafe(32)
     # Very slight chance that there is a duplicate auth token
@@ -92,7 +92,7 @@ def update_expired_token(document_id, db):
         String: Updated auth token
     """
     
-    new_auth_token = create_auth_token()
+    new_auth_token = create_auth_token(db)
     auth_connection = db["users"]
     
     auth_connection.update_one(  {"_id": ObjectId(document_id)},
