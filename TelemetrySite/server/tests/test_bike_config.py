@@ -1,7 +1,6 @@
 import json
 
-# Test the ability to read a config from the database
-def test_bike_config_read(client, mock_db):
+def test_bike_config_read(client):
     response = client.get("/ConfigData/0")
     assert response.status_code == 200, "Authorized user not allowed"
     json_data = response.get_json()
@@ -12,12 +11,12 @@ def test_bike_config_read(client, mock_db):
     assert 1 == json_data["data"]["config_data"]["tms"][0]["hardwareRevisionTMS"]
 
 def test_bike_config_read_unauthorized(client):
-    response = client.get("/ConfigData/2")
-    assert response.status_code == 400, "Unauthorized user accessed data"
+    response = client.get("/ConfigData/-1")
+    assert response.status_code == 401, "Unauthorized user accessed data"
 
 def test_bike_config_read_outdated(client):
     response = client.get("/ConfigData/1")
-    assert response.status_code == 400, "Outdated user allowed access"
+    assert response.status_code == 401, "Outdated user allowed access"
 
 def test_bike_config_write(client):
     config_payload = {
@@ -54,12 +53,12 @@ def test_bike_config_write_unauthorized(client):
     }
 
     response = client.post(
-        "/ConfigData/2",
+        "/ConfigData/-1",
         data={"configData": json.dumps(config_payload)},
         content_type="application/x-www-form-urlencoded"
     )
     
-    assert response.status_code==400, "Unauthorized user accessed data"
+    assert response.status_code==401, "Unauthorized user accessed data"
 
 def test_bike_config_write_expired(client):
     config_payload = {
@@ -75,4 +74,4 @@ def test_bike_config_write_expired(client):
         content_type="application/x-www-form-urlencoded"
     )
     
-    assert response.status_code==400, "Expired user accessed data"
+    assert response.status_code==401, "Expired user accessed data"

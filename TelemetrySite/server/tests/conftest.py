@@ -14,9 +14,9 @@ from server import create_app
 #  mongomock to create a mongo db in memory so we don't interact 
 #  with our production db. To execute a test, enter pytest in the console.
 #  Any and all new backend code require integrated python tests so future
-#  developers know if they broke the system when changing it. Additionally,
-#  if you are not connected to an RIT network when you execute the test,
-#  test_utils.py will auto fail since it checks the connection to real mongo db.
+#  developers know if they broke the system when changing it.
+#  Currently, GitHub actions runs these test automatically whenever a pr 
+#  targets main. This way, we never merge code into main that is broken (hopefully)
 
 @pytest.fixture
 def app(mock_db):
@@ -61,22 +61,27 @@ def setup_config_doc(mock_db):
 
     # Insert a mock user for authentication
     users = mock_db["users"]
-
-    users.insert_one({
-        "username": "test_user_valid",
-        "password": "123".encode(),
-        "auth_token": 0,
-        "auth_time": datetime.now()
-    })
     
-    users.insert_one({
-        "username": "outdated_user",
-        "password": "123".encode(),
-        "auth_token": 1,
-        "auth_time": datetime.min
-    })
-    
-    return 0
+    users.insert_many([
+        {
+            "username": "test_user_valid",
+            "password": "123".encode(),
+            "auth_token": 0,
+            "auth_time": datetime.now()
+        },
+        {
+            "username": "outdated_user",
+            "password": "123".encode(),
+            "auth_token": 1,
+            "auth_time": datetime.min
+        },
+        {
+            "username": "duplicate_user",
+            "password": "123".encode(),
+            "auth_token": 2,
+            "auth_time": datetime.now()
+        }
+    ])
 
 @pytest.fixture
 def client(app):

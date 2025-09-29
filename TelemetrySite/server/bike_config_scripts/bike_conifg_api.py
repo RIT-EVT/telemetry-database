@@ -24,9 +24,9 @@ class BikeConfigApi(MethodView):
         """
         
         if not authenticate_user(auth_token, self.db):
-            return {"authError":"unauthenticated user"}, 400
+            return {"authError":"unauthenticated user"}, 401
         elif check_expired_tokens(auth_token, self.db):
-            return {"authError":"expired user token"}, 400
+            return {"authError":"expired user token"}, 401
 
         db_connection = self.db["configs"]
 
@@ -49,9 +49,9 @@ class BikeConfigApi(MethodView):
         """
         
         if not authenticate_user(auth_token, self.db):
-            return {"authError":"unauthenticated user"}, 400
+            return {"authError":"unauthenticated user"}, 401
         elif check_expired_tokens(auth_token, self.db):
-            return {"authError":"expired user token"}, 400
+            return {"authError":"expired user token"}, 401
         
         db_connection = self.db["configs"]
         config_data = request.form["configData"]

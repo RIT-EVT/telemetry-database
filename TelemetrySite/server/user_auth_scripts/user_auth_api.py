@@ -26,7 +26,7 @@ class UserAuthApi(MethodView):
             mongo_data = user_db_connection.find_one({"username":username, "password":password.encode()})
         
             if mongo_data == None:
-                return {"error":"Invalid username or password"}, 404        
+                return {"error":"Invalid username or password"}, 401       
             else:
                 auth_token = mongo_data["auth_token"]
                 # always update auth token on login
@@ -43,19 +43,19 @@ class UserAuthApi(MethodView):
             if secure_num != getenv("CHALLENGE_NUM"):
                 # User value doesn't match the needed value
                 # return an error message
-                return {"error":"Incorrect challenge number"}, 400   
+                return {"error":"Incorrect challenge number"}, 401   
             # Ensure all data submitted exists to prevent any empty users
             elif username == "" or password == "":
-                return {"error":"Invalid username or password"}, 400
+                return {"error":"Invalid username or password"}, 401
             # Ensure there isn't any duplicate usernames
             elif user_db_connection.find_one({"username":username})!=None:
-                return {"error":"Duplicate username detected"}, 400
+                return {"error":"Duplicate username detected"}, 401
             else:
                 
                 auth_token = create_auth_token(self.db)    
                 user_db_connection.insert_one({"username" : username, "password" : password.encode(),
                                                 "auth_token" : auth_token, "auth_time" : current_date_time})
                 
-                return {"auth_token":auth_token}, 200   
+                return {"auth_token":auth_token}, 201   
         else:
-            return{"error":"Invalid action"}, 400
+            return{"error":"Invalid action"}, 404
