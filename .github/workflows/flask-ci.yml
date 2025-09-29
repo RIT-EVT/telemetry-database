@@ -1,10 +1,14 @@
 name: Flask CI
 
 on:
-  push:
-    branches: [ "new_feature/unit_tests" ]
   pull_request:
-    branches: [ "main" ]
+    types:
+      - ready_for_review
+      - opened
+      - reopened
+      - synchronize
+    branches:
+      - main
 
 jobs:
   test-backend:
@@ -32,5 +36,5 @@ jobs:
         run: pip install mongomock
 
       - name: Run tests
-        run: pytest tests/
+        run: pytest --maxfail=1 --disable-warnings -q
         working-directory: TelemetrySite/server
