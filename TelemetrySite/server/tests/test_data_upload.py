@@ -81,9 +81,22 @@ def test_post_missing_mf4(client):
     # Assertions about return data
     assert response.status_code == 400
     
+    with open(os.path.join(folder_name, "test_data/DEV1_4_13.dbc.test"), "rb") as dbc:
+        data["dbcFile"]=(dbc, "DEV1_4_13.dbc")
+        data["mf4File"]=""
+        response = client.post(
+            "/DataUpload/0",
+            data=data,
+            content_type="multipart/form-data"
+        )
+    
+    # Assertions about return data
+    assert response.status_code == 400
+    
+
 def test_post_missing_dbc(client):
     with open(os.path.join(folder_name, "test_data/ExampleData.MF4.test"), "rb") as mf4:
-        data["mf4File"]=(mf4, "DEV1_4_13.dbc")
+        data["mf4File"]=(mf4, "ExampleData.mf4")
         data.pop("dbcFile")
         response = client.post(
             "/DataUpload/0",
@@ -93,7 +106,19 @@ def test_post_missing_dbc(client):
     
     # Assertions about return data
     assert response.status_code == 400
-
+    
+    with open(os.path.join(folder_name, "test_data/ExampleData.MF4.test"), "rb") as mf4:
+        data["mf4File"]=(mf4, "ExampleData.mf4")
+        data["dbcFile"]=""
+        response = client.post(
+            "/DataUpload/0",
+            data=data,
+            content_type="multipart/form-data"
+        )
+    
+    # Assertions about return data
+    assert response.status_code == 400
+    
 def test_post_missing_context(client):
     with open(os.path.join(folder_name, "test_data/ExampleData.MF4.test"), "rb") as mf4, open(os.path.join(folder_name, "test_data/DEV1_4_13.dbc.test"), "rb") as dbc:
         data["mf4File"]=(mf4, "ExampleData.MF4")
@@ -107,3 +132,17 @@ def test_post_missing_context(client):
             
     # Assertions about return data
     assert response.status_code == 400
+    
+def test_post_unauthorized_user(client):
+    # No need to even submit data, it should fail automatically 
+    response = client.post("/DataUpload/-1")
+    
+    # Assertions about return data
+    assert response.status_code == 401
+    
+def test_post_expired_user(client):
+
+    response = client.post("/DataUpload/1")
+    
+    # Assertions about return data
+    assert response.status_code == 401
