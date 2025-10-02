@@ -3,7 +3,7 @@ name: GitLab Push
 on:
   push:
     branches:
-      - main  # change to your production branch
+      - new_feature/unit_tests
 
 jobs:
   build-and-push:
