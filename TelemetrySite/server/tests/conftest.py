@@ -4,19 +4,29 @@ import os
 from datetime import datetime
 import dotenv
 import mongomock
+import mongomock.gridfs
 from bson import ObjectId
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from server import create_app
 
 ## Welcome to the conftest file for our integrated python testing.
 #  This file should contain all fixtures we use for our testing.
-#  For testing, we use the pytest to execute our tests and 
+#  
+## For testing, we use the pytest to execute our tests and 
 #  mongomock to create a mongo db in memory so we don't interact 
 #  with our production db. To execute a test, enter pytest in the console.
 #  Any and all new backend code require integrated python tests so future
 #  developers know if they broke the system when changing it.
-#  Currently, GitHub actions runs these test automatically whenever a pr 
-#  targets main. This way, we never merge code into main that is broken (hopefully)
+#  
+## Currently, GitHub actions runs these test automatically whenever a pr 
+#  targets main. This way, we never merge code into main that is broken (hopefully), 
+#  but it is also useful to run these test as you're updating the code so you know
+#  ahead of time if your changes are working or not
+#
+## Any and allow new features for our backend need test cases. This includes
+#  testing all edge cases (ex: what if a user tries to upload an incorrect file)
+#  and all possible events. No test cases will ever be perfect, but we want 
+#  our to be as close as we can get it.
 
 @pytest.fixture
 def app(mock_db):
@@ -35,6 +45,8 @@ def load_test_env():
 def mock_db(monkeypatch):
     # Create a mock mongo db in memory for testing
     mock_client = mongomock.MongoClient()
+    mongomock.gridfs.enable_gridfs_integration()
+
     mock_db = mock_client["ernie"]
 
     # Patch create_db_connection globally to return the mock db
@@ -59,7 +71,7 @@ def setup_config_doc(mock_db):
         }
     })
 
-    # Insert a mock user for authentication
+    # Insert a mock users for authentication
     users = mock_db["users"]
     
     users.insert_many([

@@ -30,8 +30,7 @@ def submit_data(mf4_file, dbc_file, context_data, runOrderNumber, db):
     data_values_json = parse_data(mf4_file, config_values, can_id_values)
 
     context_data = json.loads(context_data)
-    
-   
+
     with open(mf4_file, "rb") as f:
         context_data["event"]["runs"][0]["mf4File"] = fs.put(f, filename=os.path.basename(mf4_file))
 
@@ -205,7 +204,7 @@ def parse_data(mdf_path, config_values, id_to_name):
         previous_bits_used = 0
         
         config_data_length = len(config_data)
-         
+        
         for config_current_index in range(0, config_data_length ):
 
             config_current = config_data[config_current_index]

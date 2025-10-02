@@ -26,12 +26,13 @@ class DataUploadApi(MethodView):
         Returns:
             tuple: Progress value
         """
+
         if not authenticate_user(auth_token, self.db):
-            return jsonify({"authError":"unauthenticated user"}), 400
+            return {"authError":"unauthenticated user"}, 400
         elif check_expired_tokens(auth_token, self.db):
-            return jsonify({"authError":"expired user token"}), 400
+            return {"authError":"expired user token"}, 400
         
-        return jsonify(get_progress()), 200
+        return get_progress(), 200
 
     def post(self, auth_token):
         """
@@ -43,20 +44,21 @@ class DataUploadApi(MethodView):
         Returns:
             tuple: success message
         """
-        
+
         if not authenticate_user(auth_token, self.db):
-            return jsonify({"authError":"unauthenticated user"}), 400
+            return {"authError":"unauthenticated user"}, 401
         elif check_expired_tokens(auth_token, self.db):
-            return jsonify({"authError":"expired user token"}), 400
+            return {"authError":"expired user token"}, 401
         
         # Check if the post request has all needed data needed
         if "mf4File" not in request.files:
-            return jsonify({"error": "No mf4 file uploaded"}), 400
+            return {"error": "No mf4 file uploaded"}, 400
         elif "dbcFile" not in request.files:
-            return jsonify({"error": "No dbc file uploaded"}), 400
+            return {"error": "No dbc file uploaded"}, 400
         elif "contextData" not in request.form:
-            return jsonify({"error": "No context data passed"}), 400
+            return {"error": "No context data passed"}, 400
         # save all needed data to local variables
+
         mf4File = request.files["mf4File"]
         dbcFile = request.files["dbcFile"]
         context_data = request.form["contextData"]
@@ -64,9 +66,9 @@ class DataUploadApi(MethodView):
         
         # ensure the file actually contains a valid file name and files
         if not mf4File or mf4File.name == "":
-            return jsonify({"error": "No mf4 file uploaded"}), 400
+            return {"error": "No mf4 file uploaded"}, 400
         elif not dbcFile or dbcFile.name == "":
-            return jsonify({"error": "No dbc file uploaded"}), 400
+            return {"error": "No dbc file uploaded"}, 400
 
         # ensure files are of correct file type before uploading data to NRDB
         if self.file_type_check(mf4File.filename) and self.file_type_check(
@@ -83,7 +85,7 @@ class DataUploadApi(MethodView):
 
             mf4File.save(mf4_file)
             dbcFile.save(dbc_file)
-            
+
             # submit the data!
             submit_data(mf4_file, dbc_file, context_data, runOrderNumber, self.db)
 
@@ -91,15 +93,10 @@ class DataUploadApi(MethodView):
             os.remove(mf4_file)
             os.remove(dbc_file)
             
-            return jsonify({"message": "Data received successfully"}), 201
+            return {"message": "Data received successfully"}, 201
         else:
-            return (
-                jsonify(
-                    {"error": "Wrong file type submitted. Must be of type mf4 and dbc"}
-                ),
-                400,
-            )
-
+            return {"error": "Wrong file type submitted. Must be of type mf4 and dbc"}, 400
+        
     def file_type_check(self, filename):
         """
         Verify the the files are valid types
