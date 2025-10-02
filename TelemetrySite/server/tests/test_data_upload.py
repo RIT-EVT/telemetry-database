@@ -93,7 +93,6 @@ def test_post_missing_mf4(client):
     # Assertions about return data
     assert response.status_code == 400
     
-
 def test_post_missing_dbc(client):
     with open(os.path.join(folder_name, "test_data/ExampleData.MF4.test"), "rb") as mf4:
         data["mf4File"]=(mf4, "ExampleData.mf4")
@@ -118,7 +117,7 @@ def test_post_missing_dbc(client):
     
     # Assertions about return data
     assert response.status_code == 400
-    
+
 def test_post_missing_context(client):
     with open(os.path.join(folder_name, "test_data/ExampleData.MF4.test"), "rb") as mf4, open(os.path.join(folder_name, "test_data/DEV1_4_13.dbc.test"), "rb") as dbc:
         data["mf4File"]=(mf4, "ExampleData.MF4")
