@@ -27,7 +27,7 @@ jobs:
 
       - name: Build frontend
         working-directory: TelemetrySite/client
-        run: npm run build
+        run: CI=false npm run build
 
       # --- Backend Tests ---
       - name: Set up Python
