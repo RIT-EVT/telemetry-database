@@ -69,4 +69,7 @@ jobs:
           git remote add gitlab git@git.rc.rit.edu:evt_database_deployment/evt_database_deplyment_branch.git
           git add .
           git commit -m "Deploy from GitHub $GITHUB_SHA"
+          # Rename local branch to main
+          git branch -M main
+          # Push to GitLab main branch
           git push --force gitlab main
