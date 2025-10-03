@@ -52,6 +52,11 @@ jobs:
           cp -r TelemetrySite/server prod/backend
           cp -r TelemetrySite/client/build prod/frontend
 
+          # Create .gitignore to exclude unwanted stuff
+          cat > prod/.gitignore <<EOL
+          backend/__pycache__/
+          backend/tests/
+
       # --- Configure SSH & Push to GitLab ---
       - name: Set up SSH
         run: |
