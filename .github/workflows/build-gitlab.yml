@@ -3,7 +3,7 @@ name: GitLab Push
 on:
   push:
     branches:
-      - new_feature/unit_tests
+      - main
 
 jobs:
   build-and-push:
