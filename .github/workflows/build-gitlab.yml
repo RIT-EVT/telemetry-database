@@ -71,7 +71,7 @@ jobs:
           git init
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git remote add gitlab git@git.rc.rit.edu:evt_database_deployment/evt_database_deplyment_branch.git
+          git remote add gitlab git@git.rc.rit.edu:evt_database_deployment/evt_database_deployment_branch.git
           git add .
           git commit -m "Deploy from GitHub $GITHUB_SHA"
           git branch -M main
