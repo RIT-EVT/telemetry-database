@@ -8,8 +8,6 @@
 
 import {
   Form,
-  FormGroup,
-  Input,
   Button,
   Card,
   Col,
@@ -17,15 +15,15 @@ import {
   CardTitle,
   CardBody,
   Container,
-  InputGroup,
-  InputGroupText,
 } from "reactstrap";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 
-import ContextJSONIdValues from "./jsonFiles/ContextForm.json";
-import ContextJSONFormElements from "./jsonFiles/FormElementFormat.json";
+import ContextJSONIdValues from "./JsonFiles/ContextForm.json";
 import { useNavigate, useLocation } from "react-router-dom";
+import DynamicForm from "./DynamicForm";
+import SelectCreator from "./SelectorCreator";
 
+import "bootstrap/dist/css/bootstrap.min.css";
 import "./ContextForm.css";
 
 import { BuildURI } from "Utils/ServerUtils.jsx";
@@ -35,20 +33,16 @@ import { BuildURI } from "Utils/ServerUtils.jsx";
  *
  * @return {HTMLFormElement} Form element for all the needed fields
  */
-function ContextForm() {
-  /* -------------------------------------------------------------------------- */
-  /* -------------------------- Establish State Hooks ------------------------- */
-  /* -------------------------------------------------------------------------- */
-  const [mainContextForm, UpdateContext] = useState("");
+function ContextForm(props) {
+  const [MainContextForm, SetContextForm] = useState(null);
+  const [EventContextForm, SetEventForm] = useState(null);
+  const [BikeContextForm, SetBikeForm] = useState(null);
+  const [BikeSelect, SetBikeSelect] = useState(null);
 
-  const [eventContextForm, UpdateEventForm] = useState(null);
-  const [bikeContextForm, UpdateBikeForm] = useState(null);
-  const [bikeSelect, UpdateBikeSelect] = useState(null);
-
-  const [eventData, setEventData] = useState(null);
+  const [EventData, SetEventData] = useState(null);
 
   // Each config form object
-  const [configForm, setFormElements] = useState({
+  const [ConfigForm, SetFormElements] = useState({
     bms: null,
     imu: null,
     tmu: null,
@@ -57,7 +51,7 @@ function ContextForm() {
     mc: null,
   });
   // Each dropdown object created in runtime with saved names and a field for custom
-  const [dropDowns, setDropDowns] = useState({
+  const [DropDowns, SetDropDowns] = useState({
     bms: null,
     imu: null,
     tmu: null,
@@ -66,7 +60,7 @@ function ContextForm() {
     mc: null,
   });
   // Current selected value of each dropdown
-  const [configSelectedValue, setConfigSelectedValue] = useState({
+  const [ConfigSelectedValue, SetConfigSelectedValue] = useState({
     bms: null,
     imu: null,
     tmu: null,
@@ -76,7 +70,7 @@ function ContextForm() {
     bike: null,
   });
   // Values passed from back end
-  const [dropDownOptions, setDropdownOptions] = useState({
+  const [DropDownOptions, SetDropdownOptions] = useState({
     bms: [],
     imu: [],
     tmu: [],
@@ -86,33 +80,15 @@ function ContextForm() {
     bike: [],
   });
 
-  /* -------------------------------------------------------------------------- */
-  /* --------------------------- Initialize Constants ------------------------- */
-  /* -------------------------------------------------------------------------- */
-
   /**
    * All possible config types
    */
-  let ConfigName = ["bms", "imu", "tmu", "tms", "pvc", "mc", "bike"];
-
-  // Which config selects are optional
-  let RequiredSelects = {
-    bms: true,
-    tms: true,
-    imu: false,
-    tmu: false,
-    pvc: true,
-    mc: true,
-    bike: true,
-  };
-
-  let FormId = "ContextForm";
+  let ConfigName = useMemo(() => {
+    return ["bms", "imu", "tmu", "tms", "pvc", "mc", "bike"];
+  }, []);
 
   let navigate = useNavigate();
   let location = useLocation();
-  /* -------------------------------------------------------------------------- */
-  /* ----------------------------- Const Functions ---------------------------- */
-  /* -------------------------------------------------------------------------- */
 
   /**
    * When a select field for the config forms updates,
@@ -122,122 +98,64 @@ function ContextForm() {
    * @param {string} configName - Name of config to update
    * @param {string} value - New value of select field
    */
-  const handleConfigSelectChange = (configName, value) => {
+  function HandleConfigSelectChange(configName, value) {
     // Update the state of the new conifg. Mutates the state rather than creating a new state
-    setConfigSelectedValue((prev) => ({ ...prev, [configName]: value }));
-  };
+    SetConfigSelectedValue((prev) => ({ ...prev, [configName]: value }));
+  }
 
   /**
    * Whenever the select field on a config form changes
    * check if it is Custom. If it is, display form elements.
    * Else, set form object to null
    *
-   * @param {formElement.event} event - event that occurred to the select element
    * @param {string} configName - name of config being updated
-   * @param {boolean} bikeLoaded - if the change is coming from the bike
+   * @param {formElement.event} newConfigName - event that occurred to the select element
    */
-  const handleConfigFormChange = async (
-    event,
-    configName,
-    bikeLoaded = false
-  ) => {
-    // Get the config that has been changed
-    const newConfigName = bikeLoaded ? event : event.target.value;
-    handleConfigSelectChange(configName, newConfigName);
+  const HandleConfigFormChange = useCallback(
+    async (configName, newConfigName) => {
+      HandleConfigSelectChange(configName, newConfigName);
 
-    if (newConfigName === "Custom") {
-      const formElement = GenerateFormElement(`${configName}Config`);
-      if (configName === "bike") {
-        UpdateBikeForm(formElement);
-      } else {
-        setFormElements((prev) => ({ ...prev, [configName]: formElement }));
-      }
-    } else if (newConfigName !== "") {
-      const targetConfig = dropDownOptions[configName].find(
-        (obj) => obj[configName + "SavedName"] === newConfigName
-      );
-
-      const formElement = GenerateFormElement(
-        `${configName}Config`,
-        targetConfig
-      );
-
-      if (configName === "bike") {
-        for (const configEntry of Object.entries(targetConfig)) {
-          // configEntry is an array in the form [key, data]
-          const configKey = configEntry[0];
-          const configValue = configEntry[1];
-          if (configKey in dropDowns) {
-            setConfigSelectedValue((prev) => ({
-              ...prev,
-              [configKey]: configValue,
-            }));
-            handleConfigFormChange(configValue, configKey, true);
-          }
+      if (newConfigName === "Custom") {
+        const formElement = DynamicForm(`${configName}Config`);
+        if (configName === "bike") {
+          SetBikeForm(formElement);
+        } else {
+          SetFormElements((prev) => ({ ...prev, [configName]: formElement }));
         }
-
-        UpdateBikeForm(formElement);
-      } else {
-        setFormElements((prev) => ({ ...prev, [configName]: formElement }));
-      }
-    }
-  };
-
-  /**
-   * Create a form group based off of the json key passed in.
-   * Loop through all elements in the json object and create that
-   * many input and label objects.
-   *
-   * @param {string} jsonValue - Key for the element in the FormElementFormat.json file
-   * @param {json} optionalSetData - Predefined data for config inputs
-   * @return {HTMLFormElement} Form group of all the input elements on the json file
-   */
-  const GenerateFormElement = (jsonValue, optionalSetData) => {
-    // Loop through every json element for the current field and
-    // Create a new reactstrap input element for it
-
-    return (
-      <FormGroup>
-        {Object.values(ContextJSONFormElements[jsonValue]).map(
-          (formElement) => {
-            const idValue = formElement["id"];
-            return (
-              <InputGroup key={idValue} className='FormGroupElement'>
-                <InputGroupText>{formElement["label"]}</InputGroupText>
-                <Input
-                  id={idValue}
-                  type={formElement["type"]}
-                  placeholder={formElement["placeHolder"]}
-                  required={formElement["required"]}
-                  readOnly={
-                    formElement["readOnly"] || optionalSetData ? true : false
-                  }
-                  className='formInput'
-                  value={optionalSetData ? optionalSetData[idValue] : undefined}
-                >
-                  {formElement["type"] === "select"
-                    ? formElement["selectValues"].map((value) => (
-                        <option key={value} value={value}>
-                          {value}
-                        </option>
-                      ))
-                    : null}
-                </Input>
-              </InputGroup>
-            );
+      } else if (newConfigName !== "") {
+        const targetConfig = DropDownOptions[configName].find(
+          (savedNames) => savedNames[configName + "SavedName"] === newConfigName
+        );
+        // Generate the new form and pass in values to assign
+        const formElement = DynamicForm(`${configName}Config`, targetConfig);
+        // If the saved name is a bike, we also need to fill in all the board configs
+        if (configName === "bike") {
+          // Parse the dictionary targetConfig into an array of [key, data] for easier looping
+          for (const configEntry of Object.entries(targetConfig)) {
+            // Separate the key and value
+            const configKey = configEntry[0];
+            const configValue = configEntry[1];
+            if (configKey in DropDowns) {
+              HandleConfigFormChange(configKey, configValue);
+            }
           }
-        )}
-      </FormGroup>
-    );
-  };
+
+          SetBikeForm(formElement);
+        } else {
+          SetFormElements((prev) => ({ ...prev, [configName]: formElement }));
+        }
+      }
+    },
+    [DropDownOptions, DropDowns]
+  );
 
   /**
    * Get all the saved configs from the backend
    */
-  const GetConfigData = async () => {
+  const GetConfigData = useMemo(async () => {
     try {
       const response = await fetch(
-        BuildURI("config_data") + "/" + sessionStorage.getItem("authToken"),
+        BuildURI("config_data") + "/" + props.authToken,
         {
           method: "GET",
         }
@@ -254,61 +172,34 @@ function ContextForm() {
     }
 
     return null;
-  };
+  }, [props.authToken]);
 
   /**
    * Post the saved conifg data to the backend
    */
-  const PostConfigData = async (configData) => {
+  async function PostConfigData(configData) {
     const formData = new FormData();
     formData.append("configData", configData);
-    await fetch(
-      BuildURI("config_data") + "/" + sessionStorage.getItem("authToken"),
-      {
-        method: "POST",
-        body: formData, // Convert object to JSON string
-      }
-    );
-  };
+    await fetch(BuildURI("config_data") + "/" + props.authToken, {
+      method: "POST",
+      body: formData, // Convert object to JSON string
+    });
+  }
 
   /**
-   * Create the select dropdowns for the config forms
-   * on change check if value is Custom
-   * if it is then display the normal form
+   * Check a new saved name against previous saved names for that board.
+   * This avoids multiple configs being saved under the same name
    *
-   * @param {string} displayValues - Options to display in select
-   * @param {string} name - Name of config form
-   * @return {HTMLInputElement} - HTML Select Input
+   * @param {string} savedName - name to check for
+   * @param {string} boardName - board to check for a duplicate of
+   *
+   * @return {bool} if there is a duplicate
    */
-  const SelectCreator = (displayValues, name) => {
-    return (
-      <Input
-        type='select'
-        onChange={(e) => handleConfigFormChange(e, name)}
-        placeholder='Select a config'
-        required={RequiredSelects[name]}
-        className='ConfigDropdown'
-        id={`${name}Select`}
-        defaultValue={
-          configSelectedValue[name] !== null ? configSelectedValue[name] : ""
-        }
-        disabled={name !== "bike" && configSelectedValue["bike"] !== "Custom"}
-      >
-        <option value='' disabled hidden>
-          Select an option
-        </option>
-        {displayValues.map((configNameValue) => {
-          let savedName = configNameValue[name + "SavedName"];
-          return (
-            <option key={savedName} value={savedName}>
-              {savedName}
-            </option>
-          );
-        })}
-        <option value='Custom'>Custom</option>
-      </Input>
+  function CheckSavedName(savedName, boardName) {
+    return DropDownOptions[boardName].some(
+      (config) => config[boardName + "SavedName"] === savedName
     );
-  };
+  }
 
   /**
    * Once all needed fields have been filled out,
@@ -317,7 +208,7 @@ function ContextForm() {
    *
    * @param {Event} event - event of form submit
    */
-  const SubmitData = (event) => {
+  function SubmitData(event) {
     // Prevent the form from clearing data
     event.preventDefault();
 
@@ -390,20 +281,6 @@ function ContextForm() {
     const firmwareConfig = contextValues.bikeConfig.firmwareConfig;
 
     /**
-     * Check a new saved name against previous saved names for that board.
-     * This avoids multiple configs being saved under the same name
-     *
-     * @param {string} savedName - name to check for
-     * @param {string} boardName - board to check for a duplicate of
-     *
-     * @return {bool} if there is a duplicate
-     */
-    const CheckSavedName = (savedName, boardName) => {
-      return dropDownOptions[boardName].some(
-        (config) => config[boardName + "SavedName"] === savedName
-      );
-    };
-    /**
      * An array of saved names used when saving a new bike config
      */
     const configSavedNames = {};
@@ -422,7 +299,7 @@ function ContextForm() {
 
         //Check if the config part is custom
         if (
-          configSelectedValue[firmwareConfigPart.toLowerCase()] === "Custom"
+          ConfigSelectedValue[firmwareConfigPart.toLowerCase()] === "Custom"
         ) {
           // If it is custom make sure it is not a duplicate saved name
 
@@ -460,7 +337,7 @@ function ContextForm() {
 
     // Save a new bike config with a name and all the needed data
     // Check that the saved name of the bike doesn't already exist
-    if (configSelectedValue["bike"] === "Custom") {
+    if (ConfigSelectedValue["bike"] === "Custom") {
       // saved name already in collectedData
       const bikeSavedName =
         collectedData.event.runs[0].context.bikeConfig.bikeSavedName;
@@ -483,21 +360,21 @@ function ContextForm() {
       PostConfigData(JSON.stringify(newConfigItems));
     }
     navigate("/data-upload");
-  };
+  }
 
   /**
    * Called to initialize Main Body and Event
    * form elements.
    */
-  const InitializeForms = () => {
-    UpdateContext(GenerateFormElement("mainBody"));
-    UpdateEventForm(GenerateFormElement("event", eventData ? eventData : null));
-  };
+  const InitializeForms = useCallback(() => {
+    SetContextForm(DynamicForm("mainBody"));
+    SetEventForm(DynamicForm("event", EventData ? EventData : null));
+  }, [EventData]);
 
   /**
    * Auto complete the data field
    */
-  const AutoFillData = () => {
+  function AutoFillData() {
     const date = new Date();
     const offset = date.getTimezoneOffset();
     const local = new Date(date.getTime() - offset * 60 * 1000);
@@ -526,12 +403,8 @@ function ContextForm() {
       .slice(0, 16);
 
     document.getElementById("bikeSelect").value = "TEST_BIKE";
-    handleConfigFormChange("TEST_BIKE", "bike", true);
-  };
-
-  /* -------------------------------------------------------------------------- */
-  /* ----------------------- Establish Use Effect Hooks ----------------------- */
-  /* -------------------------------------------------------------------------- */
+    HandleConfigFormChange("bike", "TEST_BIKE");
+  }
 
   /**
    * Create all form elements for the main, bike, and event
@@ -541,25 +414,38 @@ function ContextForm() {
   useEffect(() => {
     // Create each select value
     ConfigName.forEach((name) => {
-      const dropDown = SelectCreator(dropDownOptions[name], name);
+      const dropDown = SelectCreator(
+        DropDownOptions[name],
+        name,
+        HandleConfigFormChange,
+        ConfigSelectedValue
+      );
       if (name === "bike") {
-        UpdateBikeSelect(dropDown);
-      } else if (bikeContextForm) {
+        SetBikeSelect(dropDown);
+      } else if (BikeContextForm) {
         // don't create the board selects till the bike dropdown is selected
-        setDropDowns((prev) => ({ ...prev, [name]: dropDown }));
+        SetDropDowns((prev) => ({ ...prev, [name]: dropDown }));
       }
     });
 
     InitializeForms();
-  }, [dropDownOptions, eventData, bikeContextForm]);
+  }, [
+    DropDownOptions,
+    EventData,
+    BikeContextForm,
+    ConfigName,
+    ConfigSelectedValue,
+    HandleConfigFormChange,
+    InitializeForms,
+  ]);
   /**
    * Fetch all the saved configs on the first load
    * and check if this is a new run
    */
   useEffect(() => {
-    GetConfigData().then((response) => {
+    GetConfigData.then((response) => {
       if (response && "data" in response && "config_data" in response["data"]) {
-        setDropdownOptions(response.data.config_data);
+        SetDropdownOptions(response.data.config_data);
       }
     });
 
@@ -569,7 +455,7 @@ function ContextForm() {
       if (
         (eventData = JSON.parse(sessionStorage.getItem("EventData"))) !== null
       ) {
-        setEventData(eventData);
+        SetEventData(eventData);
       } else {
         console.error("Data for event was unsaved");
       }
@@ -577,17 +463,12 @@ function ContextForm() {
       //ensure no data leaks from past runs
       sessionStorage.removeItem("EventData");
     }
-  }, [location.pathname]);
-
-  /* -------------------------------------------------------------------------- */
-  /* ---------------------------- Return Final Form --------------------------- */
-  /* -------------------------------------------------------------------------- */
-
+  }, [location.pathname, GetConfigData]);
   return (
     <Form
       className='ContextForm'
       name='Context'
-      id={FormId}
+      id='MainForm'
       onSubmit={(e) => {
         SubmitData(e);
       }}
@@ -597,7 +478,7 @@ function ContextForm() {
         <Col className='left-panel'>
           <Card className='panel-content '>
             <CardTitle className='panel-header'>Main Context</CardTitle>
-            <CardBody>{mainContextForm}</CardBody>
+            <CardBody>{MainContextForm}</CardBody>
           </Card>
         </Col>
 
@@ -607,7 +488,7 @@ function ContextForm() {
             <Col className='top-right-panel'>
               <Card className='panel-content'>
                 <CardTitle className='panel-header'>Event Context</CardTitle>
-                <CardBody>{eventContextForm}</CardBody>
+                <CardBody>{EventContextForm}</CardBody>
               </Card>
             </Col>
           </Row>
@@ -615,19 +496,19 @@ function ContextForm() {
             <Col className='bottom-right-panel'>
               <Card className='panel-content'>
                 <CardTitle className='panel-header'>
-                  Bike Context: {bikeSelect}
+                  Bike Context: {BikeSelect}
                 </CardTitle>
-                <CardBody>{bikeContextForm}</CardBody>
+                <CardBody>{BikeContextForm}</CardBody>
               </Card>
             </Col>
           </Row>
         </Col>
       </Container>
       <Container className='grid-container'>
-        {bikeContextForm
+        {BikeContextForm
           ? ConfigName.map((name) => {
               if (name === "bike") {
-                return;
+                return <div></div>;
               }
               return (
                 <Card className='grid-item'>
@@ -638,9 +519,9 @@ function ContextForm() {
                      *configs of the same type that have been saved. Allow user to also
                      *create a new one with the option to save it with a name
                      */}
-                    {name.toLocaleUpperCase()} Configuration: {dropDowns[name]}
+                    {name.toLocaleUpperCase()} Configuration: {DropDowns[name]}
                   </CardTitle>
-                  <CardBody>{configForm[name]}</CardBody>
+                  <CardBody>{ConfigForm[name]}</CardBody>
                 </Card>
               );
             })
@@ -652,7 +533,7 @@ function ContextForm() {
        * SubmitData() const function
        */}
       <Button className='submitButton'>
-        Submit {eventData != null ? "Run" : null}
+        Submit {EventData != null ? "Run" : null}
       </Button>
       <Button onClick={AutoFillData} className='autoFill'>
         Auto Complete

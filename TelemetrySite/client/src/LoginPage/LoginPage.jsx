@@ -13,17 +13,11 @@ import {
   ModalBody,
 } from "reactstrap";
 import { useEffect, useState } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+
 import "./LoginPage.css";
 import { useNavigate } from "react-router-dom";
 import { BuildURI } from "Utils/ServerUtils";
-
-const styles = {
-  container: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-  },
-};
 
 /**
  * Display a username password prompt to verify who the user is
@@ -84,7 +78,7 @@ const LoginPage = ({ onLogin }) => {
         <Form onSubmit={LoginChallenge} className='form'>
           <Container>
             <Col>
-              <InputGroup style={styles.InputGroup}>
+              <InputGroup>
                 <Label className='Label' htmlFor='username'>
                   Username:
                 </Label>
@@ -197,109 +191,97 @@ const SignupPage = ({ onSignup }) => {
 
   return (
     <Card className='card'>
-      <Container>
-        <Col>
-          <center>
-            <h2>Signup</h2>
-          </center>
-          <Form onSubmit={HandleSignup} className='form'>
+      <center>
+        <h2>Signup</h2>
+      </center>
+      <Form onSubmit={HandleSignup} className='form'>
+        <Container>
+          <Col>
             <Row>
-              <Col>
-                <InputGroup className='InputGroup'>
-                  <Label htmlFor='username'>Username:</Label>
-                  <Input
-                    type='text'
-                    id='username'
-                    className='Input'
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    required
-                  />
-                </InputGroup>
-              </Col>
+              <InputGroup className='InputGroup'>
+                <Input
+                  type='text'
+                  id='username'
+                  className='Input'
+                  value={username}
+                  placeholder='Username'
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                />
+              </InputGroup>
             </Row>
-            <Row>
-              <Col>
-                <InputGroup className='InputGroup'>
-                  <Label htmlFor='password'>Password:</Label>
-                  <Input
-                    type='password'
-                    id='password'
-                    className='Input'
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </InputGroup>
-              </Col>
-            </Row>
-            <Row>
-              <Col>
-                <InputGroup className='InputGroup'>
-                  <Label htmlFor='confirm-password'>Confirm Password:</Label>
-                  <Input
-                    type='password'
-                    id='confirm-password'
-                    className='Input'
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                  />
-                </InputGroup>
-              </Col>
-            </Row>
-            <Row>
-              <Col>
-                <InputGroup className='InputGroup'>
-                  <Label htmlFor='challenge-value'>Challenge Value:</Label>
-                  <Input
-                    type='number'
-                    id='challenge-value'
-                    className='Input'
-                    value={challengeInt}
-                    onChange={(e) => setChallengeInt(e.target.value)}
-                    required
-                  />
-                </InputGroup>
-              </Col>
-            </Row>
-            <Row className='mt-3'>
-              <Col>
-                <Button type='submit' className='SubmitButton' block>
-                  Sign up
-                </Button>
-              </Col>
-              <Col>
-                <Button
-                  className='SwitchButton'
-                  block
-                  onClick={() => navigate("/login")}
-                >
-                  Switch to Login
-                </Button>
-              </Col>
-            </Row>
-          </Form>
-        </Col>
 
-        {/* Modals for error handling */}
-        <Modal isOpen={passwordModalOpen} toggle={passwordModalToggle}>
-          <ModalHeader toggle={passwordModalToggle}>
-            Passwords do not match
-          </ModalHeader>
-          <ModalBody>
-            Looks like your passwords do not match, please try again.
-          </ModalBody>
-        </Modal>
-        <Modal isOpen={challengeIntModalOpen} toggle={challengeModalToggle}>
-          <ModalHeader toggle={challengeModalToggle}>
-            Invalid challenge value
-          </ModalHeader>
-          <ModalBody>
-            Your inputted challenge value does not match the expected value
-          </ModalBody>
-        </Modal>
-      </Container>
+            <Row>
+              <InputGroup className='InputGroup'>
+                <Input
+                  type='number'
+                  id='challenge-value'
+                  className='Input'
+                  value={challengeInt}
+                  placeholder='Challenge Value'
+                  onChange={(e) => setChallengeInt(e.target.value)}
+                  required
+                />
+              </InputGroup>
+            </Row>
+          </Col>
+          <Col>
+            <Row>
+              <InputGroup className='InputGroup'>
+                <Input
+                  type='password'
+                  id='password'
+                  className='Input'
+                  value={password}
+                  placeholder='Create Password'
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </InputGroup>
+            </Row>
+            <Row>
+              <InputGroup className='InputGroup'>
+                <Input
+                  type='password'
+                  id='confirm-password'
+                  className='Input'
+                  value={confirmPassword}
+                  placeholder='Confirm Password'
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+              </InputGroup>
+            </Row>
+          </Col>
+        </Container>
+        <center>
+          <Button type='submit' className='SubmitButton'>
+            Signup
+          </Button>
+
+          <Button className='SwitchButton' onClick={() => navigate("/login")}>
+            Login
+          </Button>
+        </center>
+      </Form>
+
+      {/* Modals for error handling */}
+      <Modal isOpen={passwordModalOpen} toggle={passwordModalToggle}>
+        <ModalHeader toggle={passwordModalToggle}>
+          Passwords do not match
+        </ModalHeader>
+        <ModalBody>
+          Looks like your passwords do not match, please try again.
+        </ModalBody>
+      </Modal>
+      <Modal isOpen={challengeIntModalOpen} toggle={challengeModalToggle}>
+        <ModalHeader toggle={challengeModalToggle}>
+          Invalid challenge value
+        </ModalHeader>
+        <ModalBody>
+          Your inputted challenge value does not match the expected value
+        </ModalBody>
+      </Modal>
     </Card>
   );
 };

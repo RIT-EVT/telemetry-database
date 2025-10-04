@@ -1,54 +1,56 @@
 from utils import create_db_connection
-
 import cantools
 from asammdf import MDF
 import json
 from more_itertools import sliced
 import gridfs
+import os
 
 parsing_data_progress = [0]
 uploading_data_progress = [0]
 
-## The function that sends data to the db
-#
-# @param data_path path to the mf4 file
-# @param dbc_file path to the dbc file
-# @param context_id context id for the data
 def submit_data(mf4_file, dbc_file, context_data, runOrderNumber):
-   
-    db_connection = create_db_connection()
-    fs = gridfs.GridFS(db_connection)
-    
+    """
+        Parse the data from binary to a readable state and begin upload 
+
+    Args:
+        mf4_file (string): path to the mf4 file
+        dbc_file (string): path to the dbc file
+        context_data (Dictionary): context id for the data
+        runOrderNumber (int): Which run this is in a larger group of runs
+    """
+    fs = gridfs.GridFS(create_db_connection())
 
     dbc_decoded = cantools.database.load_file(dbc_file)
 
     # get a dictionary of CAN id -> Board name
     can_id_values = get_board_names(dbc_decoded)
     # create an outline of how to read the data
-    config_values = createConfig(can_id_values, dbc_decoded)
+    config_values = create_config(can_id_values, dbc_decoded)
     # turn data from CAN messages -> list
     data_values_json = parse_data(mf4_file, config_values, can_id_values)
 
     context_data = json.loads(context_data)
     
    
-    context_data["event"]["runs"][0]["mf4File"]=fs.put(mf4_file, encoding="utf-8")
-    context_data["event"]["runs"][0]["dbcFile"]=fs.put(dbc_file, encoding="utf-8")
+    with open(mf4_file, "rb") as f:
+        context_data["event"]["runs"][0]["mf4File"] = fs.put(f, filename=os.path.basename(mf4_file))
+
+    with open(dbc_file, "rb") as f:
+        context_data["event"]["runs"][0]["dbcFile"] = fs.put(f, filename=os.path.basename(dbc_file))
     context_data["event"]["runs"][0]["orderNumber"] = runOrderNumber
-
-    return(upload_data_in_chunks(context_data, data_values_json))
+    upload_data_in_chunks(context_data, data_values_json)
     
-    
-
-## This function uploads the contents of the messages
-# to the NRDB in chunks of ~16 mb. Max size of a document
-# is just below 17 mb, but to save time in the upload process
-# we don't try to get it exact since each file could be > 160_000
-# entries long
-#
-# @param collection_access_event reference to the mongo db connection
-# @param data_values_json data to add to the db
 def upload_data_in_chunks(new_run_data, data_values_json):
+    """
+        Upload the data in chunks that are less than 17 mb.
+        MongoDB does not allow any files to be above this value,
+        so slice the data into chunks of 15 mb/150,000 entries.
+
+    Args:
+        new_run_data (Dictionary): Context data
+        data_values_json (Dictionary): New bike data to upload
+    """
     # divide the data into chunks that are less the 16 mb
     # 150_000 ~< 15 mb but always < 16 mb
     sliced_data = list(sliced(data_values_json, 150_000))
@@ -75,15 +77,16 @@ def upload_data_in_chunks(new_run_data, data_values_json):
         collection_access_messages.insert_one(data_upload)
         
     uploading_data_progress[0]=1
-    return 0
 
-
-## The function that corelate frame id to board name
-#
-# @param dbc_database the loaded dbc file ready to be used
-#
-# @return dictionary of frame id -> board name
 def get_board_names(dbc_database):
+    """
+    Correlates frame ids to board names
+    Args:
+        dbc_database (Dictionary): The loaded dbc file ready to be used
+
+    Returns:
+        Dictionary: Frame id to board name dictionary
+    """
     config = {}
 
     # loop through every dbc entry and convert the frame id -> board name
@@ -104,24 +107,33 @@ def get_board_names(dbc_database):
             config[hex(msg.frame_id)] = board_name
     return config
 
-
-## The function that converts partial bits into an int
-#
-# @param number raw binary number to read
-# @param starting_bit bit to start reading from
-# @param final_bit bit to finish reading exclusive
-# @return binary string of bits
 def read_bits(number, starting_bit, final_bit):
+    """
+        Get the needed binary bits from a longer string of bits
+
+    Args:
+        number (int): Raw binary number to read
+        starting_bit (int): bit to start reading from inclusive
+        final_bit (int): bit to finish reading exclusive
+
+    Returns:
+        string: binary string of bits
+    """
     binary_number = format(number, "08b")
     binary_string = binary_number[starting_bit:final_bit]
     return binary_string
 
-
-## The function that combines bytes of data
-#
-# @param numbers list of bytes to combine
-# @return binary string of bytes
 def combine_binary(*numbers):
+    """
+        Combine bytes of binary data
+
+    Args:
+        number (Tuple): binary data to combine
+        
+    Returns:
+        String: combined data
+    """
+    
     # Convert each number to an 8-bit binary string
     binary_list = [format(num, "08b") for num in numbers]
 
@@ -133,23 +145,40 @@ def combine_binary(*numbers):
 
     return combined_binary
 
-
-## The function that looks at the signage of a number
-#
-# @param x number
-# @param size number of bits
-# @return signed in
 def signed_bin_convert(x, size):
-    return (x & ((1 << size - 1) - 1)) - (x & (1 << size - 1))
+    """
+    Convert an unsigned integer into a signed integer using two's complement.
 
+    Args:
+        x (int): The unsigned integer value.
+        size (int): The bit-width of the value (e.g., 8 for a byte).
 
-## The function that converts data from CAN to a list
-#
-# @param dbc_path the path to the dbc file for the CAN data
-# @param mdf_path the path to the mf4 file
-#
-# @return list form of CAN data
+    Returns:
+        int: The signed integer interpretation of x.
+    """
+    # Mask to extract the lower (size - 1) bits (the magnitude part)
+    magnitude = x & ((1 << size - 1) - 1)
+
+    # Mask to extract the sign bit (the highest bit in size bits)
+    sign = x & (1 << size - 1)
+
+    # If sign is set, subtract its value (2^(size-1)) → yields negative numbers
+    # Otherwise, just returns the magnitude
+    return magnitude - sign
+
 def parse_data(mdf_path, config_values, id_to_name):
+    """
+        Convert .MF4 files to a list of CAN messages
+
+    Args:
+        mdf_path (string): Path to the MF4 file
+        config_values (Dictionary): ID to extra data (Axis, signage, etc)
+        id_to_name (Dictionary): Dictionary for can ID to board names
+
+    Returns:
+        List: CAN messages
+    """
+    
     # Load the MDF file
     mdf = MDF(mdf_path, memory_map=False)
 
@@ -269,29 +298,34 @@ def parse_data(mdf_path, config_values, id_to_name):
     parsing_data_progress[0]=1
     return json_data
 
-
-## Clean the board names
-#
-# @param sender raw name of board
-#
-# @return cleaned board name
 def get_board_name(sender):
+    """
+        Clean the board names. Parse BMS and ignore VirtualNMTMaster
 
+    Args:
+        sender (string): Name of board that is sending a message
+
+    Returns:
+        string: cleaned board name
+    """
     if sender == "VirtualNMTMaster":  # Ignore VirtualNMTMaster
         return None
     if sender[:3] == "BMS":
         return sender[:3] + "X_" + sender[len(sender) - 1 :]
     return sender
 
-
-## The function that interprets all BMS data
-#
-# @param signal information about the CAN message
-# @param sender board that sent the message
-#
-# @return data entry
 def handle_bms(signal, sender):
+    """
+        Interpret BMS data
 
+    Args:
+        signal (Dictionary): Information about the CAN message
+        sender (String): Board that sent the message
+
+    Returns:
+        Dictionary: Updated data
+    """
+    
     signal_name = signal.name
     # each signal has the cell id at separate spots and needs special parts
 
@@ -351,13 +385,17 @@ def handle_bms(signal, sender):
 
     return entry
 
-
-## The function that handles the imu board messages
-#
-# @param signal information about the CAN message
-#
-# @return data entry
 def handle_imu(signal):
+    """
+        Handle IMU data
+
+    Args:
+        signal (Dictionary): Information about the CAN message
+
+    Returns:
+        Dictionary: Updated data
+    """
+    
     signal_name = signal.name
 
     # map the possible signal names to their table names in the sql db
@@ -386,13 +424,16 @@ def handle_imu(signal):
         json_object["axis"] = axis
     return json_object
 
-
-## The function that handle the pvc board messages
-#
-# @param signal information about the CAN message
-#
-# @return data entry
 def handle_pvc(signal):
+    """
+        Handle PVC data
+
+    Args:
+        signal (Dictionary): Information about the CAN message
+
+    Returns:
+        Dictionary: Updated data
+    """
 
     signal_name = signal.name
     signal_to_table = {"State": "PvcState"}
@@ -406,13 +447,17 @@ def handle_pvc(signal):
         "signage": "signed" if signal.is_signed else "unsigned",
     }
 
-
-## The function that handle the tms board messages
-#
-# @param signal information about the CAN message
-#
-# @return data entry
 def handle_tms(signal):
+    """
+        Handle TMS data
+
+    Args:
+        signal (Dictionary): Information about the CAN message
+
+    Returns:
+        Dictionary: Updated data
+    """
+    
     signal_name = signal.name
 
     if signal_name.find("Duty_Cycle") != -1:
@@ -443,13 +488,18 @@ def handle_tms(signal):
         entry["pumpId"] = 1
     return entry
 
+def create_config(board_names_json, dbc_file):
+    """
+        Create a config file to interpret data
 
-## The function that creates the configuration for for the data
-#
-# @param board_names_json dictionary of can signal -> board name
-# @param dbc_file dbc file to interpret data
-def createConfig(board_names_json, dbc_file):
+    Args:
+        board_names_json (Dictionary): CAN id to board names
+        dbc_file (Dictionary): The data in the DBC file
 
+    Returns:
+        Dictionary: Config data
+    """
+    
     config = {}
     # Process each message and interpret how it should be read
     for msg in dbc_file.messages:
@@ -488,12 +538,16 @@ def createConfig(board_names_json, dbc_file):
     # return the config dictionary,
     return config
 
-
 ## The function that makes the progress of data upload visible to the frontend
 #
 # @return dictionary with the current state the process is on and its percentage
 def get_progress():
-    
+    """
+        Get the progress of a current upload
+
+    Returns:
+        Int: Current progress of an upload
+    """
     if parsing_data_progress[0]!=1:
        return {"Parsing Data": parsing_data_progress[0]}
     elif uploading_data_progress[0]!=1:
