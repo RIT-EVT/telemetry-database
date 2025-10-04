@@ -7,7 +7,6 @@ from bson import ObjectId
 from utils import create_db_connection, authenticate_user, check_expired_tokens
 
 class BikeConfigApi(MethodView):
-  
     BIKE_CONFIG_DOC = '67ae8d01097ab8ae923672f8'
     
     

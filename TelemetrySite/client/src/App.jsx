@@ -10,6 +10,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { CheckServerStatus } from "Utils/ServerUtils.jsx";
 import ErrorModal from "Modal/Error/Error.jsx";
 import Header from "./Header/Header.jsx";
+import Footer from "Footer/Footer.jsx";
 
 /**
  * Render the main application and contain all the logic for what to display
@@ -92,39 +93,43 @@ function App() {
 
   return (
     <div className='MainBody'>
-      <Header onLogout={HandleSignout} authToken={AuthToken} />
-      <Container className='ContextSelect'>
-        {ServerStatus ? (
-          <Row className='Components'>
-            <Routes>
-              <Route
-                path='/context-form'
-                element={<ContextForm authToken={AuthToken} />}
-              />
-              <Route
-                path='/new-run'
-                element={<ContextForm authToken={AuthToken} />}
-              />
-              <Route path='/data-upload' element={<DataUpload />} />
-              <Route
-                path='/login'
-                element={<LoginPage onLogin={HandleLogin} />}
-              />
-              <Route
-                path='/signup'
-                element={<SignupPage onSignup={HandleSignup} />}
-              />
-              <Route path='*' element={<Page404 />} />
-            </Routes>
-          </Row>
-        ) : null}
-      </Container>
       <ErrorModal
         isOpen={IsErrorOpen}
         toggle={toggleErrorModal}
         ignore={ignoreErrorModal}
         errorMessage={ErrorMsg}
       />
+      <Header onLogout={HandleSignout} authToken={AuthToken} />
+
+      <main>
+        <Container className='ContextSelect'>
+          {ServerStatus ? (
+            <Row className='Components'>
+              <Routes>
+                <Route
+                  path='/context-form'
+                  element={<ContextForm authToken={AuthToken} />}
+                />
+                <Route
+                  path='/new-run'
+                  element={<ContextForm authToken={AuthToken} />}
+                />
+                <Route path='/data-upload' element={<DataUpload />} />
+                <Route
+                  path='/login'
+                  element={<LoginPage onLogin={HandleLogin} />}
+                />
+                <Route
+                  path='/signup'
+                  element={<SignupPage onSignup={HandleSignup} />}
+                />
+                <Route path='*' element={<Page404 />} />
+              </Routes>
+            </Row>
+          ) : null}
+        </Container>
+      </main>
+      <Footer />
     </div>
   );
 }

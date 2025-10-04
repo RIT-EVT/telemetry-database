@@ -9,7 +9,7 @@
 }
 
 .Label {
-    color: white !important;
+    color: white;
 }
 
 .InputGroup {
@@ -28,6 +28,7 @@
     transition: background-color 0.3s ease, transform 0.2s ease;
 
     background-color: #F36917;
+    color: black;
     border-color: black;
     cursor: pointer;
 }
@@ -56,6 +57,10 @@
 
 .SwitchButton:hover {
     transform: scale(1.05);
-    background-color: rgb(36, 34, 34);
+    background-color: #363434;
     border: white;
+}
+
+h2 {
+    color: white;
 }
