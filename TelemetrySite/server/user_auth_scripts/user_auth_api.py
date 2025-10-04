@@ -26,7 +26,7 @@ class UserAuthApi(MethodView):
             password = user_data.get("password")
             
             mongo_data = user_db_connection.find_one({"username":username, "password":password.encode()})
-          
+        
         
             if mongo_data == None:
                 return jsonify({"error":"Invalid username or password"}), 404        
@@ -44,7 +44,7 @@ class UserAuthApi(MethodView):
             secure_num = user_data.get("secureNum")
             
             current_date_time = datetime.now()   
-             
+            
             if secure_num != getenv("CHALLENGE_NUM"):
                 # User value doesn't match the needed value
                 # return an error message

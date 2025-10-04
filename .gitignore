@@ -7,6 +7,10 @@
 /.vscode
 __pycache__/
 data_upload_file/
+.pytest_cache/
 *.crt
 *.pem
+*.key
+*.xml
+login_data/
 /.pytest_cache
