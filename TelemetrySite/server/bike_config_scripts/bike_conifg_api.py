@@ -1,15 +1,18 @@
 from flask.views import MethodView
 from flask import request, jsonify
-
 import json
 from bson import ObjectId
 
-from utils import create_db_connection, authenticate_user, check_expired_tokens
+from utils import authenticate_user, check_expired_tokens
+from http_codes import HttpResponseType
+
 
 class BikeConfigApi(MethodView):
-  
+
     BIKE_CONFIG_DOC = '67ae8d01097ab8ae923672f8'
     
+    def __init__(self, db):
+        self.db = db
     
     def get(self, auth_token):
         """
@@ -22,18 +25,19 @@ class BikeConfigApi(MethodView):
             tuple: All configs currently saved
         """
         
-        if not authenticate_user(auth_token):
-            return jsonify({"authError":"unauthenticated user"}), 400
-        elif check_expired_tokens(auth_token):
-            return jsonify({"authError":"expired user token"}), 400
-        
-        db_connection = create_db_connection()["configs"]
+        if not authenticate_user(auth_token, self.db):
+            return HttpResponseType.UNAUTHORIZED.error()
+        elif check_expired_tokens(auth_token, self.db):
+            return HttpResponseType.UNAUTHORIZED.error()
+
+        db_connection = self.db["configs"]
+
         config_data = db_connection.find_one({"_id":ObjectId(self.BIKE_CONFIG_DOC)})
-        
+
         if config_data:
             config_data["_id"] = str(config_data["_id"])  # Convert ObjectId to string
 
-        return jsonify({"data":config_data}), 200
+        return {"data": config_data}, HttpResponseType.OK.value
     
     def post(self, auth_token):
         """
@@ -46,12 +50,12 @@ class BikeConfigApi(MethodView):
             tuple: success message
         """
         
-        if not authenticate_user(auth_token):
-            return jsonify({"authError":"unauthenticated user"}), 400
-        elif check_expired_tokens(auth_token):
-            return jsonify({"authError":"expired user token"}), 400
+        if not authenticate_user(auth_token, self.db):
+            return HttpResponseType.UNAUTHORIZED.error()
+        elif check_expired_tokens(auth_token, self.db):
+            return HttpResponseType.UNAUTHORIZED.error()
         
-        db_connection = create_db_connection()["configs"]
+        db_connection = self.db["configs"]
         config_data = request.form["configData"]
     
         config_data = json.loads(config_data)
@@ -60,11 +64,8 @@ class BikeConfigApi(MethodView):
             if len(config_data[key])!=0:
                 db_connection.update_one({"_id":ObjectId(self.BIKE_CONFIG_DOC)}, {"$push":{f"config_data.{key}":config_data[key]}})
 
-        return jsonify({"success": "Data created"}), 201
+        return {"success": "Data created"}, HttpResponseType.CREATED.value
     
     
     def delete(self):
-        return jsonify({"error":"Not implemented"}), 501
-    
-    
-    
+        return HttpResponseType.NOT_IMPLEMENTED.error()
