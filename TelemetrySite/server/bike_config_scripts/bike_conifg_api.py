@@ -4,6 +4,8 @@ import json
 from bson import ObjectId
 
 from utils import authenticate_user, check_expired_tokens
+from http_codes import HttpResponseType
+
 
 class BikeConfigApi(MethodView):
 
@@ -24,9 +26,9 @@ class BikeConfigApi(MethodView):
         """
         
         if not authenticate_user(auth_token, self.db):
-            return {"authError":"unauthenticated user"}, 401
+            return HttpResponseType.UNAUTHORIZED.error()
         elif check_expired_tokens(auth_token, self.db):
-            return {"authError":"expired user token"}, 401
+            return HttpResponseType.UNAUTHORIZED.error()
 
         db_connection = self.db["configs"]
 
@@ -35,7 +37,7 @@ class BikeConfigApi(MethodView):
         if config_data:
             config_data["_id"] = str(config_data["_id"])  # Convert ObjectId to string
 
-        return {"data": config_data}, 200
+        return {"data": config_data}, HttpResponseType.OK.value
     
     def post(self, auth_token):
         """
@@ -49,9 +51,9 @@ class BikeConfigApi(MethodView):
         """
         
         if not authenticate_user(auth_token, self.db):
-            return {"authError":"unauthenticated user"}, 401
+            return HttpResponseType.UNAUTHORIZED.error()
         elif check_expired_tokens(auth_token, self.db):
-            return {"authError":"expired user token"}, 401
+            return HttpResponseType.UNAUTHORIZED.error()
         
         db_connection = self.db["configs"]
         config_data = request.form["configData"]
@@ -62,8 +64,8 @@ class BikeConfigApi(MethodView):
             if len(config_data[key])!=0:
                 db_connection.update_one({"_id":ObjectId(self.BIKE_CONFIG_DOC)}, {"$push":{f"config_data.{key}":config_data[key]}})
 
-        return {"success": "Data created"}, 201
+        return {"success": "Data created"}, HttpResponseType.CREATED.value
     
     
     def delete(self):
-        return jsonify({"error":"Not implemented"}), 501
+        return HttpResponseType.NOT_IMPLEMENTED.error()

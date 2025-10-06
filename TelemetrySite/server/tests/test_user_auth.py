@@ -1,3 +1,5 @@
+from http_codes import HttpResponseType
+
 def test_user_auth_login(client):
     login_payload={
         "action":"login",
@@ -10,7 +12,7 @@ def test_user_auth_login(client):
         json=login_payload
     )
     
-    assert response.status_code == 200
+    assert response.status_code == HttpResponseType.OK.value
     json_data = response.get_json()
     
     assert json_data!=None
@@ -28,7 +30,7 @@ def test_user_auth_invalid_username(client):
         json=login_payload
     )
     
-    assert response.status_code==401, "User logged in with bad username"
+    assert response.status_code==HttpResponseType.UNAUTHORIZED.value, "User logged in with bad username"
 
 def test_user_auth_update_token(client):
     login_payload={
@@ -40,7 +42,7 @@ def test_user_auth_update_token(client):
         "/Login",
         json=login_payload
     )
-    assert response.status_code==200
+    assert response.status_code==HttpResponseType.OK.value
     json_data = response.get_json()
     
     assert json_data!=None
@@ -58,7 +60,7 @@ def test_user_auth_invalid_password(client):
         json=login_payload
     )
     
-    assert response.status_code==401, "User logged in with bad password"
+    assert response.status_code==HttpResponseType.UNAUTHORIZED.value, "User logged in with bad password"
 
 def test_user_auth_signup(client):
     signup_payload={    
@@ -73,7 +75,7 @@ def test_user_auth_signup(client):
         json=signup_payload
     )
         
-    assert response.status_code == 201
+    assert response.status_code == HttpResponseType.CREATED.value
     json_data = response.get_json()
     
     assert json_data!=None
@@ -93,7 +95,7 @@ def test_user_auth_signup(client):
         json=login_payload
     )
     
-    assert response.status_code == 200
+    assert response.status_code == HttpResponseType.OK.value
     assert "auth_token" in json_data
     assert json_data["auth_token"] == auth_token
 
@@ -110,7 +112,7 @@ def test_user_auth_invalid_challenge(client):
         json=invalid_signup
     )
     
-    assert response.status_code==401, "User created an acount without challenge number"
+    assert response.status_code==HttpResponseType.UNAUTHORIZED.value, "User created an acount without challenge number"
 
 def test_user_auth_duplicate_name(client):
     invalid_signup={
@@ -125,4 +127,4 @@ def test_user_auth_duplicate_name(client):
         json=invalid_signup
     )
     
-    assert response.status_code==401, "User created an with a duplicate name"
+    assert response.status_code==HttpResponseType.UNAUTHORIZED.value, "User created an with a duplicate name"

@@ -6,6 +6,7 @@ import dotenv
 import json
 import os
 import logging
+from http_codes import HttpResponseType 
 
 from data_upload_scripts.data_upload_api import DataUploadApi
 from bike_config_scripts.bike_conifg_api import BikeConfigApi
@@ -26,6 +27,7 @@ def create_app(db=None):
     dotenv.load_dotenv(os.path.join(two_up, "encryption.env"))
 
     # If no DB passed in, connect to the real one
+    # We do this so during testing we can pass in a face db connection
     if db is None:
         db = create_db_connection()
 
@@ -45,16 +47,16 @@ def create_app(db=None):
         try:
             with open(os.path.abspath(os.path.join(server_folder, "ServerPaths.json")), "r") as json_file:
                 data = json.load(json_file)
-            return jsonify(data), 200
+            return jsonify(data), HttpResponseType.OK.value
         except FileNotFoundError:
-            return jsonify({"error": "File not found"}), 404
+            return jsonify({"error": "File not found"}), HttpResponseType.INTERNAL_SERVER_ERROR.value
         except json.JSONDecodeError:
-            return jsonify({"error": "Error decoding JSON"}), 500
+            return jsonify({"error": "Error decoding JSON"}), HttpResponseType.INTERNAL_SERVER_ERROR.value
 
     return app
 
 
 if __name__ == "__main__":
     print("Starting flask")
-    app = create_app()  # real DB in production
+    app = create_app()  # real DB in production, don't pass in a connection
     app.run(debug=True)

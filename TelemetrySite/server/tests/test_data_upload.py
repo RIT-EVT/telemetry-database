@@ -1,40 +1,42 @@
 import os
 from datetime import datetime
 from json import dumps
+from http_codes import HttpResponseType
+
 
 folder_name=os.path.dirname(__file__)
 data = {
-                "mf4File": "", 
-                "dbcFile": "",
-                "contextData": dumps({
-                    "event": {
-                        "name": "test",
-                        "location": "test",
-                        "date": datetime.now().isoformat(),
-                        "type": "test",
-                        "runs": [
-                            {
-                                "orderNumber": 0,
-                                "context": {
-                                    "weather": "cold",
-                                    "riderName": "BillyBob",
-                                    "riderWeight": 80,
-                                    "airTemp": 34,
-                                    "windSpeed": 12.34,
-                                    "windDirection": "NW",
-                                    "riderFeedback": "The bike be moving",
-                                    "distanceCovered": 12.2,
-                                    "startTime": datetime.now().isoformat()
-                                },
-                                "originalDataFile": "",
-                                "dbcFile": "",
-                                "messages": []
-                            }
-                            ]
+            "mf4File": "", 
+            "dbcFile": "",
+            "contextData": dumps({
+                "event": {
+                    "name": "test",
+                    "location": "test",
+                    "date": datetime.now().isoformat(),
+                    "type": "test",
+                    "runs": [
+                        {
+                            "orderNumber": 0,
+                            "context": {
+                                "weather": "cold",
+                                "riderName": "BillyBob",
+                                "riderWeight": 80,
+                                "airTemp": 34,
+                                "windSpeed": 12.34,
+                                "windDirection": "NW",
+                                "riderFeedback": "The bike be moving",
+                                "distanceCovered": 12.2,
+                                "startTime": datetime.now().isoformat()
+                            },
+                            "originalDataFile": "",
+                            "dbcFile": "",
+                            "messages": []
                         }
-                    }),
-                    "runOrderNumber": "1"
+                    ]
                 }
+            }),
+            "runOrderNumber": "1"
+        }
 
 ## Valid test. Should return 201 and save data
 def test_post_real_files(client, mock_db):
@@ -51,7 +53,7 @@ def test_post_real_files(client, mock_db):
 
 
     # Assertions about return data
-    assert response.status_code == 201
+    assert response.status_code == HttpResponseType.CREATED.value
     assert response.get_json()["message"] == "Data received successfully"
     
     # Assertions about mongo query result
@@ -79,7 +81,7 @@ def test_post_missing_mf4(client):
         )
     
     # Assertions about return data
-    assert response.status_code == 400
+    assert response.status_code == HttpResponseType.BAD_REQUEST.value
     
     with open(os.path.join(folder_name, "test_data/DEV1_4_13.dbc.test"), "rb") as dbc:
         data["dbcFile"]=(dbc, "DEV1_4_13.dbc")
@@ -91,7 +93,7 @@ def test_post_missing_mf4(client):
         )
     
     # Assertions about return data
-    assert response.status_code == 400
+    assert response.status_code == HttpResponseType.BAD_REQUEST.value
     
 def test_post_missing_dbc(client):
     with open(os.path.join(folder_name, "test_data/ExampleData.MF4.test"), "rb") as mf4:
@@ -104,7 +106,7 @@ def test_post_missing_dbc(client):
         )
     
     # Assertions about return data
-    assert response.status_code == 400
+    assert response.status_code == HttpResponseType.BAD_REQUEST.value
     
     with open(os.path.join(folder_name, "test_data/ExampleData.MF4.test"), "rb") as mf4:
         data["mf4File"]=(mf4, "ExampleData.mf4")
@@ -116,7 +118,7 @@ def test_post_missing_dbc(client):
         )
     
     # Assertions about return data
-    assert response.status_code == 400
+    assert response.status_code == HttpResponseType.BAD_REQUEST.value
 
 def test_post_missing_context(client):
     with open(os.path.join(folder_name, "test_data/ExampleData.MF4.test"), "rb") as mf4, open(os.path.join(folder_name, "test_data/DEV1_4_13.dbc.test"), "rb") as dbc:
@@ -130,18 +132,18 @@ def test_post_missing_context(client):
         )
             
     # Assertions about return data
-    assert response.status_code == 400
+    assert response.status_code == HttpResponseType.BAD_REQUEST.value
     
 def test_post_unauthorized_user(client):
     # No need to even submit data, it should fail automatically 
     response = client.post("/DataUpload/-1")
     
     # Assertions about return data
-    assert response.status_code == 401
+    assert response.status_code == HttpResponseType.UNAUTHORIZED.value
     
 def test_post_expired_user(client):
-
+    
     response = client.post("/DataUpload/1")
     
     # Assertions about return data
-    assert response.status_code == 401
+    assert response.status_code == HttpResponseType.UNAUTHORIZED.value

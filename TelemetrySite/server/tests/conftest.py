@@ -23,7 +23,7 @@ from server import create_app
 #  but it is also useful to run these test as you're updating the code so you know
 #  ahead of time if your changes are working or not
 #
-## Any and allow new features for our backend need test cases. This includes
+## Any and all new features for our backend need test cases. This includes
 #  testing all edge cases (ex: what if a user tries to upload an incorrect file)
 #  and all possible events. No test cases will ever be perfect, but we want 
 #  our to be as close as we can get it.

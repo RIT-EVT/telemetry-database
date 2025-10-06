@@ -1,8 +1,10 @@
 import json
+from http_codes import HttpResponseType
+
 
 def test_bike_config_read(client):
     response = client.get("/ConfigData/0")
-    assert response.status_code == 200, "Authorized user not allowed"
+    assert response.status_code == HttpResponseType.OK.value, "Authorized user not allowed"
     json_data = response.get_json()
     assert "data" in json_data
     assert "config_data" in json_data["data"]
@@ -12,11 +14,11 @@ def test_bike_config_read(client):
 
 def test_bike_config_read_unauthorized(client):
     response = client.get("/ConfigData/-1")
-    assert response.status_code == 401, "Unauthorized user accessed data"
+    assert response.status_code == HttpResponseType.UNAUTHORIZED.value, "Unauthorized user accessed data"
 
 def test_bike_config_read_outdated(client):
     response = client.get("/ConfigData/1")
-    assert response.status_code == 401, "Outdated user allowed access"
+    assert response.status_code == HttpResponseType.UNAUTHORIZED.value, "Outdated user allowed access"
 
 def test_bike_config_write(client):
     config_payload = {
@@ -32,10 +34,10 @@ def test_bike_config_write(client):
         content_type="application/x-www-form-urlencoded"
     )
 
-    assert response.status_code == 201
+    assert response.status_code == HttpResponseType.CREATED.value
     
     response = client.get("/ConfigData/0")
-    assert response.status_code == 200
+    assert response.status_code == HttpResponseType.OK.value
     json_data = response.get_json()
 
     assert "data" in json_data
@@ -58,7 +60,7 @@ def test_bike_config_write_unauthorized(client):
         content_type="application/x-www-form-urlencoded"
     )
     
-    assert response.status_code==401, "Unauthorized user accessed data"
+    assert response.status_code==HttpResponseType.UNAUTHORIZED.value, "Unauthorized user accessed data"
 
 def test_bike_config_write_expired(client):
     config_payload = {
@@ -74,4 +76,4 @@ def test_bike_config_write_expired(client):
         content_type="application/x-www-form-urlencoded"
     )
     
-    assert response.status_code==401, "Expired user accessed data"
+    assert response.status_code==HttpResponseType.UNAUTHORIZED.value, "Expired user accessed data"

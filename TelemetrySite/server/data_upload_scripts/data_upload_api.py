@@ -1,9 +1,10 @@
 from flask.views import MethodView
-from flask import request, jsonify
+from flask import request
 from werkzeug.utils import secure_filename
 import os
 from data_upload_scripts.data_upload import submit_data, get_progress
 from utils import authenticate_user, check_expired_tokens
+from http_codes import HttpResponseType 
 
 class DataUploadApi(MethodView):
 
@@ -28,11 +29,11 @@ class DataUploadApi(MethodView):
         """
 
         if not authenticate_user(auth_token, self.db):
-            return {"authError":"unauthenticated user"}, 400
+            return HttpResponseType.UNAUTHORIZED.error()
         elif check_expired_tokens(auth_token, self.db):
-            return {"authError":"expired user token"}, 400
+            return HttpResponseType.UNAUTHORIZED.error()
         
-        return get_progress(), 200
+        return get_progress(), HttpResponseType.OK.value
 
     def post(self, auth_token):
         """
@@ -46,17 +47,17 @@ class DataUploadApi(MethodView):
         """
 
         if not authenticate_user(auth_token, self.db):
-            return {"authError":"unauthenticated user"}, 401
+            return HttpResponseType.UNAUTHORIZED.error()
         elif check_expired_tokens(auth_token, self.db):
-            return {"authError":"expired user token"}, 401
+            return HttpResponseType.UNAUTHORIZED.error()
         
         # Check if the post request has all needed data needed
         if "mf4File" not in request.files:
-            return {"error": "No mf4 file uploaded"}, 400
+            return HttpResponseType.BAD_REQUEST.error()
         elif "dbcFile" not in request.files:
-            return {"error": "No dbc file uploaded"}, 400
+            return HttpResponseType.BAD_REQUEST.error()
         elif "contextData" not in request.form:
-            return {"error": "No context data passed"}, 400
+            return HttpResponseType.BAD_REQUEST.error()
         # save all needed data to local variables
 
         mf4File = request.files["mf4File"]
@@ -66,9 +67,9 @@ class DataUploadApi(MethodView):
         
         # ensure the file actually contains a valid file name and files
         if not mf4File or mf4File.name == "":
-            return {"error": "No mf4 file uploaded"}, 400
+            return HttpResponseType.BAD_REQUEST.error()
         elif not dbcFile or dbcFile.name == "":
-            return {"error": "No dbc file uploaded"}, 400
+            return HttpResponseType.BAD_REQUEST.error()
 
         # ensure files are of correct file type before uploading data to NRDB
         if self.file_type_check(mf4File.filename) and self.file_type_check(
@@ -93,9 +94,9 @@ class DataUploadApi(MethodView):
             os.remove(mf4_file)
             os.remove(dbc_file)
             
-            return {"message": "Data received successfully"}, 201
+            return {"message": "Data received successfully"}, HttpResponseType.CREATED.value
         else:
-            return {"error": "Wrong file type submitted. Must be of type mf4 and dbc"}, 400
+            return HttpResponseType.BAD_REQUEST.error()
         
     def file_type_check(self, filename):
         """
