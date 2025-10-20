@@ -8,5 +8,6 @@
 __pycache__/
 data_upload_file/
 *.crt
-*.pem
+*.key
+*.xml
 /.pytest_cache
