@@ -22,9 +22,22 @@ This database has a few goals:
   - Again, pipe dream, I want to have data streamed live from the bike to the database so we have a live feed of the state of the bike.
 - Ease of Access
   - Prior to any database set up, you had to give away your right arm and first born to get any of our data.
-  - Providing the database will give the MechEs and the Integration team greater access to data which (allegedly) they need.
+  - Providing the database will give the MECEs and the Integration team greater access to data which (allegedly) they need.
 
 ---
+
+## Documentation for MECEs
+
+Hello MECEs, if you are here this means you have been tasked with either uploading data or accessing the data in the database. Whichever you wish to do, this section of the readme should set you up.
+
+### Uploading Data
+
+In the very near future, we will have a dedicated RIT website for uploading data, but for now that dream is not fully realized. For now, if you wish to upload data, you can either contact a member of the database team to upload it for you or you can follow the instructions 
+[here](#download-instructions) to download and run the website on your computer.
+
+### Data Access
+
+
 
 ## Documentation
 
@@ -54,7 +67,7 @@ Before too long, the database team is going to make a custom application to allo
 
 This react-strap-based website allows users to input context and configuration information and to upload CAN data files.<br>
 
-Ideally, MECE's will just download the files and run it on their computer. This includes running both the website and backend api that goes along with it.<br>
+Ideally, MECEs will just download the files and run it on their computer. This includes running both the website and backend api that goes along with it.<br>
 
 In the future, I hope to host at least the backend restful api, and eventually the website itself, on a web server, but that is not going to happen for a long time. To anyone that works on this in the future, if this message is still here, that means I never went back and fixed the mess I made, and for that I sincerely apologize for. This was meant to be quick and dirty, but I attempted to follow best practices and self document the code where I could. <br>
 
@@ -92,7 +105,7 @@ Verify your install on any platform by running:<br>
 
 After Node JS has been installed, the next step is to clone the repo and all needed components. <br>
 
-Open your command terminal and 'cd' into the desired folder location and run the following commands <br>
+Open your command terminal and `cd` into the desired folder location and run the following commands <br>
 
 `git clone https://github.com/RIT-EVT/telemetry-database.git` <br>
 `npm install react`<br>

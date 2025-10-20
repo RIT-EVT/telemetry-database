@@ -1,13 +1,41 @@
-*.csv
-*.MF4
-.idea/
+
+# dependencies
+node_modules/
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# production
+build/
+
+# misc
+.DS_Store
 *.env
+*.env.local
+*.env.development.local
+*.env.test.local
+*.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Decoding 
+*.csv
 *.dbc
-*.cpython-312.pyc
-/.vscode
-__pycache__/
+*.MF4
 data_upload_file/
+
+# Python files
+*.cpython-312.pyc
+.vscode/
+__pycache__/
+.pytest_cache/
+
+# Authentications
 *.crt
+*.pem
 *.key
 *.xml
-/.pytest_cache

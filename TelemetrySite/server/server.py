@@ -1,60 +1,64 @@
+# server.py
 from flask import Flask, jsonify
 from flask_restful import Api
 from flask_cors import CORS
 import dotenv
 import json
+import os
+import logging
+from http_codes import HttpResponseType 
+
 from data_upload_scripts.data_upload_api import DataUploadApi
 from bike_config_scripts.bike_conifg_api import BikeConfigApi
 from user_auth_scripts.user_auth_api import UserAuthApi
-import os
-import logging
-
-app = Flask(__name__)  # Create Flask instance
-api = Api(app)  # API router
-CORS(app)
-log = logging.getLogger('werkzeug')
-
-# credential file exists two levels up from the current file
-two_up = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-dotenv.load_dotenv(two_up + "/credentials.env")
-
-# create views for url rules
-
-user_view = DataUploadApi.as_view("DateUploadApi")
+from utils import create_db_connection   # your existing DB util
 
 
-app.add_url_rule(
-    "/api/DataUpload/<auth_token>",
-    view_func=user_view,
-    methods=["GET", "POST"],
-)
+def create_app(db=None):
+    app = Flask(__name__)
+    api = Api(app)
+    CORS(app)
+    log = logging.getLogger("werkzeug")
 
-user_view =BikeConfigApi.as_view("BikeConfigApi")
+    # Load credentials
+    server_folder = os.path.dirname(__file__)
+    two_up = os.path.dirname(os.path.dirname(server_folder))
+    dotenv.load_dotenv(os.path.join(two_up, "credentials.env"))
+    dotenv.load_dotenv(os.path.join(two_up, "encryption.env"))
 
-app.add_url_rule("/api/ConfigData/<auth_token>", view_func = user_view, methods=["GET", "POST", "DELETE"])
+    # If no DB passed in, connect to the real one
+    # We do this so during testing we can pass in a face db connection
+    if db is None:
+        db = create_db_connection()
 
-user_view = UserAuthApi.as_view("UserAuthApi")
+    # Register routes with DB injected
+    api.add_resource(
+        DataUploadApi, "/DataUpload/<auth_token>", resource_class_kwargs={"db": db}
+    )
+    api.add_resource(
+        BikeConfigApi, "/ConfigData/<auth_token>", resource_class_kwargs={"db": db}
+    )
+    api.add_resource(
+        UserAuthApi, "/Login", resource_class_kwargs={"db": db}
+    )
 
-app.add_url_rule("/api/Login", view_func=user_view, methods=["POST"])
-file_path = os.path.dirname(__file__)
-## Get all the url paths
-#
-# @return JSON file of path values
-@app.route("/api/")
-def MainContext():
-    # Open the JSON file and load its contents
-    try:
-        with open(os.path.join(file_path, "ServerPaths.json"), "r") as json_file:
-            data = json.load(json_file)
-        return jsonify(data), 200
-    except FileNotFoundError:
-        return jsonify({"error": "File not found"}), 404
-    except json.JSONDecodeError:
-        return jsonify({"error": "Error decoding JSON"}), 500
+    @app.route("/")
+    def MainContext():
+        try:
+            with open(os.path.abspath(os.path.join(server_folder, "ServerPaths.json")), "r") as json_file:
+                data = json.load(json_file)
+            return jsonify(data), HttpResponseType.OK.value
+        except FileNotFoundError:
+            return jsonify({"error": "File not found"}), HttpResponseType.INTERNAL_SERVER_ERROR.value
+        except json.JSONDecodeError:
+            return jsonify({"error": "Error decoding JSON"}), HttpResponseType.INTERNAL_SERVER_ERROR.value
+
+    return app
 
 
 
 
 if __name__ == "__main__":
-    # Only run Flask's dev server when starting manually:
-    app.run(host="127.0.0.1", port=5000, debug=True)
+    print("Starting flask")
+    app = create_app()  # real DB in production, don't pass in a connection
+    app.run(debug=True)
