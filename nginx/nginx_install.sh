@@ -19,4 +19,6 @@ sudo systemctl enable nginx
 echo "Checking NGINX status..."
 sudo systemctl status nginx
 
+
+
 echo "NGINX installation complete."
