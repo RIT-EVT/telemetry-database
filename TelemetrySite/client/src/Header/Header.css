@@ -24,7 +24,7 @@
 
 
 .Header>div {
-    flex: 0 0 50%;
+    flex: 0 0 40%;
     display: flex;
     justify-content: right;
     justify-content: space-evenly;
