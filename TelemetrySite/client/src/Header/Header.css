@@ -1,13 +1,33 @@
-.ContextHeader {
+.Header {
     position: relative;
     background-color: #F36917;
+    color: black;
     width: 100%;
-    padding-bottom: 5px;
     margin-bottom: 5px;
     border-style: solid;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.Header>h1 {
+    flex-grow: 0;
+
+    font-size: 60px;
+    padding: 5px;
+    color: black;
+    width: fit-content;
+    cursor: pointer;
+    user-select: none;
+    margin-bottom: 0px;
+}
+
+
+.Header>div {
+    flex: 0 0 50%;
+    display: flex;
+    justify-content: right;
+    justify-content: space-evenly;
 }
 
 .SignOutButton {
@@ -24,6 +44,22 @@
     border-radius: 5px;
     font-size: 16px;
 }
+
+a {
+    color: black;
+    cursor: pointer;
+    transition: .3s ease-out;
+    text-decoration: none;
+}
+
+a:hover {
+    transform: scale(1.1);
+}
+
+.activeLink {
+    text-decoration: underline;
+}
+
 
 .SignOutButton:hover {
     transform: scale(1.05);
