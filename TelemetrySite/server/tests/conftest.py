@@ -78,19 +78,19 @@ def setup_config_doc(mock_db):
         {
             "username": "test_user_valid",
             "password": "123".encode(),
-            "auth_token": 0,
+            "auth_token": "0",
             "auth_time": datetime.now()
         },
         {
             "username": "outdated_user",
             "password": "123".encode(),
-            "auth_token": 1,
+            "auth_token": "1",
             "auth_time": datetime.min
         },
         {
             "username": "duplicate_user",
             "password": "123".encode(),
-            "auth_token": 2,
+            "auth_token": "2",
             "auth_time": datetime.now()
         }
     ])

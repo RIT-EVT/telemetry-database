@@ -59,7 +59,6 @@ def authenticate_user(auth_token, db):
     # If it is then allow the operation to continue
     # Otherwise return an error
     auth_connection = db["users"]    
-    auth_token=convert_to_int(auth_token)
     return (auth_connection.find_one({"auth_token":auth_token})!=None)
 
 def check_expired_tokens(auth_token, db):
@@ -74,7 +73,6 @@ def check_expired_tokens(auth_token, db):
     """
     
     auth_connection = db["users"]
-    auth_token=convert_to_int(auth_token)
     auth_time = auth_connection.find_one({"auth_token":auth_token})["auth_time"]
     # only allow an auth token to last a day
     days = (datetime.now()-auth_time).days
@@ -98,9 +96,3 @@ def update_expired_token(document_id, db):
     auth_connection.update_one(  {"_id": ObjectId(document_id)},
             {"$set": {"auth_token":new_auth_token, "auth_time":datetime.now()}})
     return new_auth_token
-
-def convert_to_int(value):
-    
-    if type(value) == str:
-        return int(value)
-    return value
