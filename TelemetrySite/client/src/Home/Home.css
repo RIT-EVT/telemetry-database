@@ -10,10 +10,12 @@
     background-color: #F76902;
     border-color: #e96202;
     color: black;
+    transition: .3s ease-in-out;
 }
 
 .button-link:hover {
     background-color: #F76902;
     border-color: #e96202;
     color: black;
+    transform: scale(1.1);
 }

@@ -15,7 +15,7 @@ const Page404 = () => {
                 </Row>
                 <Row>
                     <div className='mfTitle'>
-                        <h1 className='titleMain'>Context 404 Page</h1>
+                        <h1 className='titleMain'>Telemetry DB 404 Page</h1>
                     </div>
                 </Row>
                 <Row>

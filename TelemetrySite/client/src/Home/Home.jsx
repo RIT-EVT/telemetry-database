@@ -32,7 +32,7 @@ const Home = () => {
                     {CreateCard(
                         "📤 Context Upload",
                         " Upload new telemetry data and automatically generate context for system-wide analysis.",
-                        "/upload",
+                        "/context-upload",
                         "Go to Upload"
                     )}
                 </Col>
@@ -41,7 +41,7 @@ const Home = () => {
                     {CreateCard(
                         "📊 Data Access",
                         "Browse and query processed telemetry datasets. Visualize sensor data and inspect historical runs.",
-                        "/data",
+                        "/data-access",
                         "Explore Data"
                     )}
                 </Col>

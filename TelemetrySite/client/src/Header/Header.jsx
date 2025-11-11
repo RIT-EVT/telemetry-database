@@ -20,7 +20,7 @@ const Header = (props) => {
         const headerLinks = {
             "Data Upload": "/context-upload",
             "Data Access": "/data-access",
-            Documentation: "/documentation",
+            Documentation: "/doc",
         };
         setLinks(
             <div>
