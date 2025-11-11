@@ -17,8 +17,6 @@ Label {
 
 }
 
-
-
 .formInput {
   margin-left: 20px;
 
@@ -26,7 +24,6 @@ Label {
 
 .container {
   display: flex;
-  /* Optional, can rely on Bootstrap's grid */
   flex-wrap: wrap;
   gap: 20px;
   /* Space between panels */
@@ -47,15 +44,14 @@ Label {
 .panel-header {
   font-size: 1.2em;
   font-weight: bold;
-  color: #F36917;
+  color: #F76902 !important;
 }
 
 .panel-content {
   flex-grow: 1;
   padding: 10px;
-  background-color: #504A43;
+  background-color: #000000;
   border: 1px solid #181617;
-  color: #ffffff;
 }
 
 
@@ -69,10 +65,9 @@ Label {
 }
 
 .grid-item {
-  padding: 15px !important;
-  background-color: #504A43 !important;
-  border: 1px solid #211e1f !important;
-  color: #ffffff !important;
+  padding: 15px;
+  background-color: #000000;
+  border: 1px solid #211e1f;
 }
 
 /* Grid Header Styling */
@@ -81,7 +76,7 @@ Label {
   font-weight: bold;
   font-size: 1.2em;
   text-align: left;
-  color: #F36917;
+  color: #F36917 !important;
 }
 
 /* Button styling */

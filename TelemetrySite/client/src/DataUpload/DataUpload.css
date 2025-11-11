@@ -16,11 +16,11 @@
 /* Card Styling */
 .upload-card {
     padding: 2rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
-    border-radius: 8px !important;
-    background-color: #504A43 !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background-color: #0000;
     width: 100%;
-    color: white !important;
+    color: white;
 }
 
 /* File Input */
@@ -28,7 +28,7 @@
     margin-bottom: 1rem;
     width: 100%;
     padding: 0.5rem;
-    border: 1px solid #ced4da !important;
+    border: 1px solid #ced4da;
     border-radius: 4px;
 }
 

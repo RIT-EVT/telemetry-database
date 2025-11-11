@@ -1,5 +1,5 @@
 .card {
-    background-color: #504A43 !important;
+    background-color: #000000;
     padding: 10px;
 }
 
@@ -9,7 +9,7 @@
 }
 
 .Label {
-    color: white !important;
+    color: white;
 }
 
 .InputGroup {

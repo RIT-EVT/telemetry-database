@@ -1,13 +1,16 @@
 .Header {
     position: relative;
-    background-color: #F36917;
-    color: black;
+    background-color: #000000;
+    color: #F36917;
     width: 100%;
     margin-bottom: 5px;
-    border-style: solid;
+
     display: flex;
+
     justify-content: space-between;
     align-items: baseline;
+
+    border: none;
 }
 
 .Header>h1 {
@@ -15,7 +18,6 @@
 
     font-size: 60px;
     padding: 5px;
-    color: black;
     width: fit-content;
     cursor: pointer;
     user-select: none;
@@ -46,7 +48,7 @@
 }
 
 a {
-    color: black;
+    color: #F36917;
     cursor: pointer;
     transition: .3s ease-out;
     text-decoration: none;

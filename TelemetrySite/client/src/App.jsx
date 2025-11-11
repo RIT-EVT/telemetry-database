@@ -5,7 +5,6 @@ import { LoginPage, SignupPage } from "LoginPage/LoginPage.jsx";
 import "./App.css";
 import Page404 from "./404/404.jsx";
 import { useEffect, useState, useCallback } from "react";
-import { Container, Row } from "reactstrap";
 import { useNavigate, useLocation } from "react-router-dom";
 import { CheckServerStatus } from "Utils/ServerUtils.jsx";
 import ErrorModal from "Modal/Error/Error.jsx";
@@ -93,37 +92,27 @@ function App() {
             <Header onLogout={HandleSignout} authToken={AuthToken} />
 
             {ServerStatus ? (
-                <Container className='ContextSelect'>
-                    <Row className='Components'>
-                        <Routes>
-                            <Route
-                                path='/'
-                                element={<Home authToken={AuthToken} />}
-                            />
-                            <Route
-                                path='/context-upload'
-                                element={<ContextForm authToken={AuthToken} />}
-                            />
-                            <Route
-                                path='/new-run'
-                                element={<ContextForm authToken={AuthToken} />}
-                            />
-                            <Route
-                                path='/data-upload'
-                                element={<DataUpload />}
-                            />
-                            <Route
-                                path='/login'
-                                element={<LoginPage onLogin={HandleLogin} />}
-                            />
-                            <Route
-                                path='/signup'
-                                element={<SignupPage onSignup={HandleSignup} />}
-                            />
-                            <Route path='*' element={<Page404 />} />
-                        </Routes>
-                    </Row>
-                </Container>
+                <Routes>
+                    <Route path='/' element={<Home authToken={AuthToken} />} />
+                    <Route
+                        path='/context-upload'
+                        element={<ContextForm authToken={AuthToken} />}
+                    />
+                    <Route
+                        path='/new-run'
+                        element={<ContextForm authToken={AuthToken} />}
+                    />
+                    <Route path='/data-upload' element={<DataUpload />} />
+                    <Route
+                        path='/login'
+                        element={<LoginPage onLogin={HandleLogin} />}
+                    />
+                    <Route
+                        path='/signup'
+                        element={<SignupPage onSignup={HandleSignup} />}
+                    />
+                    <Route path='*' element={<Page404 />} />
+                </Routes>
             ) : null}
 
             <ErrorModal

@@ -27,7 +27,7 @@ const Header = (props) => {
                 {Object.keys(headerLinks).map((key) => {
                     return (
                         <Link
-                            class={
+                            className={
                                 location.pathname === headerLinks[key]
                                     ? "activeLink"
                                     : ""
