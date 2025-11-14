@@ -16,7 +16,7 @@ const Home = () => {
     return (
         <Container className='mt-5'>
             {/* Welcome Header */}
-            <Row className='mb-4 text-center'>
+            <Row className='mb-b'>
                 <Col>
                     <h1>EVT Telemetry Portal</h1>
                     <p className='text-muted'>
@@ -60,8 +60,7 @@ const Home = () => {
                 <Col>
                     <h4>Recent Activity</h4>
                     <p className='text-muted'>
-                        No recent uploads. Once data is processed, you’ll see
-                        status updates here.
+                        Telemetry Database has no recent updates.
                     </p>
                 </Col>
             </Row>

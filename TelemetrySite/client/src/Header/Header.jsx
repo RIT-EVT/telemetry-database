@@ -2,11 +2,11 @@ import "./Header.css";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-
+import Logo from "./EVT_Logo.png";
 /**
  * Generate a header element that displays a logout button can calls back to a function when pressed
  */
-const Header = (props) => {
+const Header = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -50,6 +50,7 @@ const Header = (props) => {
                     clicked("/");
                 }}
             >
+                <img src={Logo} alt='Electric Vehicle Team Logo' />
                 Telemetry DB
             </h1>
             {links}

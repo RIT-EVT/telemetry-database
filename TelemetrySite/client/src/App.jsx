@@ -90,7 +90,6 @@ function App() {
     return (
         <div className='MainBody'>
             <Header onLogout={HandleSignout} authToken={AuthToken} />
-
             {ServerStatus ? (
                 <Routes>
                     <Route path='/' element={<Home authToken={AuthToken} />} />
@@ -114,7 +113,6 @@ function App() {
                     <Route path='*' element={<Page404 />} />
                 </Routes>
             ) : null}
-
             <ErrorModal
                 isOpen={IsErrorOpen}
                 toggle={toggleErrorModal}

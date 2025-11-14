@@ -38,6 +38,16 @@
     padding-right: 20px;
     padding-top: 7px;
     padding-bottom: 7px;
+    background-color: #F36917 !important;
+    transition: .2s;
+}
+
+.submit-btn:hover {
+    transform: scale(1.1) !important;
+}
+
+h4 {
+    color: #F36917 !important;
 }
 
 #container {
@@ -45,6 +55,7 @@
     width: 400px;
     height: 8px;
     position: relative;
+
 }
 
 /* General button styles */

@@ -510,7 +510,7 @@ function ContextForm(props) {
             //ensure no data leaks from past runs
             sessionStorage.removeItem("EventData");
         }
-    }, [location.pathname, GetConfigData]);
+    }, [location.pathname]);
     return (
         <Form
             className='ContextForm'
