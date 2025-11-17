@@ -89,7 +89,9 @@ function App() {
 
     return (
         <div className='MainBody'>
-            <Header onLogout={HandleSignout} authToken={AuthToken} />
+            <header>
+                <Header onLogout={HandleSignout} authToken={AuthToken} />
+            </header>
             {ServerStatus ? (
                 <Routes>
                     <Route path='/' element={<Home authToken={AuthToken} />} />

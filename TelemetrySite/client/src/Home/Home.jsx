@@ -61,7 +61,7 @@ const Home = () => {
 
             <Row className='mt-5'>
                 <Col>
-                    <h4>Recent Activity</h4>
+                    <h3>Recent Activity</h3>
                     <p className='text-muted'>
                         Telemetry Database has no recent updates.
                     </p>
