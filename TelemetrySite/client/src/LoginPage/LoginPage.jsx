@@ -13,9 +13,10 @@ import {
     ModalBody,
 } from "reactstrap";
 import { useEffect, useState } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
 
+import "bootstrap/dist/css/bootstrap.min.css";
 import "./LoginPage.css";
+
 import { useNavigate } from "react-router-dom";
 import { BuildURI } from "Utils/ServerUtils";
 
@@ -72,42 +73,44 @@ const LoginPage = ({ onLogin }) => {
         <Card className='card'>
             <center>
                 <h2>Login</h2>
-                <Form onSubmit={LoginChallenge} className='form'>
+                <Form onSubmit={LoginChallenge}>
                     <Container>
-                        <Col>
-                            <InputGroup>
-                                <Label className='Label' htmlFor='username'>
-                                    Username:
-                                </Label>
-                                <Input
-                                    type='text'
-                                    id='username'
-                                    value={username}
-                                    className='Input'
-                                    onChange={(e) =>
-                                        setUsername(e.target.value)
-                                    }
-                                    required
-                                />
-                            </InputGroup>
-                        </Col>
-                        <Col>
-                            <InputGroup>
-                                <Label className='Label' htmlFor='password'>
-                                    Password:
-                                </Label>
-                                <Input
-                                    type='password'
-                                    id='password'
-                                    className='Input'
-                                    value={password}
-                                    onChange={(e) =>
-                                        setPassword(e.target.value)
-                                    }
-                                    required
-                                />
-                            </InputGroup>
-                        </Col>
+                        <Row>
+                            <Col>
+                                <InputGroup>
+                                    <Label className='Label' htmlFor='username'>
+                                        Username:
+                                    </Label>
+                                    <Input
+                                        type='text'
+                                        id='username'
+                                        value={username}
+                                        className='Input'
+                                        onChange={(e) =>
+                                            setUsername(e.target.value)
+                                        }
+                                        required
+                                    />
+                                </InputGroup>
+                            </Col>
+                            <Col>
+                                <InputGroup>
+                                    <Label className='Label' htmlFor='password'>
+                                        Password:
+                                    </Label>
+                                    <Input
+                                        type='password'
+                                        id='password'
+                                        className='Input'
+                                        value={password}
+                                        onChange={(e) =>
+                                            setPassword(e.target.value)
+                                        }
+                                        required
+                                    />
+                                </InputGroup>
+                            </Col>
+                        </Row>
                     </Container>
 
                     <Button className='SubmitButton' type='submit'>
@@ -200,71 +203,73 @@ const SignupPage = ({ onSignup }) => {
             </center>
             <Form onSubmit={HandleSignup} className='form'>
                 <Container>
-                    <Col>
-                        <Row>
-                            <InputGroup className='InputGroup'>
-                                <Input
-                                    type='text'
-                                    id='username'
-                                    className='Input'
-                                    value={username}
-                                    placeholder='Username'
-                                    onChange={(e) =>
-                                        setUsername(e.target.value)
-                                    }
-                                    required
-                                />
-                            </InputGroup>
-                        </Row>
+                    <Row>
+                        <Col>
+                            <Row>
+                                <InputGroup className='InputGroup'>
+                                    <Input
+                                        type='text'
+                                        id='username'
+                                        className='Input'
+                                        value={username}
+                                        placeholder='Username'
+                                        onChange={(e) =>
+                                            setUsername(e.target.value)
+                                        }
+                                        required
+                                    />
+                                </InputGroup>
+                            </Row>
 
-                        <Row>
-                            <InputGroup className='InputGroup'>
-                                <Input
-                                    type='number'
-                                    id='challenge-value'
-                                    className='Input'
-                                    value={challengeInt}
-                                    placeholder='Challenge Value'
-                                    onChange={(e) =>
-                                        setChallengeInt(e.target.value)
-                                    }
-                                    required
-                                />
-                            </InputGroup>
-                        </Row>
-                    </Col>
-                    <Col>
-                        <Row>
-                            <InputGroup className='InputGroup'>
-                                <Input
-                                    type='password'
-                                    id='password'
-                                    className='Input'
-                                    value={password}
-                                    placeholder='Create Password'
-                                    onChange={(e) =>
-                                        setPassword(e.target.value)
-                                    }
-                                    required
-                                />
-                            </InputGroup>
-                        </Row>
-                        <Row>
-                            <InputGroup className='InputGroup'>
-                                <Input
-                                    type='password'
-                                    id='confirm-password'
-                                    className='Input'
-                                    value={confirmPassword}
-                                    placeholder='Confirm Password'
-                                    onChange={(e) =>
-                                        setConfirmPassword(e.target.value)
-                                    }
-                                    required
-                                />
-                            </InputGroup>
-                        </Row>
-                    </Col>
+                            <Row>
+                                <InputGroup className='InputGroup'>
+                                    <Input
+                                        type='number'
+                                        id='challenge-value'
+                                        className='Input'
+                                        value={challengeInt}
+                                        placeholder='Challenge Value'
+                                        onChange={(e) =>
+                                            setChallengeInt(e.target.value)
+                                        }
+                                        required
+                                    />
+                                </InputGroup>
+                            </Row>
+                        </Col>
+                        <Col>
+                            <Row>
+                                <InputGroup className='InputGroup'>
+                                    <Input
+                                        type='password'
+                                        id='password'
+                                        className='Input'
+                                        value={password}
+                                        placeholder='Create Password'
+                                        onChange={(e) =>
+                                            setPassword(e.target.value)
+                                        }
+                                        required
+                                    />
+                                </InputGroup>
+                            </Row>
+                            <Row>
+                                <InputGroup className='InputGroup'>
+                                    <Input
+                                        type='password'
+                                        id='confirm-password'
+                                        className='Input'
+                                        value={confirmPassword}
+                                        placeholder='Confirm Password'
+                                        onChange={(e) =>
+                                            setConfirmPassword(e.target.value)
+                                        }
+                                        required
+                                    />
+                                </InputGroup>
+                            </Row>
+                        </Col>
+                    </Row>
                 </Container>
                 <center>
                     <Button type='submit' className='SubmitButton'>

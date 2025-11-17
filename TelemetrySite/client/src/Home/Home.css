@@ -19,3 +19,8 @@
     color: black;
     transform: scale(1.1);
 }
+
+.fill {
+    height: 100% !important;
+    width: 100% !important;
+}

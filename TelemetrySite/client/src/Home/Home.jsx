@@ -30,7 +30,8 @@ const Home = () => {
             <Row className='g-4'>
                 <Col md='4'>
                     {CreateCard(
-                        "📤 Context Upload",
+                        "📤",
+                        "Context Upload",
                         " Upload new telemetry data and automatically generate context for system-wide analysis.",
                         "/context-upload",
                         "Go to Upload"
@@ -39,7 +40,8 @@ const Home = () => {
 
                 <Col md='4'>
                     {CreateCard(
-                        "📊 Data Access",
+                        "📊",
+                        "Data Access",
                         "Browse and query processed telemetry datasets. Visualize sensor data and inspect historical runs.",
                         "/data-access",
                         "Explore Data"
@@ -48,7 +50,8 @@ const Home = () => {
 
                 <Col md='4'>
                     {CreateCard(
-                        "📚 Documentation",
+                        "📚",
+                        "Documentation",
                         "View internal API documentation, tool usage guides, and team workflow standards.",
                         "/docs",
                         "Read Docs"
@@ -68,11 +71,13 @@ const Home = () => {
     );
 };
 
-function CreateCard(title, content, link, buttonContent) {
+function CreateCard(icon, title, content, link, buttonContent) {
     return (
-        <Card className='shadow-sm'>
+        <Card className='shadow-sm fill'>
             <CardBody>
                 <CardTitle tag='h2' className='page-title'>
+                    <div>{icon}</div>
+
                     {title}
                 </CardTitle>
                 <CardText className='body-text'>{content}</CardText>

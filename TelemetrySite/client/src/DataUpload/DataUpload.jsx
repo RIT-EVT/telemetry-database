@@ -11,6 +11,7 @@ import {
 import {
     Container,
     Col,
+    Row,
     Card,
     CardBody,
     Input,
@@ -45,28 +46,30 @@ function DataUpload() {
     function DisplayRedirect() {
         setBodyDisplay(
             <Container className='button-container'>
-                <Col>
-                    <Button
-                        className='redirectButton'
-                        onClick={() => {
-                            RedirectToContext("/new-run");
-                        }}
-                    >
-                        New Run
-                    </Button>
-                </Col>
-                <Col>
-                    <Button
-                        className='redirectButton'
-                        onClick={() => {
-                            sessionStorage.removeItem("EventData");
-                            resetRunOrderNumber();
-                            RedirectToContext("/context-form");
-                        }}
-                    >
-                        New Context
-                    </Button>
-                </Col>
+                <Row>
+                    <Col>
+                        <Button
+                            className='redirectButton'
+                            onClick={() => {
+                                RedirectToContext("/new-run");
+                            }}
+                        >
+                            New Run
+                        </Button>
+                    </Col>
+                    <Col>
+                        <Button
+                            className='redirectButton'
+                            onClick={() => {
+                                sessionStorage.removeItem("EventData");
+                                resetRunOrderNumber();
+                                RedirectToContext("/context-form");
+                            }}
+                        >
+                            New Context
+                        </Button>
+                    </Col>
+                </Row>
             </Container>
         );
     }
@@ -217,23 +220,17 @@ function DataUpload() {
                     // Update the UI with the formatted estimated time remaining
                     if (!dataSubmitted) {
                         setProgressBar(
-                            <center>
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                    }}
-                                >
-                                    <progress
-                                        value={currentProgress}
-                                        style={{ marginRight: "10px" }}
-                                    />
-                                    <div>
-                                        {responseString} :{" "}
-                                        {Math.round(currentProgress * 100)}%
-                                    </div>
-                                </div>
-                            </center>
+                            <Container>
+                                <Col>
+                                    <Row>
+                                        <progress value={currentProgress} />
+                                        <div className='response'>
+                                            {responseString} :{" "}
+                                            {Math.round(currentProgress * 100)}%
+                                        </div>
+                                    </Row>
+                                </Col>
+                            </Container>
                         );
                     } else {
                         clearInterval(interval);
@@ -297,28 +294,30 @@ function DataUpload() {
                     encType='multipart/form-data'
                 >
                     <Container>
-                        <Col>
-                            <h4 className='mb-3'>Upload MF4 File</h4>
-                            <Input
-                                type='file'
-                                id='fileUploadMF4'
-                                className='file-input'
-                                required
-                                accept='.mf4'
-                                bsSize='sm'
-                            />
-                        </Col>
-                        <Col>
-                            <h4 className='mb-3'>Upload DBC File</h4>
-                            <Input
-                                type='file'
-                                id='fileUploadDBC'
-                                className='file-input'
-                                required
-                                accept='.dbc'
-                                bsSize='sm'
-                            />
-                        </Col>
+                        <Row>
+                            <Col>
+                                <h4 className='mb-3'>Upload MF4 File</h4>
+                                <Input
+                                    type='file'
+                                    id='fileUploadMF4'
+                                    className='file-input'
+                                    required
+                                    accept='.mf4'
+                                    bsSize='sm'
+                                />
+                            </Col>
+                            <Col>
+                                <h4 className='mb-3'>Upload DBC File</h4>
+                                <Input
+                                    type='file'
+                                    id='fileUploadDBC'
+                                    className='file-input'
+                                    required
+                                    accept='.dbc'
+                                    bsSize='sm'
+                                />
+                            </Col>
+                        </Row>
                     </Container>
                     <Button className='submit-btn'>
                         Submit{" "}

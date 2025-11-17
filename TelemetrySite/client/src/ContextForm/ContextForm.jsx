@@ -453,7 +453,11 @@ function ContextForm(props) {
      * Hook on update to dropdown values
      */
     useEffect(() => {
-        // Create each select value
+        InitializeForms();
+    }, [EventData]);
+
+    // 2️⃣ Rebuild dropdowns only when DropDownOptions change
+    useEffect(() => {
         ConfigName.forEach((name) => {
             const dropDown = SelectCreator(
                 DropDownOptions[name],
@@ -461,24 +465,14 @@ function ContextForm(props) {
                 HandleConfigFormChange,
                 ConfigSelectedValue
             );
+
             if (name === "bike") {
                 SetBikeSelect(dropDown);
             } else if (BikeContextForm) {
-                // don't create the board selects till the bike dropdown is selected
                 SetDropDowns((prev) => ({ ...prev, [name]: dropDown }));
             }
         });
-
-        InitializeForms();
-    }, [
-        DropDownOptions,
-        EventData,
-        BikeContextForm,
-        ConfigName,
-        ConfigSelectedValue,
-        HandleConfigFormChange,
-        InitializeForms,
-    ]);
+    }, [DropDownOptions, BikeContextForm]); // 👈 remove frequently changing dependencies
     /**
      * Fetch all the saved configs on the first load
      * and check if this is a new run
@@ -516,76 +510,76 @@ function ContextForm(props) {
             className='ContextForm'
             name='Context'
             id='MainForm'
-            onSubmit={(e) => {
-                SubmitData(e);
-            }}
+            onSubmit={(e) => SubmitData(e)}
         >
-            <Container className='container'>
-                {/* Left Panel */}
-                <Col className='left-panel'>
-                    <Card className='panel-content '>
-                        <CardTitle tag='h2' className='panel-header'>
-                            Main Context
-                        </CardTitle>
-                        <CardBody>{MainContextForm}</CardBody>
-                    </Card>
-                </Col>
+            <Container fluid className='main-container'>
+                {/* === MAIN + EVENT + BIKE CONTEXT === */}
+                <Row className='g-3 align-items-stretch'>
+                    {/* Left Panel */}
+                    <Col md='6' className='d-flex'>
+                        <Card className='panel-content fill'>
+                            <CardTitle tag='h2' className='panel-header'>
+                                Main Context
+                            </CardTitle>
+                            <CardBody>{MainContextForm}</CardBody>
+                        </Card>
+                    </Col>
 
-                {/* Right Panels */}
-                <Col className='right-panel'>
-                    <Row>
-                        <Col className='top-right-panel'>
-                            <Card className='panel-content'>
-                                <CardTitle tag='h2' className='panel-header'>
-                                    Event Context
-                                </CardTitle>
-                                <CardBody>{EventContextForm}</CardBody>
-                            </Card>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col className='bottom-right-panel'>
-                            <Card className='panel-content'>
-                                <CardTitle tag='h2' className='panel-header'>
-                                    Bike Context: {BikeSelect}
-                                </CardTitle>
-                                <CardBody>{BikeContextForm}</CardBody>
-                            </Card>
-                        </Col>
-                    </Row>
-                </Col>
-            </Container>
-            <Container className='grid-container'>
-                {BikeContextForm
-                    ? ConfigName.map((name) => {
-                          if (name === "bike") {
-                              return <div></div>;
-                          }
-                          return (
-                              <Card className='grid-item'>
-                                  <CardTitle className='grid-header'>
-                                      {/*
-                                       *Create each element of the grid. Initially each has the name
-                                       *of the config and a dropdown. Dropdown is populated by past
-                                       *configs of the same type that have been saved. Allow user to also
-                                       *create a new one with the option to save it with a name
-                                       */}
-                                      {name.toLocaleUpperCase()} Configuration:{" "}
-                                      {DropDowns[name]}
-                                  </CardTitle>
-                                  <CardBody>{ConfigForm[name]}</CardBody>
-                              </Card>
-                          );
-                      })
-                    : null}
+                    {/* Right Panels */}
+                    <Col md='6' className='d-flex flex-column gap-3'>
+                        <Card className='panel-content fill'>
+                            <CardTitle tag='h2' className='panel-header'>
+                                Event Context
+                            </CardTitle>
+                            <CardBody>{EventContextForm}</CardBody>
+                        </Card>
+
+                        <Card className='panel-content fill'>
+                            <CardTitle tag='h2' className='panel-header'>
+                                Bike Context: {BikeSelect}
+                            </CardTitle>
+                            <CardBody>{BikeContextForm}</CardBody>
+                        </Card>
+                    </Col>
+                </Row>
+
+                {/* === CONFIGURATION GRID === */}
+                {BikeContextForm && (
+                    <Container fluid className='grid-container mt-4 spacing'>
+                        {ConfigName.filter((name) => name !== "bike")
+                            .reduce((rows, _, i) => {
+                                if (i % 2 === 0)
+                                    rows.push(ConfigName.slice(i, i + 2));
+                                return rows;
+                            }, [])
+                            .map((pair, rowIndex) => (
+                                <Row key={rowIndex} className='g-3'>
+                                    {pair.map((name, colIndex) => (
+                                        <Col
+                                            md='6'
+                                            key={colIndex}
+                                            className='d-flex'
+                                        >
+                                            <Card className='grid-item fill flex-grow-1'>
+                                                <CardTitle className='grid-header'>
+                                                    {name.toUpperCase()}{" "}
+                                                    Configuration:{" "}
+                                                    {DropDowns[name]}
+                                                </CardTitle>
+                                                <CardBody>
+                                                    {ConfigForm[name]}
+                                                </CardBody>
+                                            </Card>
+                                        </Col>
+                                    ))}
+                                </Row>
+                            ))}
+                    </Container>
+                )}
             </Container>
 
-            {/*
-             * Submitting data is handled in the
-             * SubmitData() const function
-             */}
             <Button className='submitButton'>
-                Submit {EventData != null ? "Run" : null}
+                Submit {EventData ? "Run" : ""}
             </Button>
             <Button onClick={AutoFillData} className='autoFill'>
                 Auto Complete

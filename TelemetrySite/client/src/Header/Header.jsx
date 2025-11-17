@@ -51,7 +51,6 @@ const Header = () => {
                 }}
             >
                 <img src={Logo} alt='Electric Vehicle Team Logo' />
-                Telemetry DB
             </h1>
             {links}
             {/* {props.authToken ? (

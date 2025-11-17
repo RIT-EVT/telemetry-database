@@ -72,8 +72,16 @@ h4 {
 /* Hover effects */
 .redirectButton:hover {
     transform: scale(1.05);
-    /* Slightly enlarge button */
     background-color: #ac4b13 !important;
     border: black;
+}
 
+progress {
+    margin-right: "10px";
+    background-color: "0x000000";
+    accent-color: "#F36917"
+}
+
+.response {
+    color: white;
 }

@@ -1,6 +1,8 @@
 .card {
     background-color: #000000;
     padding: 10px;
+    width: 70%;
+    margin: auto;
 }
 
 h2 {
