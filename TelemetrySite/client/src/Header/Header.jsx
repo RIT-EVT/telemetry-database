@@ -45,13 +45,9 @@ const Header = () => {
 
     return (
         <div className='Header'>
-            <h1
-                onClick={() => {
-                    clicked("/");
-                }}
-            >
+            <Link to='/'>
                 <img src={Logo} alt='Electric Vehicle Team Logo' />
-            </h1>
+            </Link>
             {links}
             {/* {props.authToken ? (
                 <button

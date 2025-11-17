@@ -92,29 +92,34 @@ function App() {
             <header>
                 <Header onLogout={HandleSignout} authToken={AuthToken} />
             </header>
-            {ServerStatus ? (
-                <Routes>
-                    <Route path='/' element={<Home authToken={AuthToken} />} />
-                    <Route
-                        path='/context-upload'
-                        element={<ContextForm authToken={AuthToken} />}
-                    />
-                    <Route
-                        path='/new-run'
-                        element={<ContextForm authToken={AuthToken} />}
-                    />
-                    <Route path='/data-upload' element={<DataUpload />} />
-                    <Route
-                        path='/login'
-                        element={<LoginPage onLogin={HandleLogin} />}
-                    />
-                    <Route
-                        path='/signup'
-                        element={<SignupPage onSignup={HandleSignup} />}
-                    />
-                    <Route path='*' element={<Page404 />} />
-                </Routes>
-            ) : null}
+            <main>
+                {ServerStatus ? (
+                    <Routes>
+                        <Route
+                            path='/'
+                            element={<Home authToken={AuthToken} />}
+                        />
+                        <Route
+                            path='/context-upload'
+                            element={<ContextForm authToken={AuthToken} />}
+                        />
+                        <Route
+                            path='/new-run'
+                            element={<ContextForm authToken={AuthToken} />}
+                        />
+                        <Route path='/data-upload' element={<DataUpload />} />
+                        <Route
+                            path='/login'
+                            element={<LoginPage onLogin={HandleLogin} />}
+                        />
+                        <Route
+                            path='/signup'
+                            element={<SignupPage onSignup={HandleSignup} />}
+                        />
+                        <Route path='*' element={<Page404 />} />
+                    </Routes>
+                ) : null}
+            </main>
             <ErrorModal
                 isOpen={IsErrorOpen}
                 toggle={toggleErrorModal}

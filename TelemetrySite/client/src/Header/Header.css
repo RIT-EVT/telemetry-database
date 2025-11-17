@@ -26,10 +26,9 @@
     align-items: baseline;
 }
 
-.Header>h1>img {
+img {
     width: 200px;
 }
-
 
 .Header>div {
     flex: 0 0 40%;
