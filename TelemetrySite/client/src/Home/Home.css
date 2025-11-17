@@ -1,0 +1,26 @@
+.page-title {
+    color: #F76902;
+}
+
+.body-text {
+    color: white;
+}
+
+.button-link {
+    background-color: #F76902;
+    border-color: #e96202;
+    color: black;
+    transition: .3s ease-in-out;
+}
+
+.button-link:hover {
+    background-color: #F76902;
+    border-color: #e96202;
+    color: black;
+    transform: scale(1.1);
+}
+
+.fill {
+    height: 100% !important;
+    width: 100% !important;
+}

@@ -10,7 +10,8 @@
 }
 
 .mfTitle {
-    margin-left: 25%;
+    margin: auto;
+    text-align: center;
 }
 
 .titleMain {
@@ -19,7 +20,7 @@
     font-style: normal;
     font-weight: bold;
     font-size: 72px;
-    color: #b1b1b1;
+    color: #000;
 }
 
 .titleAE {

@@ -1,134 +1,135 @@
-.MainFormGroups {
-  padding: 10px;
+/* General layout */
+.ContextForm {
+  margin: 0 10px;
 }
 
-.ContextForm {
-  margin-left: 10px;
-  margin-right: 10px;
+
+.main-container {
+  padding: 20px;
+}
+
+/* Panels */
+.left-panel,
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.panel-content {
+  flex-grow: 1;
+  padding: 15px;
+  background-color: #000000;
+  border: 1px solid #181617;
+  color: white;
+}
+
+.panel-header {
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #F76902 !important;
+}
+
+.grid-item {
+  padding: 15px;
+  background-color: #000000;
+  border: 1px solid #211e1f;
+  margin-bottom: 30px;
+}
+
+.grid-header {
+  margin-bottom: 10px;
+  font-weight: bold;
+  font-size: 1.2em;
+  color: #F36917 !important;
+}
+
+/* Buttons */
+.submitButton,
+.autoFill {
+  padding: 10px 20px;
+  background-color: #F36917;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  position: fixed;
+  bottom: 10px;
+  transition: 0.1s;
+}
+
+.submitButton {
+  right: 10px;
+}
+
+.autoFill {
+  left: 10px;
+}
+
+.submitButton:hover,
+.autoFill:hover {
+  background-color: #9d4614;
+  transform: scale(1.05);
+}
+
+/* Form elements */
+.MainFormGroups {
+  padding: 10px;
 }
 
 .FormGroupElement {
   padding: 5px;
 }
 
-Label {
+label {
   padding-right: 20px;
   font-size: 1.3em;
-
 }
-
-
 
 .formInput {
   margin-left: 20px;
-
 }
 
-.container {
-  display: flex;
-  /* Optional, can rely on Bootstrap's grid */
-  flex-wrap: wrap;
-  gap: 20px;
-  /* Space between panels */
+.ConfigDropdown {
+  color: #000;
+  font-size: 1em;
+  border-radius: 10px;
 }
 
-.left-panel,
-.right-panel {
+
+/* Make all cards visually consistent */
+.panel-content,
+.grid-item {
   display: flex;
   flex-direction: column;
-  flex: 1;
-}
-
-.right-panel .top-right-panel,
-.bottom-right-panel .right-panel {
-  margin-bottom: 20px;
-}
-
-.panel-header {
-  font-size: 1.2em;
-  font-weight: bold;
-  color: #F36917;
-}
-
-.panel-content {
-  flex-grow: 1;
-  padding: 10px;
-  background-color: #504A43;
+  justify-content: flex-start;
+  height: 100%;
+  background-color: #000;
   border: 1px solid #181617;
-  color: #ffffff;
+  color: white;
 }
 
+/* Ensure all cards stretch evenly */
+.row {
+  align-items: stretch;
+}
 
-/* Grid layout for configuration forms */
+/* Grid and spacing */
 .grid-container {
-  display: grid;
-
-  grid-template-columns: repeat(2, minmax(200px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
+  margin-top: 30px;
+  padding: 0px;
 }
 
-.grid-item {
-  padding: 15px !important;
-  background-color: #504A43 !important;
-  border: 1px solid #211e1f !important;
-  color: #ffffff !important;
+.fill {
+  width: 100%;
+  height: 100%;
+  margin: 0px;
 }
 
-/* Grid Header Styling */
+
 .grid-header {
   margin-bottom: 10px;
   font-weight: bold;
   font-size: 1.2em;
-  text-align: left;
-  color: #F36917;
-}
-
-/* Button styling */
-.submitButton {
-  margin-top: 20px;
-  padding: 10px 20px;
-  background-color: #F36917;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  position: fixed;
-  display: block;
-  right: 10px;
-  bottom: 10px;
-  transition: 10ms;
-}
-
-.submitButton:hover {
-  background-color: #9d4614;
-  scale: 1.05;
-}
-
-/* Button styling */
-.autoFill {
-  margin-top: 20px;
-  padding: 10px 20px;
-  background-color: #F36917;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  position: fixed;
-  display: block;
-  left: 10px;
-  bottom: 10px;
-  transition: 10ms;
-}
-
-.autoFill:hover {
-  background-color: #9d4614;
-  scale: 1.05;
-}
-
-.ConfigDropdown {
-  background-color: #ffffff;
-  color: #000000;
-  font-size: 1em;
-  border-radius: 10px;
+  color: #F36917 !important;
 }

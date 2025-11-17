@@ -16,11 +16,11 @@
 /* Card Styling */
 .upload-card {
     padding: 2rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
-    border-radius: 8px !important;
-    background-color: #504A43 !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background-color: #0000;
     width: 100%;
-    color: white !important;
+    color: white;
 }
 
 /* File Input */
@@ -28,7 +28,7 @@
     margin-bottom: 1rem;
     width: 100%;
     padding: 0.5rem;
-    border: 1px solid #ced4da !important;
+    border: 1px solid #ced4da;
     border-radius: 4px;
 }
 
@@ -38,6 +38,16 @@
     padding-right: 20px;
     padding-top: 7px;
     padding-bottom: 7px;
+    background-color: #F36917 !important;
+    transition: .2s;
+}
+
+.submit-btn:hover {
+    transform: scale(1.1) !important;
+}
+
+h4 {
+    color: #F36917 !important;
 }
 
 #container {
@@ -45,6 +55,7 @@
     width: 400px;
     height: 8px;
     position: relative;
+
 }
 
 /* General button styles */
@@ -61,8 +72,16 @@
 /* Hover effects */
 .redirectButton:hover {
     transform: scale(1.05);
-    /* Slightly enlarge button */
     background-color: #ac4b13 !important;
     border: black;
+}
 
+progress {
+    margin-right: "10px";
+    background-color: "0x000000";
+    accent-color: "#F36917"
+}
+
+.response {
+    color: white;
 }
