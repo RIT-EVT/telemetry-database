@@ -7,6 +7,7 @@ import Page404 from "./404/404.jsx";
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { CheckServerStatus } from "Utils/ServerUtils.jsx";
+import DataVisualizer from "DataVisualizer/DataVisualizer.jsx";
 import ErrorModal from "Modal/Error/Error.jsx";
 import Header from "./Header/Header.jsx";
 import Home from "./Home/Home.jsx";
@@ -108,6 +109,10 @@ function App() {
                             element={<ContextForm authToken={AuthToken} />}
                         />
                         <Route path='/data-upload' element={<DataUpload />} />
+                        <Route
+                            path='/data-access'
+                            element={<DataVisualizer />}
+                        />
                         <Route
                             path='/login'
                             element={<LoginPage onLogin={HandleLogin} />}
