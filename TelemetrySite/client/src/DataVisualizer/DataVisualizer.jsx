@@ -113,7 +113,6 @@ function DataVisualizer() {
                         </Button>
                     </InputGroup>
 
-                    {/* --- Conditional Parameters --- */}
                     {stage.type !== "none" && (
                         <div className='p-2 bg-light rounded'>
                             <h6 className='mb-2'>{stage.type} Parameters</h6>
