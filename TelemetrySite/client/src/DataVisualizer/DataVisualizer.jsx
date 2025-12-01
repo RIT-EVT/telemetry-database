@@ -61,6 +61,9 @@ function DataVisualizer() {
         );
     };
 
+    /**
+     * Update
+     */
     const handleParamChange = (stageId, index, field, newValue) => {
         setStages((prev) =>
             prev.map((stage) =>
