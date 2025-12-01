@@ -553,7 +553,7 @@ function ContextForm(props) {
                                 return rows;
                             }, [])
                             .map((pair, rowIndex) => (
-                                <Row key={rowIndex} className='g-3'>
+                                <Row key={rowIndex} className='g-3 mb-3'>
                                     {pair.map((name, colIndex) => (
                                         <Col
                                             md='6'
