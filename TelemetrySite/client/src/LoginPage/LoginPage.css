@@ -1,6 +1,12 @@
 .card {
-    background-color: #504A43 !important;
+    background-color: #000000;
     padding: 10px;
+    width: 70%;
+    margin: auto;
+}
+
+h2 {
+    color: #F36917;
 }
 
 .form {
@@ -9,7 +15,7 @@
 }
 
 .Label {
-    color: white !important;
+    color: white;
 }
 
 .InputGroup {

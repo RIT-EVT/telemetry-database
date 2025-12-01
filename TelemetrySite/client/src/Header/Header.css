@@ -1,13 +1,40 @@
-.ContextHeader {
+.Header {
     position: relative;
-    background-color: #F36917;
+    background-color: #000000;
+    color: #F36917;
     width: 100%;
-    padding-bottom: 5px;
+    max-height: 20%;
     margin-bottom: 5px;
-    border-style: solid;
+
     display: flex;
-    align-items: center;
-    justify-content: center;
+
+    justify-content: space-between;
+    align-items: baseline;
+
+    border: none;
+}
+
+.Header>h1 {
+    flex-grow: 0;
+
+    font-size: 60px;
+    padding: 5px;
+    width: fit-content;
+    cursor: pointer;
+    user-select: none;
+    margin-bottom: 0px;
+    align-items: baseline;
+}
+
+img {
+    width: 200px;
+}
+
+.Header>div {
+    flex: 0 0 40%;
+    display: flex;
+    justify-content: right;
+    justify-content: space-evenly;
 }
 
 .SignOutButton {
@@ -24,6 +51,23 @@
     border-radius: 5px;
     font-size: 16px;
 }
+
+a {
+    color: #F36917;
+    cursor: pointer;
+    transition: .3s ease-out;
+    text-decoration: none;
+}
+
+a:hover {
+    transform: scale(1.1);
+    color: #ff9558;
+}
+
+.activeLink {
+    text-decoration: underline;
+}
+
 
 .SignOutButton:hover {
     transform: scale(1.05);
