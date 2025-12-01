@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Input, Button, Form, InputGroup, Row, Col } from "reactstrap";
 import { Plus, X } from "react-feather";
-import QueryEntry from "./QueryEntry";
-
+import QueryEntry from "./QueryEntry.ts";
 const QueryTypes = ["Match", "Group", "Sample", "Sort", "Unwind"];
 
 function DataVisualizer() {

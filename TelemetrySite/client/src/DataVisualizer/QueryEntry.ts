@@ -1,7 +1,7 @@
-export default class QueryEntry {
+class QueryEntry {
     index: number;
     type: string;
-    params: object[]
+    params: {field: string, operator: string, value: string}[]
     constructor(index: number, queryType = "none") {
         this.index = index;
         this.type = queryType;
@@ -25,10 +25,14 @@ export default class QueryEntry {
     }
 
     UpdateParamValues(index: number, field: string, operator: string, value: string) {
-        this.params[index] = { field: field, operator, value };
+        this.params[index] = { field: field, operator:operator, value: value };
     }
 
     UpdateParamValue(index: number, field: string, value: string){
+        if(this.params===null || this.params[index] === null)
+            return
         this.params[index][field] = value;
     }
 }
+
+export default QueryEntry;
