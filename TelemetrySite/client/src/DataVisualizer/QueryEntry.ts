@@ -1,7 +1,7 @@
 class QueryEntry {
     index: number;
     type: string;
-    params: {field: string, operator: string, value: string}[]
+    params: Record<string, string>[]
     constructor(index: number, queryType = "none") {
         this.index = index;
         this.type = queryType;
