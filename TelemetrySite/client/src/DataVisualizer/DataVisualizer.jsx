@@ -1,103 +1,90 @@
 import { useState } from "react";
 import { Input, Button, Form, InputGroup, Row, Col } from "reactstrap";
 import { Plus, X } from "react-feather";
+import QueryEntry from "./QueryEntry";
 
 const QueryTypes = ["Match", "Group", "Sample", "Sort", "Unwind"];
 
 function DataVisualizer() {
-    const [stages, setStages] = useState([
-        { id: Date.now(), type: "none", params: [] },
-    ]);
+    const [stages, setStages] = useState([new QueryEntry(0)]);
 
-    const addStageAfter = (afterId) => {
-        setStages((prev) => {
-            const newStage = { id: Date.now(), type: "none", params: [] };
-            const index = prev.findIndex((stage) => stage.id === afterId);
-            const newStages = [...prev];
-            newStages.splice(index + 1, 0, newStage);
-            return newStages;
-        });
-    };
+    /**
+     * Insert a new stage after a given stageIndex
+     * @param {Int} stageIndex - stageIndex to insert after
+     */
+    const addStageAfter = (stageIndex) => {
+        const newStages = [...stages];
+        const newStage = new QueryEntry(stageIndex + 1);
 
-    const removeStage = (id) => {
-        if (stages.length === 1) return;
-        setStages((prev) => prev.filter((stage) => stage.id !== id));
-    };
+        for (let indexIncrease = stageIndex + 1; indexIncrease < newStages.length; indexIncrease++)
+            newStages[indexIncrease].IncreaseIndex();
 
-    const handleTypeChange = (id, value) => {
-        setStages((prev) =>
-            prev.map((stage) =>
-                stage.id === id ? { ...stage, type: value, params: [] } : stage
-            )
-        );
-    };
+        newStages.splice(stageIndex + 1, 0, newStage);
 
-    const addParam = (stageId) => {
-        setStages((prev) =>
-            prev.map((stage) =>
-                stage.id === stageId
-                    ? {
-                          ...stage,
-                          params: [
-                              ...stage.params,
-                              { field: "", operator: "", value: "" },
-                          ],
-                      }
-                    : stage
-            )
-        );
-    };
-
-    const removeParam = (stageId, index) => {
-        setStages((prev) =>
-            prev.map((stage) =>
-                stage.id === stageId
-                    ? {
-                          ...stage,
-                          params: stage.params.filter((_, i) => i !== index),
-                      }
-                    : stage
-            )
-        );
+        setStages(newStages);
     };
 
     /**
-     * Update
+     * Remove a stage from the array of stages by stageIndex
+     * @param {Int} stageIndex - stageIndex to remove
      */
-    const handleParamChange = (stageId, index, field, newValue) => {
-        setStages((prev) =>
-            prev.map((stage) =>
-                stage.id === stageId
-                    ? {
-                          ...stage,
-                          params: stage.params.map((p, i) =>
-                              i === index ? { ...p, [field]: newValue } : p
-                          ),
-                      }
-                    : stage
-            )
-        );
+    const removeStage = (stageIndex) => {
+        if (stages.length === 1) return;
+        const newStages = [...stages];
+
+        for (let indexDecrease = stageIndex + 1; indexDecrease < newStages.length; indexDecrease++)
+            newStages[indexDecrease].DecreaseIndex();
+
+        newStages.splice(stageIndex, 1);
+
+        setStages(newStages);
+    };
+
+    const handleTypeChange = (stageIndex, value) => {
+        const newStages = [...stages];
+
+        newStages[stageIndex].type = value;
+
+        setStages(newStages);
+    };
+
+    const addParam = (stageIndex) => {
+        const newStages = [...stages];
+
+        newStages[stageIndex].AddParams();
+
+        setStages(newStages);
+    };
+
+    const removeParam = (stageIndex, paramIndex) => {
+        const newStages = [...stages];
+
+        newStages[stageIndex].RemoveParam(paramIndex);
+
+        setStages(newStages);
+    };
+
+    const handleParamChange = (stageIndex, paramIndex, field, newValue) => {
+        const newStages = [...stages];
+
+        newStages[stageIndex].UpdateParamValue(paramIndex, field, newValue);
+
+        setStages(newStages);
     };
 
     return (
         <Form>
             {stages.map((stage) => (
-                <div key={stage.id} className='mb-3 p-2 border rounded'>
+                <div key={stage.index} className='mb-3 p-2 border rounded'>
                     <InputGroup className='mb-2 align-items-center'>
-                        <Button
-                            color='danger'
-                            size='sm'
-                            onClick={() => removeStage(stage.id)}
-                        >
+                        <Button color='danger' size='sm' onClick={() => removeStage(stage.index)}>
                             <X size={14} />
                         </Button>
 
                         <Input
                             type='select'
                             value={stage.type}
-                            onChange={(e) =>
-                                handleTypeChange(stage.id, e.target.value)
-                            }
+                            onChange={(e) => handleTypeChange(stage.index, e.target.value)}
                         >
                             <option value='none'>Select Stage</option>
                             {QueryTypes.map((queryType) => (
@@ -107,11 +94,7 @@ function DataVisualizer() {
                             ))}
                         </Input>
 
-                        <Button
-                            color='success'
-                            size='sm'
-                            onClick={() => addStageAfter(stage.id)}
-                        >
+                        <Button color='success' size='sm' onClick={() => addStageAfter(stage.index)}>
                             <Plus size={14} />
                         </Button>
                     </InputGroup>
@@ -121,71 +104,37 @@ function DataVisualizer() {
                             <h6 className='mb-2'>{stage.type} Parameters</h6>
 
                             {stage.params.map((param, i) => (
-                                <Row
-                                    key={i}
-                                    className='align-items-center mb-2'
-                                >
+                                <Row key={i} className='align-items-center mb-2'>
                                     <Col md='4'>
                                         <Input
                                             placeholder='Field'
                                             value={param.field}
-                                            onChange={(e) =>
-                                                handleParamChange(
-                                                    stage.id,
-                                                    i,
-                                                    "field",
-                                                    e.target.value
-                                                )
-                                            }
+                                            onChange={(e) => handleParamChange(stage.index, i, "field", e.target.value)}
                                         />
                                     </Col>
                                     <Col md='3'>
                                         <Input
                                             placeholder='Operator'
                                             value={param.operator}
-                                            onChange={(e) =>
-                                                handleParamChange(
-                                                    stage.id,
-                                                    i,
-                                                    "operator",
-                                                    e.target.value
-                                                )
-                                            }
+                                            onChange={(e) => handleParamChange(stage.index, i, "operator", e.target.value)}
                                         />
                                     </Col>
                                     <Col md='4'>
                                         <Input
                                             placeholder='Value'
                                             value={param.value}
-                                            onChange={(e) =>
-                                                handleParamChange(
-                                                    stage.id,
-                                                    i,
-                                                    "value",
-                                                    e.target.value
-                                                )
-                                            }
+                                            onChange={(e) => handleParamChange(stage.index, i, "value", e.target.value)}
                                         />
                                     </Col>
                                     <Col md='1'>
-                                        <Button
-                                            color='danger'
-                                            size='sm'
-                                            onClick={() =>
-                                                removeParam(stage.id, i)
-                                            }
-                                        >
+                                        <Button color='danger' size='sm' onClick={() => removeParam(stage.index, i)}>
                                             <X size={12} />
                                         </Button>
                                     </Col>
                                 </Row>
                             ))}
 
-                            <Button
-                                color='secondary'
-                                size='sm'
-                                onClick={() => addParam(stage.id)}
-                            >
+                            <Button color='secondary' size='sm' onClick={() => addParam(stage.index)}>
                                 + Add Parameter
                             </Button>
                         </div>
