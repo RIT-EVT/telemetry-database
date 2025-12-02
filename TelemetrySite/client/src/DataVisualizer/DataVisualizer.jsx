@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Input, Button, Form, InputGroup, Row, Col } from "reactstrap";
 import { Plus, X } from "react-feather";
 import QueryEntry from "./QueryEntry.ts";
+import React from "react";
 const QueryTypes = ["Match", "Group", "Sample", "Sort", "Unwind"];
 
 function DataVisualizer() {
@@ -9,7 +10,7 @@ function DataVisualizer() {
 
     /**
      * Insert a new stage after a given stageIndex
-     * @param {Int} stageIndex - stageIndex to insert after
+     * @param {number} stageIndex - stageIndex to insert after
      */
     const addStageAfter = (stageIndex) => {
         const newStages = [...stages];
