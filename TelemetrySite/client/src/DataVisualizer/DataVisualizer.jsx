@@ -26,7 +26,7 @@ function DataVisualizer() {
 
     /**
      * Remove a stage from the array of stages by stageIndex
-     * @param {Int} stageIndex - stageIndex to remove
+     * @param {number} stageIndex - stageIndex to remove
      */
     const removeStage = (stageIndex) => {
         if (stages.length === 1) return;
@@ -105,27 +105,16 @@ function DataVisualizer() {
 
                             {stage.params.map((param, i) => (
                                 <Row key={i} className='align-items-center mb-2'>
-                                    <Col md='4'>
-                                        <Input
-                                            placeholder='Field'
-                                            value={param.field}
-                                            onChange={(e) => handleParamChange(stage.index, i, "field", e.target.value)}
-                                        />
-                                    </Col>
-                                    <Col md='3'>
-                                        <Input
-                                            placeholder='Operator'
-                                            value={param.operator}
-                                            onChange={(e) => handleParamChange(stage.index, i, "operator", e.target.value)}
-                                        />
-                                    </Col>
-                                    <Col md='4'>
-                                        <Input
-                                            placeholder='Value'
-                                            value={param.value}
-                                            onChange={(e) => handleParamChange(stage.index, i, "value", e.target.value)}
-                                        />
-                                    </Col>
+                                    {Object.keys(param).map((key) => (
+                                        <Col key={key} md='4'>
+                                            <Input
+                                                placeholder={key}
+                                                value={param.field}
+                                                onChange={(e) => handleParamChange(stage.index, i, key, e.target.value)}
+                                            />
+                                        </Col>
+                                    ))}
+
                                     <Col md='1'>
                                         <Button color='danger' size='sm' onClick={() => removeParam(stage.index, i)}>
                                             <X size={12} />

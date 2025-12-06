@@ -1,14 +1,14 @@
 import { Route, Routes } from "react-router-dom";
 import ContextForm from "./ContextForm/ContextForm.jsx";
 import DataUpload from "./DataUpload/DataUpload.jsx";
-import { LoginPage, SignupPage } from "LoginPage/LoginPage.jsx";
+import { LoginPage, SignupPage } from "./LoginPage/LoginPage.jsx";
 import "./App.css";
 import Page404 from "./404/404.jsx";
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { CheckServerStatus } from "Utils/ServerUtils.jsx";
-import DataVisualizer from "DataVisualizer/DataVisualizer.jsx";
-import ErrorModal from "Modal/Error/Error.jsx";
+import { CheckServerStatus } from "./Utils/ServerUtils.jsx";
+import DataVisualizer from "./DataVisualizer/DataVisualizer.jsx";
+import ErrorModal from "./Modal/Error/Error.jsx";
 import Header from "./Header/Header.jsx";
 import Home from "./Home/Home.jsx";
 

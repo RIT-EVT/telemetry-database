@@ -7,17 +7,8 @@ import {
     getRunOrderNumber,
     incrementRunOrderNumber,
     resetRunOrderNumber,
-} from "Utils/ServerUtils.jsx";
-import {
-    Container,
-    Col,
-    Row,
-    Card,
-    CardBody,
-    Input,
-    Button,
-    Form,
-} from "reactstrap";
+} from "../Utils/ServerUtils.jsx";
+import { Container, Col, Row, Card, CardBody, Input, Button, Form } from "reactstrap";
 import { useNavigate } from "react-router-dom";
 
 /**
@@ -91,12 +82,7 @@ function DataUpload() {
             return;
         }
 
-        const PostDataFile = async (
-            mf4File,
-            dbcFile,
-            contextData,
-            runOrderNumber
-        ) => {
+        const PostDataFile = async (mf4File, dbcFile, contextData, runOrderNumber) => {
             // Ensure CheckData() completes before proceeding
 
             try {
@@ -121,22 +107,14 @@ function DataUpload() {
             formData.append("runOrderNumber", runOrderNumber);
 
             try {
-                const response = await fetch(
-                    BuildURI("data_upload") +
-                        "/" +
-                        sessionStorage.getItem("authToken"),
-                    {
-                        method: "POST",
-                        body: formData,
-                    }
-                );
+                const response = await fetch(BuildURI("data_upload") + "/" + sessionStorage.getItem("authToken"), {
+                    method: "POST",
+                    body: formData,
+                });
 
                 if (!response.ok) {
                     const jsonResponse = await response.json();
-                    console.error(
-                        "Error occurred on server side. Error message: " +
-                            jsonResponse.error
-                    );
+                    console.error("Error occurred on server side. Error message: " + jsonResponse.error);
                     return false;
                 }
                 incrementRunOrderNumber();
@@ -151,12 +129,7 @@ function DataUpload() {
         const mf4File = document.getElementById("fileUploadMF4").files[0];
         const dbcFile = document.getElementById("fileUploadDBC").files[0];
 
-        const postDataResponse = PostDataFile(
-            mf4File,
-            dbcFile,
-            contextData,
-            getRunOrderNumber()
-        );
+        const postDataResponse = PostDataFile(mf4File, dbcFile, contextData, getRunOrderNumber());
 
         /**
          * Fetch the progress of the current upload
@@ -166,19 +139,14 @@ function DataUpload() {
         const FetchProgress = async () => {
             try {
                 const fetchProgressResponse = await fetch(
-                    BuildURI("data_upload") +
-                        "/" +
-                        sessionStorage.getItem("authToken"),
+                    BuildURI("data_upload") + "/" + sessionStorage.getItem("authToken"),
                     {
                         method: "GET",
                     }
                 );
 
                 if (!fetchProgressResponse.ok) {
-                    console.error(
-                        "Network response was not ok: " +
-                            fetchProgressResponse.statusText
-                    );
+                    console.error("Network response was not ok: " + fetchProgressResponse.statusText);
                 }
 
                 const data = await fetchProgressResponse.json();
@@ -212,11 +180,7 @@ function DataUpload() {
 
             if (responseString !== "Finished") {
                 const currentProgress = data[responseString];
-                if (
-                    currentProgress > lastProgress ||
-                    currentProgress < 0 ||
-                    responseString !== lastResponseString
-                ) {
+                if (currentProgress > lastProgress || currentProgress < 0 || responseString !== lastResponseString) {
                     // Update the UI with the formatted estimated time remaining
                     if (!dataSubmitted) {
                         setProgressBar(
@@ -225,8 +189,7 @@ function DataUpload() {
                                     <Row>
                                         <progress value={currentProgress} />
                                         <div className='response'>
-                                            {responseString} :{" "}
-                                            {Math.round(currentProgress * 100)}%
+                                            {responseString} : {Math.round(currentProgress * 100)}%
                                         </div>
                                     </Row>
                                 </Col>
@@ -268,10 +231,7 @@ function DataUpload() {
                     eventLocation: parsedContextData.event.location,
                 };
 
-                sessionStorage.setItem(
-                    "EventData",
-                    JSON.stringify(eventObject)
-                );
+                sessionStorage.setItem("EventData", JSON.stringify(eventObject));
 
                 DisplayRedirect();
             }
@@ -281,18 +241,11 @@ function DataUpload() {
     useEffect(() => {
         //make sure a refresh doesn't make the user resubmit data
 
-        if (
-            sessionStorage.getItem("DataSubmitted") !== null &&
-            sessionStorage.getItem("DataSubmitted") === "true"
-        ) {
+        if (sessionStorage.getItem("DataSubmitted") !== null && sessionStorage.getItem("DataSubmitted") === "true") {
             DisplayRedirect();
         } else {
             setBodyDisplay(
-                <Form
-                    className='DataUploadForm'
-                    onSubmit={SubmitFile}
-                    encType='multipart/form-data'
-                >
+                <Form className='DataUploadForm' onSubmit={SubmitFile} encType='multipart/form-data'>
                     <Container>
                         <Row>
                             <Col>
@@ -319,10 +272,7 @@ function DataUpload() {
                             </Col>
                         </Row>
                     </Container>
-                    <Button className='submit-btn'>
-                        Submit{" "}
-                        {sessionStorage.getItem("EventData") ? "Run" : null}
-                    </Button>
+                    <Button className='submit-btn'>Submit {sessionStorage.getItem("EventData") ? "Run" : null}</Button>
                 </Form>
             );
         }
