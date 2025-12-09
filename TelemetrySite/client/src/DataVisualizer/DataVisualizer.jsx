@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Input, Button, Form, InputGroup, Row, Col } from "reactstrap";
 import { Plus, X } from "react-feather";
 import QueryEntry from "./QueryEntry.ts";
-import React from "react";
+import "./DataVisualizer.css";
 const QueryTypes = ["Match", "Group", "Sample", "Sort", "Unwind"];
 
 function DataVisualizer() {
@@ -40,10 +40,15 @@ function DataVisualizer() {
         setStages(newStages);
     };
 
+    /**
+     * Update the type of query a stage is
+     * @param {number} stageIndex - stageIndex to update the type of
+     * @param {string} value - type to update
+     */
     const handleTypeChange = (stageIndex, value) => {
         const newStages = [...stages];
 
-        newStages[stageIndex].type = value;
+        newStages[stageIndex].UpdateType(value);
 
         setStages(newStages);
     };
@@ -75,8 +80,8 @@ function DataVisualizer() {
     return (
         <Form>
             {stages.map((stage) => (
-                <div key={stage.index} className='mb-3 p-2 border rounded'>
-                    <InputGroup className='mb-2 align-items-center'>
+                <div key={stage.index} className='mb-3 p-2 border rounded data-background'>
+                    <InputGroup className='mb-2 align-items-center '>
                         <Button color='danger' size='sm' onClick={() => removeStage(stage.index)}>
                             <X size={14} />
                         </Button>
@@ -100,11 +105,11 @@ function DataVisualizer() {
                     </InputGroup>
 
                     {stage.type !== "none" && (
-                        <div className='p-2 bg-light rounded'>
+                        <div className='p-2 bg-light rounded param-background'>
                             <h6 className='mb-2'>{stage.type} Parameters</h6>
 
                             {stage.params.map((param, i) => (
-                                <Row key={i} className='align-items-center mb-2'>
+                                <Row key={i} xs='3' className='align-items-center mb-2 '>
                                     {Object.keys(param).map((key) => (
                                         <Col key={key} md='4'>
                                             <Input

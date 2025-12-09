@@ -2,3 +2,13 @@
     margin-left: 8px;
     background-color: black;
 }
+
+.data-background {
+    border-color: rgb(84, 90, 93);
+    background-color: rgb(49, 53, 55);
+}
+
+.param-background {
+    background-color: rgb(44, 48, 49) !important;
+    color: white;
+}
