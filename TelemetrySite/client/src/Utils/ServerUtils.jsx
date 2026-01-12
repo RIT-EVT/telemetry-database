@@ -10,23 +10,23 @@ let BASE_URL = "http://127.0.0.1:5000";
 
 let RunOrderNumber = 0;
 
-// These functions are not immediately used in seperate files, but they
+// These functions are not immediately used in separate files, but they
 // are general enough to grant them their own place
 
 const BuildURI = (ServerCallsKey) => {
-  return BASE_URL + ServerCalls[ServerCallsKey];
+    return BASE_URL + ServerCalls[ServerCallsKey];
 };
 
 const getRunOrderNumber = () => {
-  return RunOrderNumber;
+    return RunOrderNumber;
 };
 
 const incrementRunOrderNumber = () => {
-  RunOrderNumber += 1;
+    RunOrderNumber += 1;
 };
 
 const resetRunOrderNumber = () => {
-  RunOrderNumber = 0;
+    RunOrderNumber = 0;
 };
 /**
  * Check the status of the server.
@@ -36,22 +36,21 @@ const resetRunOrderNumber = () => {
  * @return {boolean} true -> server is online. false -> server is offline
  */
 const CheckServerStatus = async () => {
-  try {
-    const response = await fetch(BASE_URL + "/", { method: "GET" });
+    try {
+        const response = await fetch(BASE_URL + "/", { method: "GET" });
 
-    // If server responds but status is not 200-299
-    if (!response.ok) {
-      return false;
+        // If server responds but status is not 200-299
+        if (!response.ok) {
+            return false;
+        }
+
+        const data = await response.json();
+        ServerCalls = data;
+        return true;
+    } catch (error) {
+        // This runs if the server is offline or network request fails
+        return false;
     }
-
-    const data = await response.json();
-    ServerCalls = data;
-    return true;
-
-  } catch (error) {
-    // This runs if the server is offline or network request fails
-    return false;
-  }
 };
 
 /**
@@ -60,20 +59,20 @@ const CheckServerStatus = async () => {
  * @return {Boolean} If the server is online
  */
 const CheckData = async () => {
-  if (!ServerCalls) {
-    return CheckServerStatus().then((response) => {
-      return response;
-    });
-  }
-  return true;
+    if (!ServerCalls) {
+        return CheckServerStatus().then((response) => {
+            return response;
+        });
+    }
+    return true;
 };
 
 export {
-  BuildURI,
-  CheckServerStatus,
-  CheckData,
-  ServerCalls,
-  getRunOrderNumber,
-  incrementRunOrderNumber,
-  resetRunOrderNumber,
+    BuildURI,
+    CheckServerStatus,
+    CheckData,
+    ServerCalls,
+    getRunOrderNumber,
+    incrementRunOrderNumber,
+    resetRunOrderNumber,
 };
