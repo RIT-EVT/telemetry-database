@@ -20,52 +20,65 @@ class BasicQueryApi(MethodView):
                 return self.test_query(request.get_json()), 200
                 
         
-            
-
         
     def test_query(self, data):
-        query = self.construct_query(data)
-        query.append({"$group":{
-            "_id":"$event.name",
-            "count": { "$sum": 1 }
-        }})
+        facets = {}
 
-        result = {}
+        match_date = {}
+        match_name = {}
+        match_location = {}
 
         if "dateRange" in data:
-            temp_pipeline = [
-                {
-                    "$match": {
-                        "event.date": {
-                            "$gte": data["dateRange"]["start"],
-                            "$lt": data["dateRange"]["end"]
-                        }
-                    }
-                },
-                {
-                    "$group": {
-                        "_id": "$event.name",
-                        "count": { "$sum": 1 }
-                    }
-                },
-                {
-                    "$project": {
-                        "_id": 0,
-                        "eventName": "$_id",
-                        "count": 1
-                    }
+            match_date = {
+                "event.date": {
+                    "$gte": data["dateRange"]["start"],
+                    "$lt": data["dateRange"]["end"]
                 }
+            }
+            facets["matchDate"] = [
+                { "$match": match_date },
+                { "$group": { "_id": "$event.name" } },
+                { "$count": "count" }
             ]
 
+        if "eventName" in data:
+            match_name = {
+                "event.name": data["eventName"]
+            }
+            facets["matchName"] = [
+                { "$match": match_name },
+                { "$group": { "_id": "$event.name" } },
+                { "$count": "count" }
+            ]
 
-            result["dateResult"] = list(self.db["messages"].aggregate(temp_pipeline, allowDiskUse=True))
+        if "eventLocation" in data:
+            match_location = {
+                "event.location": data["eventLocation"]
+            }
+            facets["matchLocation"] = [
+                { "$match": match_location },
+                { "$group": { "_id": "$event.name" } },
+                { "$count": "count" }
+            ]
 
-        print(query)
+        match_all = {}
+        match_all.update(match_date)
+        match_all.update(match_name)
+        match_all.update(match_location)
 
-        query.append({ "$count": "total" })
-        list(self.db["messages"].aggregate(query, allowDiskUse=True))
+        facets["matchAll"] = [
+            { "$match": match_all },
+            { "$group": { "_id": "$event.name" } },
+            { "$count": "count" }
+        ]
+
+        pipeline = [
+            { "$facet": facets }
+        ]
+
+        result = list(self.db["messages"].aggregate(pipeline, allowDiskUse=True))
         print(result)
-
+        
         return result
 
     @staticmethod

@@ -27,7 +27,7 @@ class QueryEntry {
         const param = ParamFields[this.type];
 
         // Ensure the param exists and enforce the max number of params for this QueryType
-        if (!param || (param.maxLength != -1 && param.maxLength < this.params.length + 1)) return;
+        if (!param || (param.maxLength !== -1 && param.maxLength < this.params.length + 1)) return;
 
         const newObject: Record<string, string> = {};
         for (const key of param.fields) {

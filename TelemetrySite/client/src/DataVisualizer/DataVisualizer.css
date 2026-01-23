@@ -16,6 +16,7 @@
 .query-mode-bar {
     padding: 1rem;
 }
+
 .align-center {
     align-content: center;
     text-align: center;
@@ -31,20 +32,34 @@
 }
 
 .query-mode-button {
-    background-color: black;
+    background-color: #070707;
     color: #f76902;
-    border-color: rgb(39, 39, 39);
+    border: solid;
+    border-color: rgb(33, 33, 33);
 }
 
 .current-mode {
     background-color: #f76902;
-    border-color: #f77213;
+    border: solid;
+    border-color: #ca5d0f;
+
     color: black;
 }
 
 .query-mode-button:hover,
 .current-mode:hover {
     transform: scale(1.1);
+}
+
+.query-mode-button:hover {
+    background-color: black;
+    color: #f76902;
+}
+
+.current-mode:hover {
+    color: black;
+    background-color: #e56000;
+    border-color: #99460a;
 }
 
 .basic-query-title {

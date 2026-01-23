@@ -37,9 +37,7 @@ function BasicQuery() {
             const isSelected = prev.includes(option);
 
             if (option === "Date") {
-                return isSelected
-                    ? prev.filter((o) => o !== "Date")
-                    : [...prev.filter((o) => o !== "Date Range"), "Date"];
+                return isSelected ? prev.filter((o) => o !== "Date") : [...prev.filter((o) => o !== "Date Range"), "Date"];
             }
 
             if (option === "Date Range") {
@@ -102,19 +100,15 @@ function BasicQuery() {
     const testQuery = async (e) => {
         e.preventDefault();
         const payload = formatPayload();
-        console.log(payload);
-        const response = await fetch(
-            BuildURI("basic_query") + "/" + sessionStorage.getItem("authToken") + "/test-query",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(payload),
-            }
-        );
 
-        console.log(response);
+        const response = await fetch(BuildURI("basic_query") + "/" + sessionStorage.getItem("authToken") + "/test-query", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+        });
+
         const data = await response.json();
 
         console.log(data);
@@ -150,7 +144,7 @@ function BasicQuery() {
 
     return (
         <Form onSubmit={handleSubmit}>
-            <Card className="p-3">
+            <Card className='p-3'>
                 {/* Dropdown */}
                 <Dropdown isOpen={dropdownOpen} toggle={toggleDropdown}>
                     <DropdownToggle caret>Select Query Options</DropdownToggle>
@@ -158,10 +152,10 @@ function BasicQuery() {
                         {BasicOptions.map((option) => (
                             <DropdownItem key={option} toggle={false} onClick={() => toggleOption(option)}>
                                 <Input
-                                    type="checkbox"
+                                    type='checkbox'
                                     checked={selectedOptions.includes(option)}
                                     readOnly
-                                    className="me-2"
+                                    className='me-2'
                                 />
                                 {option}
                             </DropdownItem>
@@ -173,10 +167,10 @@ function BasicQuery() {
                 {selectedOptions.map((option) => {
                     if (option === "Date") {
                         return (
-                            <FormGroup key={option} className="mt-3">
-                                <Label className="basic-query-title">Date</Label>
+                            <FormGroup key={option} className='mt-3'>
+                                <Label className='basic-query-title'>Date</Label>
                                 <Input
-                                    type="date"
+                                    type='date'
                                     value={formValues.date}
                                     onChange={(e) => handleChange("date", e.target.value)}
                                     required
@@ -187,12 +181,12 @@ function BasicQuery() {
 
                     if (option === "Date Range") {
                         return (
-                            <FormGroup key={option} className="mt-3">
-                                <Label className="basic-query-title">Date Range</Label>
+                            <FormGroup key={option} className='mt-3'>
+                                <Label className='basic-query-title'>Date Range</Label>
                                 <Row>
                                     <Col md={6}>
                                         <Input
-                                            type="date"
+                                            type='date'
                                             value={formValues.startDate}
                                             onChange={(e) => handleChange("startDate", e.target.value)}
                                             required
@@ -200,7 +194,7 @@ function BasicQuery() {
                                     </Col>
                                     <Col md={6}>
                                         <Input
-                                            type="date"
+                                            type='date'
                                             value={formValues.endDate}
                                             onChange={(e) => handleChange("endDate", e.target.value)}
                                             required
@@ -213,11 +207,11 @@ function BasicQuery() {
 
                     if (option === "Event Name") {
                         return (
-                            <FormGroup key={option} className="mt-3">
-                                <Label className="basic-query-title">Event Name</Label>
+                            <FormGroup key={option} className='mt-3'>
+                                <Label className='basic-query-title'>Event Name</Label>
                                 <Input
-                                    type="text"
-                                    placeholder="Enter Name"
+                                    type='text'
+                                    placeholder='Enter Name'
                                     value={formValues.eventName}
                                     onChange={(e) => handleChange("eventName", e.target.value)}
                                     required
@@ -228,11 +222,11 @@ function BasicQuery() {
 
                     if (option === "Event Location") {
                         return (
-                            <FormGroup key={option} className="mt-3">
-                                <Label className="basic-query-title">Event Location</Label>
+                            <FormGroup key={option} className='mt-3'>
+                                <Label className='basic-query-title'>Event Location</Label>
                                 <Input
-                                    type="text"
-                                    placeholder="Enter Location"
+                                    type='text'
+                                    placeholder='Enter Location'
                                     value={formValues.eventLocation}
                                     onChange={(e) => handleChange("eventLocation", e.target.value)}
                                     required
@@ -244,34 +238,34 @@ function BasicQuery() {
                     return null;
                 })}
                 <Container>
-                    <Row xs="3">
-                        <Col className="align-center">
+                    <Row xs='3'>
+                        <Col className='align-center'>
                             <Button
                                 disabled={selectedOptions.length === 0}
                                 onClick={testQuery}
-                                color="primary"
-                                className="mt-3"
+                                color='primary'
+                                className='mt-3'
                             >
                                 Test Query
                             </Button>
                         </Col>
-                        <Col className="align-center">
+                        <Col className='align-center'>
                             <Button
                                 disabled={selectedOptions.length === 0}
                                 onClick={handleSubmit}
-                                color="primary"
-                                className="mt-3"
+                                color='primary'
+                                className='mt-3'
                             >
                                 Finalize Query
                             </Button>
                         </Col>
-                        <Col className="align-center">
+                        <Col className='align-center'>
                             <Button
                                 disabled={selectedOptions.length === 0}
                                 onClick={saveQuery}
-                                color="primary"
-                                className="mt-3"
-                                type="submit"
+                                color='primary'
+                                className='mt-3'
+                                type='submit'
                             >
                                 Save Query
                             </Button>
