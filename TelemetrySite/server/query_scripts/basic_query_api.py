@@ -74,10 +74,10 @@ class BasicQueryApi(MethodView):
 
         pipeline = [
             {"$facet": facets},
+            # So this is two messy entries, but they serve an important role
+            # facets inherently return and array of documents, but our pipeline compresses it down to 1
+            # these two queries take all the facets, strip them of the array, and changes it to an object
             {
-                # So this is two messy entries, but they serve an important role
-                # facets inherently return and array of documents, but our pipeline compresses it down to 1
-                # these two queries take all the facets, strip them of the array, and changes it to an object
                 "$project": {
                     "_id": 0,
                     "facets": {
@@ -87,7 +87,12 @@ class BasicQueryApi(MethodView):
                                 "as": "facet",
                                 "in": {
                                     "k": "$$facet.k",
-                                    "v": {"$arrayElemAt": ["$$facet.v", 0]},
+                                    "v": {
+                                        "$ifNull": [
+                                            {"$arrayElemAt": ["$$facet.v", 0]},
+                                            {"count": 0, "events": []},
+                                        ]
+                                    },
                                 },
                             }
                         }
@@ -98,6 +103,7 @@ class BasicQueryApi(MethodView):
         ]
 
         cursor = self.db["messages"].aggregate(pipeline, allowDiskUse=True)
+
         return next(cursor, None)
 
     @staticmethod
