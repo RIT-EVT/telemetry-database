@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Button, Container, Row, Col } from "reactstrap";
-import AdvancedQuery from "./AdvancedQuery";
+import AdvancedQuery from "./QuerySites/AdvancedQuery";
 
 import "./DataVisualizer.css";
-import BasicQuery from "./BasicQuery";
+import BasicQuery from "./QuerySites/BasicQuery";
 
 function DataVisualizer() {
     const [mode, setMode] = useState("basic");

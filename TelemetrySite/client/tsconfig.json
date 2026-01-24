@@ -35,5 +35,9 @@
     "skipLibCheck": true,
     "allowImportingTsExtensions": true,
     "noEmit": true,
-  }
+
+    "baseUrl": "src"
+  },
+
+  "include": ["src"]
 }

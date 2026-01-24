@@ -2,7 +2,7 @@ import { Plus, X } from "react-feather";
 import QueryEntry from "./QueryEntry.ts";
 import { useState } from "react";
 import { Input, Button, InputGroup, Row, Col, Form, Card } from "reactstrap";
-import { BuildURI } from "../Utils/ServerUtils";
+import { BuildURI } from "Utils/ServerUtils";
 
 const QueryTypes = ["Match", "Group", "Sample", "Sort", "Unwind"];
 
@@ -98,18 +98,18 @@ const AdvancedQuery = () => {
         <Form>
             <Card>
                 {stages.map((stage) => (
-                    <div key={stage.index} className="mb-3 p-2 border rounded data-background">
-                        <InputGroup className="mb-2 align-items-center ">
-                            <Button color="danger" size="sm" onClick={() => removeStage(stage.index)}>
+                    <div key={stage.index} className='mb-3 p-2 border rounded data-background'>
+                        <InputGroup className='mb-2 align-items-center '>
+                            <Button color='danger' size='sm' onClick={() => removeStage(stage.index)}>
                                 <X size={14} />
                             </Button>
 
                             <Input
-                                type="select"
+                                type='select'
                                 value={stage.type}
                                 onChange={(e) => handleTypeChange(stage.index, e.target.value)}
                             >
-                                <option value="none">Select Stage</option>
+                                <option value='none'>Select Stage</option>
                                 {QueryTypes.map((queryType) => (
                                     <option key={queryType} value={queryType}>
                                         {queryType}
@@ -117,42 +117,36 @@ const AdvancedQuery = () => {
                                 ))}
                             </Input>
 
-                            <Button color="success" size="sm" onClick={() => addStageAfter(stage.index)}>
+                            <Button color='success' size='sm' onClick={() => addStageAfter(stage.index)}>
                                 <Plus size={14} />
                             </Button>
                         </InputGroup>
 
                         {stage.type !== "none" && (
-                            <div className="p-2 bg-light rounded param-background">
-                                <h6 className="mb-2">{stage.type} Parameters</h6>
+                            <div className='p-2 bg-light rounded param-background'>
+                                <h6 className='mb-2'>{stage.type} Parameters</h6>
 
                                 {stage.params.map((param, i) => (
-                                    <Row key={i} xs="3" className="align-items-center mb-2 ">
+                                    <Row key={i} xs='3' className='align-items-center mb-2 '>
                                         {Object.keys(param).map((key) => (
-                                            <Col key={key} md="4">
+                                            <Col key={key} md='4'>
                                                 <Input
                                                     placeholder={key}
                                                     value={param.field}
-                                                    onChange={(e) =>
-                                                        handleParamChange(stage.index, i, key, e.target.value)
-                                                    }
+                                                    onChange={(e) => handleParamChange(stage.index, i, key, e.target.value)}
                                                 />
                                             </Col>
                                         ))}
 
-                                        <Col md="1">
-                                            <Button
-                                                color="danger"
-                                                size="sm"
-                                                onClick={() => removeParam(stage.index, i)}
-                                            >
+                                        <Col md='1'>
+                                            <Button color='danger' size='sm' onClick={() => removeParam(stage.index, i)}>
                                                 <X size={12} />
                                             </Button>
                                         </Col>
                                     </Row>
                                 ))}
 
-                                <Button color="secondary" size="sm" onClick={() => addParam(stage.index)}>
+                                <Button color='secondary' size='sm' onClick={() => addParam(stage.index)}>
                                     + Add Parameter
                                 </Button>
                             </div>

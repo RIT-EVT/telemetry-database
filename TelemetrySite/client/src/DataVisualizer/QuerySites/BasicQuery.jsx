@@ -14,7 +14,7 @@ import {
     Button,
     Container,
 } from "reactstrap";
-import { BuildURI } from "../Utils/ServerUtils";
+import { BuildURI } from "Utils/ServerUtils";
 
 const BasicOptions = ["Date", "Date Range", "Event Name", "Event Location"];
 
@@ -108,10 +108,13 @@ function BasicQuery() {
             },
             body: JSON.stringify(payload),
         });
+        if (response.ok) {
+            const data = await response.json();
 
-        const data = await response.json();
-
-        console.log(data);
+            console.log(data);
+        } else {
+            console.error(`An error occurred in testQuery. Fetch request returned with code ${response.status}`);
+        }
     };
 
     const saveQuery = async (e) => {};
@@ -128,7 +131,7 @@ function BasicQuery() {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify(payload),
-                }
+                },
             );
 
             if (!response.ok) {
