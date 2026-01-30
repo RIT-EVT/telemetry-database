@@ -17,7 +17,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import DynamicForm from "./DynamicForm";
 import SelectCreator from "./SelectorCreator";
 
-import { BuildURI } from "../Utils/ServerUtils.jsx";
+import { BuildURI } from "../Utils/ServerUtils.ts";
 
 /**
  * Create needed context forms. Return the configured elements
@@ -118,7 +118,7 @@ function ContextForm(props) {
                 }
             } else if (newConfigName !== "") {
                 const targetConfig = DropDownOptions[configName].find(
-                    (savedNames) => savedNames[configName + "SavedName"] === newConfigName
+                    (savedNames) => savedNames[configName + "SavedName"] === newConfigName,
                 );
                 // Generate the new form and pass in values to assign
                 const formElement = DynamicForm(`${configName}Config`, targetConfig);
@@ -143,7 +143,7 @@ function ContextForm(props) {
                 }
             }
         },
-        [DropDownOptions, DropDowns]
+        [DropDownOptions, DropDowns],
     );
 
     /**

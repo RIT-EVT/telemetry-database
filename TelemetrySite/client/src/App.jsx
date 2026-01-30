@@ -6,7 +6,7 @@ import "./App.css";
 import Page404 from "./404/404.jsx";
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { CheckServerStatus } from "./Utils/ServerUtils.jsx";
+import { CheckServerStatus } from "./Utils/ServerUtils.ts";
 import DataVisualizer from "./DataVisualizer/DataVisualizer.jsx";
 import ErrorModal from "./Modal/Error/Error.jsx";
 import Header from "./Header/Header.jsx";

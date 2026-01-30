@@ -14,14 +14,14 @@ import {
     Button,
     Container,
 } from "reactstrap";
-import { BuildURI } from "Utils/ServerUtils";
+import { BuildURI } from "Utils/ServerUtils.ts";
 import QueryResponse from "./QueryResponseModal/QueryResponse";
 
 const BasicOptions = ["Date", "Date Range", "Event Name", "Event Location"];
 
 function BasicQuery() {
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    const [selectedOptions, setSelectedOptions] = useState([]);
+    const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
     const [isResponseModalVisible, setResponseModalVisible] = useState(true);
 
     const [formValues, setFormValues] = useState({
@@ -35,8 +35,8 @@ function BasicQuery() {
     const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
     const toggleModal = () => setResponseModalVisible(!isResponseModalVisible);
 
-    const toggleOption = (option) => {
-        setSelectedOptions((prev) => {
+    const toggleOption = (option: string) => {
+        setSelectedOptions((prev: string[]) => {
             const isSelected = prev.includes(option);
 
             if (option === "Date") {
@@ -55,7 +55,7 @@ function BasicQuery() {
 
     const formatPayload = () => {
         // Format payload for backend
-        const payload = {};
+        const payload: Record<string, string> = {};
 
         if (selectedOptions.includes("Date")) {
             const start = new Date(formValues.date);
@@ -63,10 +63,8 @@ function BasicQuery() {
             const end = new Date(formValues.date);
             // Check the whole first day
             end.setDate(end.getDate() + 1);
-            payload.dateRange = {
-                start,
-                end,
-            };
+
+            payload.dateRange = JSON.stringify({ start, end });
         }
 
         if (selectedOptions.includes("Date Range")) {
@@ -76,10 +74,7 @@ function BasicQuery() {
             // Inclusive search of last date
             end.setDate(end.getDate() + 1);
 
-            payload.dateRange = {
-                start,
-                end,
-            };
+            payload.dateRange = JSON.stringify({ start, end });
         }
 
         if (selectedOptions.includes("Event Name")) {
@@ -93,15 +88,14 @@ function BasicQuery() {
         return payload;
     };
 
-    const handleChange = (key, value) => {
+    const handleChange = (key: string, value: string) => {
         setFormValues((prev) => ({
             ...prev,
             [key]: value,
         }));
     };
 
-    const testQuery = async (e) => {
-        e.preventDefault();
+    const testQuery = async () => {
         const payload = formatPayload();
 
         const response = await fetch(BuildURI("basic_query") + "/" + sessionStorage.getItem("authToken") + "/test-query", {
@@ -121,10 +115,9 @@ function BasicQuery() {
         }
     };
 
-    const saveQuery = async (e) => {};
+    const saveQuery = async () => {};
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleSubmit = async () => {
         const payload = formatPayload();
         try {
             const response = await fetch(

@@ -4,7 +4,7 @@
  * the url paths to change on the backend without
  * effecting the frontend
  */
-var ServerCalls = {};
+let ServerCalls: Record<string, string> = {};
 
 let BASE_URL = "http://127.0.0.1:5000";
 
@@ -13,7 +13,7 @@ let RunOrderNumber = 0;
 // These functions are not immediately used in separate files, but they
 // are general enough to grant them their own place
 
-const BuildURI = (ServerCallsKey) => {
+const BuildURI = (ServerCallsKey: string) => {
     return BASE_URL + ServerCalls[ServerCallsKey];
 };
 

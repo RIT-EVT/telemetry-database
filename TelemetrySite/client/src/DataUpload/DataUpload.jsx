@@ -7,7 +7,7 @@ import {
     getRunOrderNumber,
     incrementRunOrderNumber,
     resetRunOrderNumber,
-} from "../Utils/ServerUtils.jsx";
+} from "../Utils/ServerUtils.ts";
 import { Container, Col, Row, Card, CardBody, Input, Button, Form } from "reactstrap";
 import { useNavigate } from "react-router-dom";
 
@@ -61,7 +61,7 @@ function DataUpload() {
                         </Button>
                     </Col>
                 </Row>
-            </Container>
+            </Container>,
         );
     }
 
@@ -142,7 +142,7 @@ function DataUpload() {
                     BuildURI("data_upload") + "/" + sessionStorage.getItem("authToken"),
                     {
                         method: "GET",
-                    }
+                    },
                 );
 
                 if (!fetchProgressResponse.ok) {
@@ -193,7 +193,7 @@ function DataUpload() {
                                         </div>
                                     </Row>
                                 </Col>
-                            </Container>
+                            </Container>,
                         );
                     } else {
                         clearInterval(interval);
@@ -273,7 +273,7 @@ function DataUpload() {
                         </Row>
                     </Container>
                     <Button className='submit-btn'>Submit {sessionStorage.getItem("EventData") ? "Run" : null}</Button>
-                </Form>
+                </Form>,
             );
         }
     }, []);

@@ -2,6 +2,7 @@ from flask.views import MethodView
 from utils import authenticate_user, check_expired_tokens
 from http_codes import HttpResponseType
 from flask import jsonify, request
+from json import loads
 
 
 class BasicQueryApi(MethodView):
@@ -40,10 +41,14 @@ class BasicQueryApi(MethodView):
         match_location = {}
 
         if "dateRange" in data:
+
+            # parse date from a string to a json object
+            dateRange = loads(data["dateRange"])
+
             match_date = {
                 "event.date": {
-                    "$gte": data["dateRange"]["start"],
-                    "$lt": data["dateRange"]["end"],
+                    "$gte": dateRange["start"],
+                    "$lt": dateRange["end"],
                 }
             }
             facets["matchDate"] = [
