@@ -10,9 +10,7 @@ type QueryResponseProps = {
 const QueryResponse = ({ isOpen, toggleModal, title }: QueryResponseProps) => {
     return (
         <Modal isOpen={isOpen} toggle={toggleModal}>
-            <ModalHeader className='background'>
-                <h1>{title}</h1>
-            </ModalHeader>
+            <ModalHeader className='background'>{title}</ModalHeader>
             <ModalBody className='background'>{/* response content */}</ModalBody>
             <ModalFooter className='background'>
                 <Button onClick={toggleModal}></Button>
