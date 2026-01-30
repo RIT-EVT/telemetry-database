@@ -2,7 +2,6 @@ import { Plus, X } from "react-feather";
 import QueryEntry from "./QueryEntry.ts";
 import { useState } from "react";
 import { Input, Button, InputGroup, Row, Col, Form, Card } from "reactstrap";
-import { BuildURI } from "Utils/ServerUtils";
 
 const QueryTypes = ["Match", "Group", "Sample", "Sort", "Unwind"];
 
@@ -13,12 +12,12 @@ const AdvancedQuery = () => {
      * Insert a new stage after a given stageIndex
      * @param {number} stageIndex - Stage's index
      */
-    const addStageAfter = (stageIndex) => {
+    const addStageAfter = (stageIndex: number) => {
         const newStages = [...stages];
         const newStage = new QueryEntry(stageIndex + 1);
 
         for (let indexIncrease = stageIndex + 1; indexIncrease < newStages.length; indexIncrease++)
-            newStages[indexIncrease].IncreaseIndex();
+            newStages[indexIncrease]?.IncreaseIndex();
 
         newStages.splice(stageIndex + 1, 0, newStage);
 
@@ -29,12 +28,12 @@ const AdvancedQuery = () => {
      * Remove a stage from the array of stages by stageIndex
      * @param {number} stageIndex - Stage's index
      */
-    const removeStage = (stageIndex) => {
+    const removeStage = (stageIndex: number) => {
         if (stages.length === 1) return;
         const newStages = [...stages];
 
         for (let indexDecrease = stageIndex + 1; indexDecrease < newStages.length; indexDecrease++)
-            newStages[indexDecrease].DecreaseIndex();
+            newStages[indexDecrease]?.DecreaseIndex();
 
         newStages.splice(stageIndex, 1);
 
@@ -46,10 +45,10 @@ const AdvancedQuery = () => {
      * @param {number} stageIndex - Stage's index
      * @param {string} value - Type to update stage to
      */
-    const handleTypeChange = (stageIndex, value) => {
+    const handleTypeChange = (stageIndex: number, value: string) => {
         const newStages = [...stages];
 
-        newStages[stageIndex].UpdateType(value);
+        newStages[stageIndex]?.UpdateType(value);
 
         setStages(newStages);
     };
@@ -58,10 +57,10 @@ const AdvancedQuery = () => {
      * Add a new parameter to a stage
      * @param {number} stageIndex - Stage's index
      */
-    const addParam = (stageIndex) => {
+    const addParam = (stageIndex: number) => {
         const newStages = [...stages];
 
-        newStages[stageIndex].AddParams();
+        newStages[stageIndex]?.AddParams();
 
         setStages(newStages);
     };
@@ -71,10 +70,10 @@ const AdvancedQuery = () => {
      * @param {number} stageIndex - Stage's index
      * @param {number} paramIndex - Index of parameter in the stage
      */
-    const removeParam = (stageIndex, paramIndex) => {
+    const removeParam = (stageIndex: number, paramIndex: number) => {
         const newStages = [...stages];
 
-        newStages[stageIndex].RemoveParam(paramIndex);
+        newStages[stageIndex]?.RemoveParam(paramIndex);
 
         setStages(newStages);
     };
@@ -86,10 +85,10 @@ const AdvancedQuery = () => {
      * @param {string} field - Field to update
      * @param {string} newValue - New value of the field
      */
-    const handleParamChange = (stageIndex, paramIndex, field, newValue) => {
+    const handleParamChange = (stageIndex: number, paramIndex: number, field: string, newValue: string) => {
         const newStages = [...stages];
 
-        newStages[stageIndex].UpdateParamValue(paramIndex, field, newValue);
+        newStages[stageIndex]?.UpdateParamValue(paramIndex, field, newValue);
 
         setStages(newStages);
     };
