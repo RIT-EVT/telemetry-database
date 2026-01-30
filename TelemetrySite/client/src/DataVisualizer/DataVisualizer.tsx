@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Button, Container, Row, Col } from "reactstrap";
-import AdvancedQuery from "./QuerySystem/AdvancedQuery";
+import AdvancedQuery from "./QuerySystem/AdvancedQuerySystem/AdvancedQuery";
 
 import "./DataVisualizer.css";
-import BasicQuery from "./QuerySystem/BasicQuery";
+import BasicQuery from "./QuerySystem/BasicQuerySystem/BasicQuery";
 
 enum QueryMode {
     basic,
