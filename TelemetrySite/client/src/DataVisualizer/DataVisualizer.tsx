@@ -5,8 +5,13 @@ import AdvancedQuery from "./QuerySystem/AdvancedQuery";
 import "./DataVisualizer.css";
 import BasicQuery from "./QuerySystem/BasicQuery";
 
+enum QueryMode {
+    basic,
+    advanced,
+}
+
 function DataVisualizer() {
-    const [mode, setMode] = useState("basic");
+    const [mode, setMode] = useState(QueryMode.basic);
 
     return (
         <>
@@ -14,27 +19,23 @@ function DataVisualizer() {
                 <Row xs='2'>
                     <Col className='align-center'>
                         <Button
-                            className={`${mode === "basic" ? "current-mode" : "query-mode-button"}`}
-                            onClick={() => {
-                                if (mode !== "basic") setMode("basic");
-                            }}
+                            className={`${mode === QueryMode.basic ? "current-mode" : "query-mode-button"}`}
+                            onClick={() => setMode(QueryMode.basic)}
                         >
                             Simple Query
                         </Button>
                     </Col>
                     <Col className='align-center'>
                         <Button
-                            className={`${mode === "advanced" ? "current-mode" : "query-mode-button"}`}
-                            onClick={() => {
-                                if (mode !== "advanced") setMode("advanced");
-                            }}
+                            className={`${mode === QueryMode.advanced ? "current-mode" : "query-mode-button"}`}
+                            onClick={() => setMode(QueryMode.advanced)}
                         >
                             Advanced Query
                         </Button>
                     </Col>
                 </Row>
             </Container>
-            {mode === "basic" ? <BasicQuery /> : <AdvancedQuery />}
+            {mode === QueryMode.basic ? <BasicQuery /> : <AdvancedQuery />}
         </>
     );
 }
