@@ -75,7 +75,7 @@ class BasicQueryApi(MethodView):
         match_all.update(match_name)
         match_all.update(match_location)
 
-        facets["matchAll"] = [{"$match": match_all}, *format]
+        facets["matchFinal_Result"] = [{"$match": match_all}, *format]
 
         pipeline = [
             {"$facet": facets},

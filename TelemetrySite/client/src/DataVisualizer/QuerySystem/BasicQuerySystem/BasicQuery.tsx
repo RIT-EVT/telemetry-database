@@ -14,8 +14,9 @@ import {
     Button,
     Container,
 } from "reactstrap";
+
 import { BuildURI } from "Utils/ServerUtils.ts";
-import QueryResponse from "./QueryResponseModal/QueryResponse";
+import { QueryResponse, ResponseData } from "./QueryResponseModal/QueryResponse";
 
 import "./BasicQuery.css";
 
@@ -24,7 +25,7 @@ const BasicOptions = ["Date", "Date Range", "Event Name", "Event Location"];
 function BasicQuery() {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
-    const [response, setResponseData] = useState<object>({});
+    const [response, setResponseData] = useState<ResponseData | null>(null);
 
     const [dataFields, setDataFields] = useState<React.ReactElement[]>([]);
 
@@ -37,7 +38,7 @@ function BasicQuery() {
     });
 
     const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
-    const toggleModal = () => setResponseData({});
+    const toggleModal = () => setResponseData(null);
 
     const toggleOption = (option: string) => {
         setSelectedOptions((prev: string[]) => {
@@ -182,7 +183,7 @@ function BasicQuery() {
                                     <Input
                                         type='date'
                                         value={formValues.startDate}
-                                        max={formValues.endDate != "" ? formValues.endDate : currentDate}
+                                        max={formValues.endDate !== "" ? formValues.endDate : currentDate}
                                         onChange={(e) => handleChange("startDate", e.target.value)}
                                         required
                                     />
@@ -192,7 +193,7 @@ function BasicQuery() {
                                         type='date'
                                         value={formValues.endDate}
                                         onChange={(e) => handleChange("endDate", e.target.value)}
-                                        min={formValues.startDate != "" ? formValues.startDate : "2000-1-1"}
+                                        min={formValues.startDate !== "" ? formValues.startDate : "2000-1-1"}
                                         max={currentDate}
                                         required
                                     />
@@ -241,7 +242,6 @@ function BasicQuery() {
         formValues.startDate,
         formValues.endDate,
         formValues.date,
-        formValues.startDate,
         formValues.eventName,
     ]);
 
@@ -267,7 +267,7 @@ function BasicQuery() {
                         </DropdownMenu>
                     </Dropdown>
 
-                    {/* Inputs */}
+                    {/* Input fields */}
                     {dataFields}
 
                     <Container className='top-padding'>
@@ -307,7 +307,7 @@ function BasicQuery() {
                     </Container>
                 </Card>
             </Form>
-            <QueryResponse toggleModal={toggleModal} title={"Response"} response={response} />
+            <QueryResponse toggleModal={toggleModal} response={response} />
         </>
     );
 }
