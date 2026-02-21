@@ -1,3 +1,56 @@
+.white-border {
+    border-style: solid;
+    border-color: white;
+}
+
 .background {
-    background-color: whitesmoke;
+    background-color: black;
+}
+
+.arrow-toggle {
+    color: white;
+    background-color: white;
+}
+
+h5, h6 {
+    color: #F36917;
+}
+
+h5 {
+    font-size: 2rem;
+}
+
+h6 {
+    font-size: 1.4rem;
+}
+
+.no-background {
+    background: none;
+    border: none;
+}
+
+.no-background:hover {
+    scale: 1.1;
+    background: none;
+    border: none;
+}
+
+.no-background:target {
+    background: none;
+    border: none;
+}
+
+.no-background:active {
+    background: none !important;
+    border: none;
+}
+
+.no-background::after {
+    background: none !important;
+    border: none;
+}
+
+.no-runs-found {
+    font-size: large;
+    color: white;
 }

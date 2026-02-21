@@ -1,3 +1,69 @@
 .top-padding {
     margin-top: 2rem;
 }
+
+.center-align {
+    justify-content: center;
+    text-align: center;
+}
+
+.query-selector {
+    color: #F36917;
+}
+
+.label {
+    position: fixed;
+    right: -1000000px;
+    left: 10000000px
+}
+
+.vertical-align {
+    align-items: center;
+}
+
+.arrow {
+    color: rgb(255, 255, 255);
+}
+
+.enter-button {
+    height: 100%;
+    width: 40%;
+    font-size: 1.2rem;
+    padding: .7rem;
+    border-radius: 12px;
+    border-style: solid;
+}
+
+.test-query {
+    background-color: grey;
+    color: white;
+}
+
+.test-query:hover, .test-query:target {
+    background-color: rgb(103, 103, 103);
+}
+
+.test-query:active {
+    background-color: rgb(79, 79, 79);
+    border-color: rgb(79, 79, 79);
+}
+
+.next-step {
+    background-color: #F36917;
+    color: black;
+    border-color: #F36917;
+    transition: .2s;
+}
+
+.next-step:hover {
+    background-color: #d35c17;
+}
+
+.next-step:target {
+    background-color: #bd5315;
+}
+
+.next-step:active {
+    background-color: #bd5315;
+    border-color: #bd5315;
+}

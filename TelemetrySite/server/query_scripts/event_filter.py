@@ -5,11 +5,11 @@ from flask import jsonify, request
 from json import loads
 
 
-class BasicQueryApi(MethodView):
+class EventFilterApi(MethodView):
     def __init__(self, db):
         self.db = db
 
-    def post(self, auth_token, mode):
+    def post(self, mode, auth_token):
         if not authenticate_user(auth_token, self.db):
             return HttpResponseType.UNAUTHORIZED.error()
         elif check_expired_tokens(auth_token, self.db):
@@ -18,17 +18,31 @@ class BasicQueryApi(MethodView):
         match mode:
             case "test-query":
                 return self.test_query(request.get_json()), 200
+            case "save-event-query":
+                return self.save_event_query(request.get_json()), 200
 
     def test_query(self, data):
 
         # Format for our data portion of the aggregate pipeline for all facets
         format = [
-            {"$group": {"_id": "$event.name", "date": {"$first": "$event.date"}}},
+            {
+                "$group": {
+                    "_id": "$event.name",
+                    "date": {"$first": "$event.date"},
+                    "location": {"$first": "$event.location"},
+                }
+            },
             {
                 "$group": {
                     "_id": None,
                     "count": {"$sum": 1},
-                    "events": {"$push": {"name": "$_id", "date": "$date"}},
+                    "events": {
+                        "$push": {
+                            "name": "$_id",
+                            "date": "$date",
+                            "location": "$location",
+                        }
+                    },
                 }
             },
             {"$project": {"_id": 0, "count": 1, "events": 1}},
@@ -81,7 +95,7 @@ class BasicQueryApi(MethodView):
             {"$facet": facets},
             # So this is two messy entries, but they serve an important role
             # facets inherently return and array of documents, but our pipeline compresses it down to 1
-            # these two queries take all the facets, strip them of the array, and changes it to an object
+            # these two queries take all the facets, strip them of the documents, and changes it to a single
             {
                 "$project": {
                     "_id": 0,
@@ -110,6 +124,11 @@ class BasicQueryApi(MethodView):
         cursor = self.db["messages"].aggregate(pipeline, allowDiskUse=True)
 
         return next(cursor, None)
+
+    def save_event_query(self, data):
+        pipeline = EventFilterApi.construct_query(data)
+
+        return
 
     @staticmethod
     def construct_query(data):

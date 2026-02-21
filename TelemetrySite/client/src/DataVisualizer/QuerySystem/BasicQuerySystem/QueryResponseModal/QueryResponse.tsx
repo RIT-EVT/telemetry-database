@@ -1,79 +1,64 @@
-import { Modal, ModalBody, ModalHeader, ModalFooter, Button, Collapse } from "reactstrap";
-import { useState } from "react";
+import { Modal, ModalBody, ModalHeader, ModalFooter, Button, Collapse, Container, Table } from "reactstrap";
+import { useState, useEffect } from "react";
+import { ChevronDown, ChevronUp } from "react-feather";
 import "./QueryResponse.css";
-
-type ResponseFormat = {
-    count: number;
-    events: [
-        {
-            name: string;
-            date: string;
-        },
-    ];
-};
-
-type ResponseData = {
-    matchFinal_Result: ResponseFormat;
-    matchDate?: ResponseFormat;
-    matchName?: ResponseFormat;
-    matchLocation?: ResponseFormat;
-};
-
-type QueryResponseProps = {
-    toggleModal: () => void;
-    response: ResponseData | null;
-};
+import { QueryResponseProps, ResponseFormat, ResponseData, EventData } from "../BasicQueryDataTypes";
 
 const QueryResponse = ({ toggleModal, response }: QueryResponseProps) => {
     console.log(response);
 
-    const [displayData, setDisplayData] = useState<[boolean]>([false]);
+    const [displayData, setDisplayData] = useState<boolean[]>([]);
 
-    if (!response) return;
+    const updateDataDisplay = (index: number) => {
+        setDisplayData((prev) => prev.map((open, i) => (i === index ? !open : open)));
+    };
 
-    let responseKeys = Object.keys(response) as Array<keyof ResponseData>;
-    let responseBody = responseKeys.map((objectKey: keyof ResponseData, index: number) => {
-        const title = objectKey.replace("match", "").replace("_", " ");
-        if (!objectKey) return;
+    useEffect(() => {
+        if (!response) return;
+        const keys = Object.keys(response);
+        setDisplayData(new Array(keys.length).fill(false));
+    }, [response]);
 
-        const currentData = response[objectKey];
+    if (!response) return null;
 
-        if (!currentData) return;
-        if (displayData.length < index) {
-            const dataBool = displayData;
-            while (dataBool.length < index) dataBool.push(false);
-
-            setDisplayData(dataBool);
-        }
-        return (
-            <div key={index}>
-                <div>
-                    {title}{" "}
-                    <Button
-                        onClick={() => {
-                            const dataBool = displayData;
-                            dataBool[index] = !dataBool[index];
-
-                            setDisplayData(dataBool);
-                        }}
-                    ></Button>
-                </div>
-
-                <Collapse isOpen={displayData[index] ? true : false}>
-                    {currentData.events.map((event) => {
-                        return event.name;
-                    })}
-                </Collapse>
-            </div>
-        );
-    });
+    const responseKeys = Object.keys(response) as Array<keyof ResponseData>;
 
     return (
-        <Modal isOpen={responseKeys.length !== 0} toggle={toggleModal} size='xl'>
-            <ModalHeader toggle={toggleModal} className='background'>
+        <Modal className='white-border' isOpen={responseKeys.length !== 0} toggle={toggleModal} size='xl'>
+            <ModalHeader toggle={toggleModal} className='background header'>
                 Query Test Result
             </ModalHeader>
-            <ModalBody className='background'>{responseBody}</ModalBody>
+
+            <ModalBody className='background'>
+                <Container>
+                    {responseKeys.map((objectKey, index) => {
+                        const currentData = response[objectKey];
+                        if (!currentData) return null;
+
+                        const title = objectKey.replace("match", "").replace("_", " ");
+
+                        return (
+                            <div key={objectKey}>
+                                <div>
+                                    <h6>
+                                        {title}{" "}
+                                        <Button className='no-background' onClick={() => updateDataDisplay(index)}>
+                                            {displayData[index] ? (
+                                                <ChevronUp color={"white"} />
+                                            ) : (
+                                                <ChevronDown color={"white"} />
+                                            )}
+                                        </Button>
+                                    </h6>
+                                </div>
+
+                                <Collapse isOpen={!!displayData[index]}>{ConstructTable(currentData)}</Collapse>
+                            </div>
+                        );
+                    })}
+                </Container>
+            </ModalBody>
+
             <ModalFooter className='background'>
                 <Button color='danger' onClick={toggleModal}>
                     Exit
@@ -83,5 +68,37 @@ const QueryResponse = ({ toggleModal, response }: QueryResponseProps) => {
     );
 };
 
+const ConstructTable = (tableData: ResponseFormat) => {
+    if (tableData.count == 0)
+        return (
+            <div className='no-runs-found'>
+                <p>
+                    <b>No Runs Found Matching This Criteria</b>
+                </p>
+            </div>
+        );
+    return (
+        <Table className={"response-table"} hover>
+            <thead>
+                <tr>
+                    <th>Event Name</th>
+                    <th>Event Location</th>
+                    <th>Event Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {tableData.events.map((tableData: EventData) => {
+                    return (
+                        <tr>
+                            <td>{tableData.name}</td>
+                            <td>{tableData.location}</td>
+                            <td>{tableData.date}</td>
+                        </tr>
+                    );
+                })}
+            </tbody>
+        </Table>
+    );
+};
+
 export { QueryResponse };
-export type { ResponseData };
