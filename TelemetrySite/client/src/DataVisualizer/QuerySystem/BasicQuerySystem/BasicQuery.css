@@ -26,12 +26,13 @@
 }
 
 .enter-button {
-    height: 100%;
-    width: 40%;
+    height: fit-content;
+    width: 10%;
     font-size: 1.2rem;
-    padding: .7rem;
+    padding: .2rem;
     border-radius: 12px;
     border-style: solid;
+    text-align: center;
 }
 
 .test-query {
@@ -48,22 +49,29 @@
     border-color: rgb(79, 79, 79);
 }
 
-.next-step {
+.nav-buttons {
+    height: 70%;
+    width: 40%;
+    font-size: 1.2rem;
+    padding: .7rem;
+    border-radius: 12px;
+    border-style: solid;
+
     background-color: #F36917;
     color: black;
     border-color: #F36917;
     transition: .2s;
 }
 
-.next-step:hover {
+.nav-buttons:hover {
     background-color: #d35c17;
 }
 
-.next-step:target {
+.nav-buttons:target {
     background-color: #bd5315;
 }
 
-.next-step:active {
+.nav-buttons:active {
     background-color: #bd5315;
     border-color: #bd5315;
 }

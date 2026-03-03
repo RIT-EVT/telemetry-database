@@ -12,6 +12,7 @@ from data_upload_scripts.data_upload_api import DataUploadApi
 from bike_config_scripts.bike_config_api import BikeConfigApi
 from user_auth_scripts.user_auth_api import UserAuthApi
 from query_scripts.event_filter import EventFilterApi
+from query_scripts.message_data import MessageFilterApi
 from utils import create_db_connection  # your existing DB util
 
 
@@ -20,7 +21,6 @@ def create_app(db=None):
     api = Api(app)
     CORS(app)
     log = logging.getLogger("werkzeug")
-
     # Load credentials
     server_folder = os.path.dirname(__file__)
     two_up = os.path.dirname(os.path.dirname(server_folder))
@@ -41,7 +41,12 @@ def create_app(db=None):
     api.add_resource(UserAuthApi, "/Login", resource_class_kwargs={"db": db})
     api.add_resource(
         EventFilterApi,
-        "/EventFilter/<mode>/<auth_token>",
+        "/EventFilter",
+        resource_class_kwargs={"db": db},
+    )
+    api.add_resource(
+        MessageFilterApi,
+        "/MessageFilter",
         resource_class_kwargs={"db": db},
     )
 

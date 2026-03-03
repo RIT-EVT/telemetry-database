@@ -1,25 +1,31 @@
 from flask.views import MethodView
-from utils import authenticate_user, check_expired_tokens
+from utils import validate_user
 from http_codes import HttpResponseType
 from flask import jsonify, request
-from json import loads
+from json import loads, dumps
+from bson import ObjectId
 
 
 class EventFilterApi(MethodView):
     def __init__(self, db):
         self.db = db
 
-    def post(self, mode, auth_token):
-        if not authenticate_user(auth_token, self.db):
-            return HttpResponseType.UNAUTHORIZED.error()
-        elif check_expired_tokens(auth_token, self.db):
-            return HttpResponseType.UNAUTHORIZED.error()
+    def post(self):
+
+        mode = request.args.get("mode")
+        doc_id = request.args.get("doc_id")
+        auth_token = request.args.get("auth_token")
+
+        user_valid, response = validate_user(auth_token, self.db)
+
+        if not user_valid:
+            return response.error()
 
         match mode:
             case "test-query":
                 return self.test_query(request.get_json()), 200
             case "save-event-query":
-                return self.save_event_query(request.get_json()), 200
+                return self.save_event_query(request.get_json(), doc_id)
 
     def test_query(self, data):
 
@@ -125,26 +131,64 @@ class EventFilterApi(MethodView):
 
         return next(cursor, None)
 
-    def save_event_query(self, data):
+    def save_event_query(self, data, doc_id):
         pipeline = EventFilterApi.construct_query(data)
+        db_connection = self.db["custom-queries"]
+        pipeline_string = dumps(pipeline)
 
-        return
+        custom_query = {
+            "query-body": pipeline_string,
+            "query-finished": False,
+            "query-name": "\0",
+        }
+
+        if not self.validate_id(doc_id):
+            result = db_connection.insert_one(custom_query)
+            document_id = str(result.inserted_id)
+            return {"document_id": document_id}, 201
+
+        else:
+            db_connection.update_one(
+                {"_id": ObjectId(doc_id)},
+                {"$push": {"queries": custom_query}},  # specify array field
+            )
+
+            return {"document_id": doc_id}, 200
 
     @staticmethod
     def construct_query(data):
 
         pipeline = [{"$match": {}}]
+        queryFields = {}
 
         for key in data.keys():
             match key:
                 case "dateRange":
+                    data_key_value = loads(data[key])
+
                     pipeline[0]["$match"]["event.date"] = {
-                        "$gte": data[key]["start"],
-                        "$lt": data[key]["end"],
+                        "$gte": data_key_value["start"],
+                        "$lt": data_key_value["end"],
                     }
+                    queryFields[key] = (
+                        f"{data_key_value["start"]}-{data_key_value["end"]}"
+                    )
+
+                    break
                 case "eventName":
                     pipeline[0]["$match"]["event.name"] = data[key]
+                    queryFields[key] = data[key]
+                    break
                 case "eventLocation":
                     pipeline[0]["$match"]["event.location"] = data[key]
+                    queryFields[key] = data[key]
+                    break
 
         return pipeline
+
+    def validate_id(self, doc_id):
+        return (
+            ObjectId.is_valid(doc_id)
+            and self.db["custom-queries"].find_one({"_id": ObjectId(doc_id)})
+            is not None
+        )

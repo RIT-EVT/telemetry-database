@@ -1,7 +1,7 @@
 enum QueryStep {
-    FilterEvent,
-    FilterCanMessages,
-    SaveQuery,
+    FilterEvent = "EVENT",
+    FilterCanMessages = "MESSAGE",
+    SaveQuery = "SAVE",
 }
 type EventData = {
     name: string;
@@ -26,10 +26,17 @@ type QueryResponseProps = {
     response: ResponseData | null;
 };
 
-type UpdateQueryStep = {
+type QueryFunctions = {
     updateQueryStep: (queryStep: QueryStep) => void;
+    updateQueryDocument: (newQueryDoc: String) => void;
+    currentDocId: String;
+};
+
+type NavButtonsInput = {
+    nextStep: boolean;
+    previousStep: boolean;
 };
 
 export { QueryStep };
 
-export type { QueryResponseProps, ResponseData, ResponseFormat, EventData, UpdateQueryStep };
+export type { QueryResponseProps, ResponseData, ResponseFormat, EventData, QueryFunctions, NavButtonsInput };

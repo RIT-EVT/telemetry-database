@@ -3,5 +3,6 @@
     "data_upload": "/DataUpload",
     "config_data": "/ConfigData",
     "user_auth": "/Login",
-    "event_filter": "/EventFilter"
+    "event_filter": "/EventFilter",
+    "message_filter": "/MessageFilter"
 }

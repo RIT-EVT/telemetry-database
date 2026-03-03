@@ -54,7 +54,7 @@ function DataUpload() {
                             onClick={() => {
                                 sessionStorage.removeItem("EventData");
                                 resetRunOrderNumber();
-                                RedirectToContext("/context-form");
+                                RedirectToContext("/context-upload");
                             }}
                         >
                             New Context

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-    Card,
     Dropdown,
     DropdownToggle,
     DropdownMenu,
@@ -12,19 +11,19 @@ import {
     Row,
     Col,
     Container,
-    CardHeader,
 } from "reactstrap";
 
-import { ArrowRight } from "react-feather";
+import { ArrowRight, CheckCircle } from "react-feather";
 
 import { BuildURI } from "Utils/ServerUtils.ts";
-import { QueryResponse } from "./QueryResponseModal/QueryResponse";
+import QueryResponse from "./QueryResponseModal/QueryResponse";
+import NavigationButtons from "./Navigation.tsx";
 
-import { ResponseData, QueryStep, UpdateQueryStep } from "./BasicQueryDataTypes";
+import { ResponseData, QueryStep, QueryFunctions } from "./BasicQueryDataTypes";
 
 const BasicOptions = ["Date", "Date Range", "Event Name", "Event Location"];
 
-const FilterEvent = ({ updateQueryStep }: UpdateQueryStep) => {
+const FilterEvent = ({ updateQueryStep, updateQueryDocument, currentDocId }: QueryFunctions) => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
     const [response, setResponseData] = useState<ResponseData | null>(null);
@@ -105,13 +104,16 @@ const FilterEvent = ({ updateQueryStep }: UpdateQueryStep) => {
     };
 
     const testQuery = async (payload: Record<string, string>) => {
-        const response = await fetch(`${BuildURI("event_filter")}/test-query/${sessionStorage.getItem("authToken")}`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
+        const response = await fetch(
+            `${BuildURI("event_filter")}?mode=test-query&doc_id=${currentDocId}&auth_token=${sessionStorage.getItem("authToken")}`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
             },
-            body: JSON.stringify(payload),
-        });
+        );
         if (response.ok) {
             const data = await response.json();
 
@@ -122,10 +124,9 @@ const FilterEvent = ({ updateQueryStep }: UpdateQueryStep) => {
     };
 
     const nextStage = async (payload: Record<string, string>) => {
-        console.log("running");
         try {
             const response = await fetch(
-                `${BuildURI("event_filter")}/save-event-query/${sessionStorage.getItem("authToken")}`,
+                `${BuildURI("event_filter")}?mode=save-event-query&doc_id=${currentDocId}&auth_token=${sessionStorage.getItem("authToken")}`,
                 {
                     method: "POST",
                     headers: {
@@ -140,7 +141,9 @@ const FilterEvent = ({ updateQueryStep }: UpdateQueryStep) => {
             }
 
             const data = await response.json();
-            updateQueryStep(QueryStep.FilterEvent);
+
+            updateQueryDocument(data.document_id);
+            updateQueryStep(QueryStep.FilterCanMessages);
         } catch (err) {
             console.error("Submit error:", err);
         }
@@ -290,57 +293,43 @@ const FilterEvent = ({ updateQueryStep }: UpdateQueryStep) => {
     return (
         <>
             <Form onSubmit={handleSubmit}>
-                <Card className='p-3'>
-                    <CardHeader className='center-align'>
-                        <h1 className='query-selector'>Basic Query Constructor</h1>
-                    </CardHeader>
+                {/* Dropdown for field selection*/}
 
-                    {/* Dropdown for field selection*/}
+                <Dropdown isOpen={dropdownOpen} toggle={toggleDropdown}>
+                    <DropdownToggle caret>Select Query Options</DropdownToggle>
+                    <DropdownMenu>
+                        {BasicOptions.map((option) => (
+                            <DropdownItem key={option} toggle={false} onClick={() => toggleOption(option)}>
+                                <Input
+                                    type='checkbox'
+                                    checked={selectedOptions.includes(option)}
+                                    readOnly
+                                    className='me-2'
+                                />
+                                {option}
+                            </DropdownItem>
+                        ))}
+                    </DropdownMenu>
+                </Dropdown>
 
-                    <Dropdown isOpen={dropdownOpen} toggle={toggleDropdown}>
-                        <DropdownToggle caret>Select Query Options</DropdownToggle>
-                        <DropdownMenu>
-                            {BasicOptions.map((option) => (
-                                <DropdownItem key={option} toggle={false} onClick={() => toggleOption(option)}>
-                                    <Input
-                                        type='checkbox'
-                                        checked={selectedOptions.includes(option)}
-                                        readOnly
-                                        className='me-2'
-                                    />
-                                    {option}
-                                </DropdownItem>
-                            ))}
-                        </DropdownMenu>
-                    </Dropdown>
+                {/* Input fields */}
+                {dataFields}
 
-                    {/* Input fields */}
-                    {dataFields}
-
-                    <Container className='top-padding '>
-                        <Row xs='2' className='vertical-align'>
-                            <Col className='align-center'>
-                                <button
-                                    disabled={selectedOptions.length === 0}
-                                    value='test-query'
-                                    type='submit'
-                                    className='enter-button test-query'
-                                >
-                                    Test Query
-                                </button>
-                            </Col>
-                            <Col className='align-center'>
-                                <button
-                                    disabled={selectedOptions.length === 0}
-                                    value='next-step'
-                                    className='enter-button next-step'
-                                >
-                                    Next Step
-                                </button>
-                            </Col>
-                        </Row>
-                    </Container>
-                </Card>
+                <Container className='top-padding '>
+                    <Row xs='1'>
+                        <Col className='px-0'>
+                            <button
+                                disabled={selectedOptions.length === 0}
+                                value='test-query'
+                                type='submit'
+                                className='enter-button test-query'
+                            >
+                                <CheckCircle />
+                            </button>
+                        </Col>
+                    </Row>
+                </Container>
+                <NavigationButtons nextStep={true} previousStep={false} />
             </Form>
             <QueryResponse toggleModal={toggleModal} response={response} />
         </>

@@ -1,12 +1,10 @@
 import { Modal, ModalBody, ModalHeader, ModalFooter, Button, Collapse, Container, Table } from "reactstrap";
 import { useState, useEffect } from "react";
-import { ChevronDown, ChevronUp } from "react-feather";
+import { ChevronDown, ChevronUp, XSquare } from "react-feather";
 import "./QueryResponse.css";
 import { QueryResponseProps, ResponseFormat, ResponseData, EventData } from "../BasicQueryDataTypes";
 
 const QueryResponse = ({ toggleModal, response }: QueryResponseProps) => {
-    console.log(response);
-
     const [displayData, setDisplayData] = useState<boolean[]>([]);
 
     const updateDataDisplay = (index: number) => {
@@ -25,7 +23,15 @@ const QueryResponse = ({ toggleModal, response }: QueryResponseProps) => {
 
     return (
         <Modal className='white-border' isOpen={responseKeys.length !== 0} toggle={toggleModal} size='xl'>
-            <ModalHeader toggle={toggleModal} className='background header'>
+            <ModalHeader
+                toggle={toggleModal}
+                close={
+                    <button onClick={toggleModal}>
+                        <XSquare />
+                    </button>
+                }
+                className='background header'
+            >
                 Query Test Result
             </ModalHeader>
 
@@ -101,4 +107,4 @@ const ConstructTable = (tableData: ResponseFormat) => {
     );
 };
 
-export { QueryResponse };
+export default QueryResponse;

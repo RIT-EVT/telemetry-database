@@ -4,6 +4,8 @@ from urllib import parse
 from datetime import datetime
 from secrets import token_urlsafe
 from bson import ObjectId
+from http_codes import HttpResponseType
+
 
 def create_db_connection():
     """
@@ -12,16 +14,26 @@ def create_db_connection():
     Returns:
         Database: Database connection
     """
-    connection_string = "mongodb://" + parse.quote_plus(str(getenv("MDB_USER"))) + ":" + parse.quote_plus(str(getenv("MDB_PASSWORD")))  + "@" + str(getenv("HOST")) + ":" + str(getenv("MDB_PORT"))
+    connection_string = (
+        "mongodb://"
+        + parse.quote_plus(str(getenv("MDB_USER")))
+        + ":"
+        + parse.quote_plus(str(getenv("MDB_PASSWORD")))
+        + "@"
+        + str(getenv("HOST"))
+        + ":"
+        + str(getenv("MDB_PORT"))
+    )
     mongo_client = MongoClient(
         connection_string,
-        serverSelectionTimeoutMS=2000,   # total time to find a suitable server
-        connectTimeoutMS=1000,           # time to establish TCP connection
-        socketTimeoutMS=1000             # time to wait for response on socket
+        serverSelectionTimeoutMS=2000,  # total time to find a suitable server
+        connectTimeoutMS=1000,  # time to establish TCP connection
+        socketTimeoutMS=1000,  # time to wait for response on socket
     )
-    
+
     db_access = mongo_client["ernie"]
     return db_access
+
 
 def create_auth_token(db):
     """
@@ -32,21 +44,22 @@ def create_auth_token(db):
     """
     user_db_connection = db["users"]
 
-    auth_token=token_urlsafe(32)
+    auth_token = token_urlsafe(32)
     # Very slight chance that there is a duplicate auth token
     # There are 8e506 total tokens, so it will probably never occur
     # but still need to check. If this ever catches a duplicate, go buy
     # a lottery ticket
-    while user_db_connection.find_one({"auth_token":auth_token})!=None:
-            auth_token=token_urlsafe(32)
-            print("Go to the lottery!")
-            
+    while user_db_connection.find_one({"auth_token": auth_token}) != None:
+        auth_token = token_urlsafe(32)
+        print("Go to the lottery!")
+
     return auth_token
+
 
 def authenticate_user(auth_token, db):
     """
         Make sure the user passes a valid auth_token that exists in the db.
-        In essence, make sure the user has logged in 
+        In essence, make sure the user has logged in
 
     Args:
         auth_token (String): Auth token to check
@@ -54,12 +67,13 @@ def authenticate_user(auth_token, db):
     Returns:
         Boolean: If the auth token is valid
     """
-    
+
     # Query the db to see if the user's token is on it
     # If it is then allow the operation to continue
     # Otherwise return an error
-    auth_connection = db["users"]    
-    return (auth_connection.find_one({"auth_token":auth_token})!=None)
+    auth_connection = db["users"]
+    return auth_connection.find_one({"auth_token": auth_token}) != None
+
 
 def check_expired_tokens(auth_token, db):
     """
@@ -71,13 +85,14 @@ def check_expired_tokens(auth_token, db):
     Returns:
         Boolean: If the user's session is expired
     """
-    
+
     auth_connection = db["users"]
-    auth_time = auth_connection.find_one({"auth_token":auth_token})["auth_time"]
+    auth_time = auth_connection.find_one({"auth_token": auth_token})["auth_time"]
     # only allow an auth token to last a day
-    days = (datetime.now()-auth_time).days
-    
-    return (days>1)
+    days = (datetime.now() - auth_time).days
+
+    return days > 1
+
 
 def update_expired_token(document_id, db):
     """
@@ -89,10 +104,32 @@ def update_expired_token(document_id, db):
     Returns:
         String: Updated auth token
     """
-    
+
     new_auth_token = create_auth_token(db)
     auth_connection = db["users"]
-    
-    auth_connection.update_one(  {"_id": ObjectId(document_id)},
-            {"$set": {"auth_token":new_auth_token, "auth_time":datetime.now()}})
+
+    auth_connection.update_one(
+        {"_id": ObjectId(document_id)},
+        {"$set": {"auth_token": new_auth_token, "auth_time": datetime.now()}},
+    )
     return new_auth_token
+
+
+def validate_user(auth_token, db):
+    """Returns if a user is valid in the database
+
+    Args:
+        auth_token (string): User's authentication string
+        db (Database): Database connection
+
+    Returns:
+        bool: If the user is valid
+        HttpResponse?: Reason the user is not valid
+    """
+
+    if not authenticate_user(auth_token, db):
+        return False, HttpResponseType.UNAUTHORIZED
+    elif check_expired_tokens(auth_token, db):
+        return False, HttpResponseType.UNAUTHORIZED
+
+    return True, HttpResponseType.OK

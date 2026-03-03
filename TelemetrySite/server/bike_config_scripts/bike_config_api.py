@@ -3,7 +3,7 @@ from flask import request, jsonify
 import json
 from bson import ObjectId
 
-from utils import authenticate_user, check_expired_tokens
+from utils import validate_user
 from http_codes import HttpResponseType
 
 
@@ -25,10 +25,10 @@ class BikeConfigApi(MethodView):
             tuple: All configs currently saved
         """
 
-        if not authenticate_user(auth_token, self.db):
-            return HttpResponseType.UNAUTHORIZED.error()
-        elif check_expired_tokens(auth_token, self.db):
-            return HttpResponseType.UNAUTHORIZED.error()
+        user_valid, response = validate_user(auth_token, self.db)
+
+        if not user_valid:
+            return response.error()
 
         db_connection = self.db["configs"]
 
@@ -50,10 +50,10 @@ class BikeConfigApi(MethodView):
             tuple: success message
         """
 
-        if not authenticate_user(auth_token, self.db):
-            return HttpResponseType.UNAUTHORIZED.error()
-        elif check_expired_tokens(auth_token, self.db):
-            return HttpResponseType.UNAUTHORIZED.error()
+        user_valid, response = validate_user(auth_token, self.db)
+
+        if not user_valid:
+            return response.error()
 
         db_connection = self.db["configs"]
         config_data = request.form["configData"]

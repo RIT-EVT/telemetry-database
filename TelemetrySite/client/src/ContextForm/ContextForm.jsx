@@ -204,7 +204,7 @@ function ContextForm(props) {
         // Prevent the form from clearing data
         event.preventDefault();
 
-        const contextValues = ContextJSONIdValues.event.runs[0].context;
+        const contextValues = ContextJSONIdValues.event.run.context;
 
         // Save bike config id values
         const bikeConfig = contextValues.bikeConfig;
@@ -218,32 +218,30 @@ function ContextForm(props) {
                 date: document.getElementById(ContextJSONIdValues.event.date).value,
                 type: document.getElementById(ContextJSONIdValues.event.type).value,
                 location: document.getElementById(ContextJSONIdValues.event.location).value,
-                runs: [
-                    {
-                        //this number may be updated by the backend if this is not the first run
-                        orderNumber: 0,
-                        context: {
-                            bikeConfig: {
-                                platformName: document.getElementById(bikeConfig.platformName).value,
-                                tirePressure: document.getElementById(bikeConfig.tirePressure).value,
-                                coolantVolume: document.getElementById(bikeConfig.coolantVolume).value,
-                                bikeSavedName: document.getElementById(bikeConfig.bikeSavedName).value,
-                                firmwareConfig: {},
+                run: {
+                    //this number may be updated by the backend if this is not the first run
+                    orderNumber: 0,
+                    context: {
+                        bikeConfig: {
+                            platformName: document.getElementById(bikeConfig.platformName).value,
+                            tirePressure: document.getElementById(bikeConfig.tirePressure).value,
+                            coolantVolume: document.getElementById(bikeConfig.coolantVolume).value,
+                            bikeSavedName: document.getElementById(bikeConfig.bikeSavedName).value,
+                            firmwareConfig: {},
 
-                                hardwareConfig: {},
-                            },
-                            riderName: document.getElementById(contextValues.riderName).value,
-                            riderWeight: document.getElementById(contextValues.riderWeight).value,
-                            humidity: document.getElementById(contextValues.humidity).value,
-                            airTemp: document.getElementById(contextValues.airTemp).value,
-                            windSpeed: document.getElementById(contextValues.windSpeed).value,
-                            windDirection: document.getElementById(contextValues.windDirection).value,
-                            riderFeedback: document.getElementById(contextValues.riderFeedback).value,
-                            distanceCovered: document.getElementById(contextValues.distanceCovered).value,
-                            startTime: document.getElementById(contextValues.startTime).value,
+                            hardwareConfig: {},
                         },
+                        riderName: document.getElementById(contextValues.riderName).value,
+                        riderWeight: document.getElementById(contextValues.riderWeight).value,
+                        humidity: document.getElementById(contextValues.humidity).value,
+                        airTemp: document.getElementById(contextValues.airTemp).value,
+                        windSpeed: document.getElementById(contextValues.windSpeed).value,
+                        windDirection: document.getElementById(contextValues.windDirection).value,
+                        riderFeedback: document.getElementById(contextValues.riderFeedback).value,
+                        distanceCovered: document.getElementById(contextValues.distanceCovered).value,
+                        startTime: document.getElementById(contextValues.startTime).value,
                     },
-                ],
+                },
             },
         };
 
@@ -302,14 +300,14 @@ function ContextForm(props) {
                 }
             }
             // Declare the board name to be saved
-            collectedData.event.runs[0].context.bikeConfig.firmwareConfig[firmwareConfigPart] = firmwareConfigDataToSave;
+            collectedData.event.run.context.bikeConfig.firmwareConfig[firmwareConfigPart] = firmwareConfigDataToSave;
         }
 
         // Save a new bike config with a name and all the needed data
         // Check that the saved name of the bike doesn't already exist
         if (ConfigSelectedValue["bike"] === "Custom") {
             // saved name already in collectedData
-            const bikeSavedName = collectedData.event.runs[0].context.bikeConfig.bikeSavedName;
+            const bikeSavedName = collectedData.event.run.context.bikeConfig.bikeSavedName;
             if (bikeSavedName !== null && CheckSavedName(bikeSavedName, "bike")) {
                 alert("Duplicate custom name " + bikeSavedName);
                 return;
@@ -346,7 +344,7 @@ function ContextForm(props) {
         const offset = date.getTimezoneOffset();
         const local = new Date(date.getTime() - offset * 60 * 1000);
 
-        const configIDs = ContextJSONIdValues.event.runs[0].context;
+        const configIDs = ContextJSONIdValues.event.run.context;
         const eventIDs = ContextJSONIdValues.event;
 
         document.getElementById(eventIDs.name).value = "TEST";
