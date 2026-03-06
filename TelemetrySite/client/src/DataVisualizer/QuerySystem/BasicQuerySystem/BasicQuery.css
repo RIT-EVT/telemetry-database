@@ -11,12 +11,6 @@
     color: #F36917;
 }
 
-.label {
-    position: fixed;
-    right: -1000000px;
-    left: 10000000px
-}
-
 .vertical-align {
     align-items: center;
 }
@@ -36,13 +30,19 @@
 }
 
 .test-query {
-    background-color: grey;
+    background: transparent;
+    border: 2px solid #28a745;
+    color: #28a745;
+    padding: 8px 16px;
+    border-radius: 6px;
+    transition: 0.2s ease;
+}
+
+.test-query:hover {
+    background: #28a745;
     color: white;
 }
 
-.test-query:hover, .test-query:target {
-    background-color: rgb(103, 103, 103);
-}
 
 .test-query:active {
     background-color: rgb(79, 79, 79);

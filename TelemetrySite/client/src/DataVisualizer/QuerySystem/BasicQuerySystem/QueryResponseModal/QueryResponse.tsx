@@ -75,7 +75,7 @@ const QueryResponse = ({ toggleModal, response }: QueryResponseProps) => {
 };
 
 const ConstructTable = (tableData: ResponseFormat) => {
-    if (tableData.count == 0)
+    if (tableData.count === 0)
         return (
             <div className='no-runs-found'>
                 <p>

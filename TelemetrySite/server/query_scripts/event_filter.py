@@ -1,7 +1,7 @@
 from flask.views import MethodView
 from utils import validate_user
 from http_codes import HttpResponseType
-from flask import jsonify, request
+from flask import request
 from json import loads, dumps
 from bson import ObjectId
 
@@ -10,8 +10,24 @@ class EventFilterApi(MethodView):
     def __init__(self, db):
         self.db = db
 
-    def post(self):
+    def get(self):
+        # Get the fields from a document for event filtering
+        doc_id = request.args.get("doc_id")
+        auth_token = request.args.get("auth_token")
 
+        user_valid, response = validate_user(auth_token, self.db)
+
+        if not user_valid:
+            return response.error()
+
+        # ID isn't an ID or it doesn't correspond to a doc in the db
+        if not self.validate_id(doc_id):
+            return HttpResponseType.BAD_REQUEST.error()
+
+        self.db["custom"]
+
+    def post(self):
+        # Add or test a query against the DB
         mode = request.args.get("mode")
         doc_id = request.args.get("doc_id")
         auth_token = request.args.get("auth_token")
@@ -132,12 +148,13 @@ class EventFilterApi(MethodView):
         return next(cursor, None)
 
     def save_event_query(self, data, doc_id):
-        pipeline = EventFilterApi.construct_query(data)
+        pipeline, fields = EventFilterApi.construct_query(data)
         db_connection = self.db["custom-queries"]
         pipeline_string = dumps(pipeline)
 
         custom_query = {
             "query-body": pipeline_string,
+            "event-fields": fields,
             "query-finished": False,
             "query-name": "\0",
         }
@@ -184,7 +201,7 @@ class EventFilterApi(MethodView):
                     queryFields[key] = data[key]
                     break
 
-        return pipeline
+        return pipeline, queryFields
 
     def validate_id(self, doc_id):
         return (

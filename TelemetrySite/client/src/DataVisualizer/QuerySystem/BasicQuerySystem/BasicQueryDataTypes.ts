@@ -1,8 +1,9 @@
 enum QueryStep {
-    FilterEvent = "EVENT",
-    FilterCanMessages = "MESSAGE",
-    SaveQuery = "SAVE",
+    FilterEvent = 0,
+    FilterCanMessages = 1,
+    SaveQuery = 2,
 }
+
 type EventData = {
     name: string;
     date: string;
@@ -29,6 +30,7 @@ type QueryResponseProps = {
 type QueryFunctions = {
     updateQueryStep: (queryStep: QueryStep) => void;
     updateQueryDocument: (newQueryDoc: String) => void;
+    setHandleSubmit: (callbackFunction: (e: React.FormEvent) => void) => void; // A function that accepts a callback function to handle submits
     currentDocId: String;
 };
 

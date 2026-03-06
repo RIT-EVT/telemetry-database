@@ -32,24 +32,9 @@ class QueryManagement(MethodView):
         # Delete specific query
         self.db["custom-queries"].delete_one({"_id": ObjectId(doc_id)})
 
-        return HttpResponseType.OK
+        return HttpResponseType.NO_CONTENT
 
     def get(self):
-        # Return an entire document
+        # Return all incomplete queries
 
-        auth_token = request.args.get("auth_token")
-        doc_id = request.args.get("doc_id")
-
-        if auth_token == None or doc_id == None:
-            return {
-                "error": "Missing auth_token or doc_id"
-            }, HttpResponseType.BAD_REQUEST
-
-        user_valid, response = validate_user(auth_token, self.db)
-
-        if not user_valid:
-            return response.error()
-
-        result = list(self.db["custom-queries"].get_one({"_id": doc_id}))
-
-        return {"response": result}, HttpResponseType.OK
+        return HttpResponseType.NOT_IMPLEMENTED
