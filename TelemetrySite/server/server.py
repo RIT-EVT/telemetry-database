@@ -6,13 +6,15 @@ import dotenv
 import json
 import os
 import logging
+import mongomock
+from TelemetrySite.server.MATLAB_access_scripts.MATLAB_access_api import MATLAB_access_api
 from http_codes import HttpResponseType 
 
 from data_upload_scripts.data_upload_api import DataUploadApi
 from bike_config_scripts.bike_conifg_api import BikeConfigApi
 from user_auth_scripts.user_auth_api import UserAuthApi
 from utils import create_db_connection   # your existing DB util
-
+from MATLAB_access_scripts.MATLAB_access_api import MATLAB_access_api
 
 def create_app(db=None):
     app = Flask(__name__)
@@ -28,8 +30,8 @@ def create_app(db=None):
 
     # If no DB passed in, connect to the real one
     # We do this so during testing we can pass in a face db connection
-    if db is None:
-        db = create_db_connection()
+    #if db is None:
+     #   db = create_db_connection()
 
     # Register routes with DB injected
     api.add_resource(
@@ -40,6 +42,9 @@ def create_app(db=None):
     )
     api.add_resource(
         UserAuthApi, "/Login", resource_class_kwargs={"db": db}
+    )
+    api.add_resource(
+        MATLAB_access_api, "/MATLAB", resource_class_kwargs={"db": db}
     )
 
     @app.route("/")
@@ -58,5 +63,5 @@ def create_app(db=None):
 
 if __name__ == "__main__":
     print("Starting flask")
-    app = create_app()  # real DB in production, don't pass in a connection
+    app = create_app(mongomock.MongoClient()["ernie"])  # real DB in production, don't pass in a connection
     app.run(debug=True)
