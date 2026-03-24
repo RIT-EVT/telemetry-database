@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import {
     Dropdown,
     DropdownToggle,
@@ -10,9 +10,11 @@ import {
     Row,
     Col,
     Container,
+    InputGroup,
+    Button,
 } from "reactstrap";
 
-import { ArrowRight, CheckCircle } from "react-feather";
+import { ArrowRight } from "react-feather";
 
 import { BuildURI } from "Utils/ServerUtils.ts";
 import QueryResponse from "./QueryResponseModal/QueryResponse";
@@ -34,10 +36,21 @@ const FilterEvent = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, cu
         endDate: "",
         eventName: "",
         eventLocation: "",
+        queryName: "",
     });
 
-    const queryName = "";
+    // This allows the test button to run even if the savedName field is null
+    const [submitter, setSubmitter] = useState<string | null>(null);
 
+    const savedNameInput: JSX.Element = (
+        <Input
+            required={submitter !== "test-query"}
+            id='query-name'
+            type='text'
+            onChange={(e) => handleChange("queryName", e.target.value)}
+            placeholder='Amazing BMS Query...'
+        />
+    );
     // Update the drop down showing
     const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
     const toggleModal = () => setResponseData(null);
@@ -74,7 +87,6 @@ const FilterEvent = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, cu
 
     // Form submitting
     const handleSubmit = (e: React.FormEvent) => {
-        console.log("testing");
         e.preventDefault();
 
         // Get the button that caused the submit
@@ -84,6 +96,7 @@ const FilterEvent = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, cu
 
         if (clickedButton.value === "test-query") {
             testQuery(payload);
+            setSubmitter(null); // Reset the query name to be required
             return;
         } else if (clickedButton.value === "next-step") {
             nextStage(payload);
@@ -172,6 +185,8 @@ const FilterEvent = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, cu
             payload.eventLocation = formValues.eventLocation;
         }
 
+        payload.queryName = formValues.queryName;
+
         return payload;
     };
 
@@ -212,10 +227,10 @@ const FilterEvent = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, cu
                         return (
                             <FormGroup key={option} className='mt-3'>
                                 <Row className='vertical-align'>
+                                    <Label for='start-date'>
+                                        <h2 className='basic-query-title'>Date Range</h2>
+                                    </Label>
                                     <Col md='5' xs='12'>
-                                        <Label for='start-date'>
-                                            <h2 className='basic-query-title'>Date Range</h2>
-                                        </Label>
                                         <Input
                                             type='date'
                                             id='start-date'
@@ -235,9 +250,6 @@ const FilterEvent = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, cu
                                     </Col>
 
                                     <Col md='5' xs='12'>
-                                        <Label className='label' for='end-date'>
-                                            End Date
-                                        </Label>
                                         <Input
                                             type='date'
                                             id='end-date'
@@ -304,9 +316,10 @@ const FilterEvent = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, cu
     return (
         <>
             {/* Dropdown for field selection*/}
-
             <Dropdown isOpen={dropdownOpen} toggle={toggleDropdown}>
-                <DropdownToggle caret>Select Query Options</DropdownToggle>
+                <DropdownToggle caret color='primary'>
+                    Filter Event
+                </DropdownToggle>
                 <DropdownMenu>
                     {BasicOptions.map((option) => (
                         <DropdownItem key={option} toggle={false} onClick={() => toggleOption(option)}>
@@ -320,18 +333,26 @@ const FilterEvent = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, cu
             {/* Input fields */}
             {dataFields}
 
-            <Container className='top-padding '>
-                <Row xs='1'>
-                    <Col className='px-0'>
-                        <button
+            <Container className='top-padding px-0'>
+                <Row xs='2' className='align-items-center'>
+                    <Col>
+                        <InputGroup>
+                            <Label for='query-name'>
+                                <h2 className='basic-query-title'>Query Name</h2>
+                            </Label>
+                            {savedNameInput}
+                        </InputGroup>
+                    </Col>
+                    <Col className='center-align'>
+                        <Button
                             disabled={selectedOptions.length === 0}
                             value='test-query'
                             type='submit'
-                            className='enter-button test-query d-flex align-items-center gap-2'
+                            onMouseDown={() => setSubmitter("test-query")}
+                            color='info'
                         >
-                            <CheckCircle size={18} />
                             Test Query
-                        </button>
+                        </Button>
                     </Col>
                 </Row>
             </Container>

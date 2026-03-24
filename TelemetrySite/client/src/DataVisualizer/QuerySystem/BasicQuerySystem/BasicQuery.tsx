@@ -16,9 +16,7 @@ function BasicQuery() {
         return stored !== null ? (Number(stored) as QueryStep) : QueryStep.FilterEvent; // Convert from string to number to QueryStep
     });
     const [currentDocId, setCurrentQueryDocument] = useState<String>(window.sessionStorage.getItem("DocId") as String);
-    const handleSubmitRef = useRef<(e: React.FormEvent) => void>((e) => {
-        console.log("default submit");
-    });
+    const handleSubmitRef = useRef<(e: React.FormEvent) => void>((e) => {});
 
     // Update the handler
     const setHandleSubmit = (callbackFunction: (e: React.FormEvent) => void) => {
@@ -26,14 +24,11 @@ function BasicQuery() {
     };
 
     const updateQueryStep = (newQuery: QueryStep) => {
-        console.log(newQuery);
         setQueryStep(newQuery);
         window.sessionStorage.setItem("QueryStep", newQuery.toString());
     };
 
     const updateQueryDocument = (newQueryDocID: String) => {
-        console.log(newQueryDocID);
-
         setCurrentQueryDocument(newQueryDocID);
         window.sessionStorage.setItem("DocId", newQueryDocID.toString());
     };
@@ -59,7 +54,6 @@ function BasicQuery() {
 
     useEffect(() => {
         if (!currentDocId) {
-            console.log("no doc");
             updateQueryDocument("NULL");
             updateQueryStep(QueryStep.FilterEvent);
         } else if (!queryStep) {

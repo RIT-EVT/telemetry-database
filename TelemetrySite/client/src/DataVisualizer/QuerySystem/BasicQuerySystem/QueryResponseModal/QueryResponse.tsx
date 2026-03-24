@@ -1,6 +1,6 @@
 import { Modal, ModalBody, ModalHeader, ModalFooter, Button, Collapse, Container, Table } from "reactstrap";
 import { useState, useEffect } from "react";
-import { ChevronDown, ChevronUp, XSquare } from "react-feather";
+import { ChevronDown, ChevronUp } from "react-feather";
 import "./QueryResponse.css";
 import { QueryResponseProps, ResponseFormat, ResponseData, EventData } from "../BasicQueryDataTypes";
 
@@ -23,17 +23,7 @@ const QueryResponse = ({ toggleModal, response }: QueryResponseProps) => {
 
     return (
         <Modal className='white-border' isOpen={responseKeys.length !== 0} toggle={toggleModal} size='xl'>
-            <ModalHeader
-                toggle={toggleModal}
-                close={
-                    <button onClick={toggleModal}>
-                        <XSquare />
-                    </button>
-                }
-                className='background header'
-            >
-                Query Test Result
-            </ModalHeader>
+            <ModalHeader className='background header'>Query Test Result</ModalHeader>
 
             <ModalBody className='background'>
                 <Container>

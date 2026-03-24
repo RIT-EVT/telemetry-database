@@ -11,6 +11,10 @@
     color: #F36917;
 }
 
+.white {
+    color: white;
+}
+
 .vertical-align {
     align-items: center;
 }

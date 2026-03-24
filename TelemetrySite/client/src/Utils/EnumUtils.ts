@@ -1,7 +1,10 @@
 const enumMaxCache = new WeakMap<object, number | undefined>();
 
+/**
+ * Returns the highest enum value of a certain enum type
+ */
 function getMaxEnumValue(e: object): number | undefined {
-    if (enumMaxCache.has(e)) return enumMaxCache.get(e);
+    if (enumMaxCache.has(e)) return enumMaxCache.get(e); // Returned the cached value if it exists
 
     // Get all runtime values, which for a numeric enum includes both keys (strings) and values (numbers)
     const values = Object.values(e)
