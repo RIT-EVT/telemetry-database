@@ -6,37 +6,21 @@ import { Input, Row, Col, Container, Label, InputGroup, CardHeader } from "react
 const FilterMessages = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, currentDocId }: QueryFunctions) => {
     const auth_token = sessionStorage.getItem("authToken");
     const [canFrameCheckBoxes, setCANCheckBoxes] = useState<React.ReactElement>();
-    const [selectedBoxes, setCheckedBoxes] = useState<Map<string, boolean>>();
+    const [selectedBoxes, setBoxesChecked] = useState<Map<string, boolean>>();
 
-    const updateSelectedCheckBox = (e: {
-        nativeEvent: Event;
-        currentTarget: EventTarget & HTMLInputElement;
-        target: EventTarget;
-        bubbles: boolean;
-        cancelable: boolean;
-        defaultPrevented: boolean;
-        eventPhase: number;
-        isTrusted: boolean;
-        preventDefault(): void;
-        isDefaultPrevented(): boolean;
-        stopPropagation(): void;
-        isPropagationStopped(): boolean;
-        persist(): void;
-        timeStamp: number;
-        type: string;
-    }): void => {
+    const updateSelectedCheckBox = (e: React.ChangeEvent<HTMLInputElement>): void => {
         console.log("input");
         const newMap = selectedBoxes;
         const targetElement = e.target as HTMLInputElement;
         newMap?.set(targetElement.id, targetElement.value === "checked");
 
-        setCheckedBoxes(newMap);
+        setBoxesChecked(newMap);
     };
 
     const handleMessageFilterGet = async (response: Response): Promise<void> => {
         if (response.ok) {
             const responseData = await response.json();
-
+            // Update the current displayed check boxes
             setCANCheckBoxes(
                 responseData.response.map((element: string) => {
                     return (
@@ -51,6 +35,8 @@ const FilterMessages = ({ updateQueryStep, updateQueryDocument, setHandleSubmit,
                     );
                 }),
             );
+            // Clear any previously checked boxes from the tracker to prevent outdated checked boxes
+            setBoxesChecked(new Map<string, boolean>());
         }
     };
 

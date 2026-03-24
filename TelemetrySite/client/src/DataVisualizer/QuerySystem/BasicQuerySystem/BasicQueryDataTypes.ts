@@ -15,11 +15,19 @@ type ResponseFormat = {
     events: [EventData];
 };
 
-type ResponseData = {
+type QueryResponseResult = {
     matchFinal_Result: ResponseFormat;
     matchDate?: ResponseFormat;
     matchName?: ResponseFormat;
     matchLocation?: ResponseFormat;
+};
+
+type ResponseData = {
+    query_data: QueryResponseResult;
+    query_name: {
+        name_passed: boolean;
+        name_valid: boolean;
+    };
 };
 
 type QueryResponseProps = {
@@ -41,4 +49,12 @@ type NavButtonsInput = {
 
 export { QueryStep };
 
-export type { QueryResponseProps, ResponseData, ResponseFormat, EventData, QueryFunctions, NavButtonsInput };
+export type {
+    QueryResponseProps,
+    ResponseData,
+    QueryResponseResult,
+    ResponseFormat,
+    EventData,
+    QueryFunctions,
+    NavButtonsInput,
+};

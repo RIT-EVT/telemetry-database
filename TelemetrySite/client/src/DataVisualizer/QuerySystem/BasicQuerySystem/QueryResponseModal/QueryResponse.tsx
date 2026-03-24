@@ -1,8 +1,8 @@
-import { Modal, ModalBody, ModalHeader, ModalFooter, Button, Collapse, Container, Table } from "reactstrap";
-import { useState, useEffect } from "react";
+import { Modal, ModalBody, ModalHeader, ModalFooter, Button, Collapse, Container, Table, Row, Col } from "reactstrap";
+import { useState, useEffect, ReactElement } from "react";
 import { ChevronDown, ChevronUp } from "react-feather";
 import "./QueryResponse.css";
-import { QueryResponseProps, ResponseFormat, ResponseData, EventData } from "../BasicQueryDataTypes";
+import { QueryResponseProps, QueryResponseResult, ResponseFormat, EventData } from "../BasicQueryDataTypes";
 
 const QueryResponse = ({ toggleModal, response }: QueryResponseProps) => {
     const [displayData, setDisplayData] = useState<boolean[]>([]);
@@ -19,39 +19,46 @@ const QueryResponse = ({ toggleModal, response }: QueryResponseProps) => {
 
     if (!response) return null;
 
-    const responseKeys = Object.keys(response) as Array<keyof ResponseData>;
+    const responseKeys = Object.keys(response.query_data) as Array<keyof QueryResponseResult>;
+    const queryNameValidDisplay = (): ReactElement | null => {
+        if (!response.query_name.name_passed) return null;
 
+        return <Row>Query Response name</Row>;
+    };
     return (
         <Modal className='white-border' isOpen={responseKeys.length !== 0} toggle={toggleModal} size='xl'>
             <ModalHeader className='background header'>Query Test Result</ModalHeader>
 
             <ModalBody className='background'>
                 <Container>
-                    {responseKeys.map((objectKey, index) => {
-                        const currentData = response[objectKey];
-                        if (!currentData) return null;
+                    <Col>
+                        {queryNameValidDisplay()}
+                        {responseKeys.map((objectKey, index) => {
+                            const currentData = response.query_data[objectKey];
+                            if (!currentData) return null;
 
-                        const title = objectKey.replace("match", "").replace("_", " ");
+                            const title = objectKey.replace("match", "").replace("_", " ");
 
-                        return (
-                            <div key={objectKey}>
-                                <div>
-                                    <h6>
-                                        {title}{" "}
-                                        <Button className='no-background' onClick={() => updateDataDisplay(index)}>
-                                            {displayData[index] ? (
-                                                <ChevronUp color={"white"} />
-                                            ) : (
-                                                <ChevronDown color={"white"} />
-                                            )}
-                                        </Button>
-                                    </h6>
-                                </div>
+                            return (
+                                <Row key={objectKey}>
+                                    <div>
+                                        <h6>
+                                            {title}{" "}
+                                            <Button className='no-background' onClick={() => updateDataDisplay(index)}>
+                                                {displayData[index] ? (
+                                                    <ChevronUp color={"white"} />
+                                                ) : (
+                                                    <ChevronDown color={"white"} />
+                                                )}
+                                            </Button>
+                                        </h6>
+                                    </div>
 
-                                <Collapse isOpen={!!displayData[index]}>{ConstructTable(currentData)}</Collapse>
-                            </div>
-                        );
-                    })}
+                                    <Collapse isOpen={!!displayData[index]}>{ConstructTable(currentData)}</Collapse>
+                                </Row>
+                            );
+                        })}
+                    </Col>
                 </Container>
             </ModalBody>
 

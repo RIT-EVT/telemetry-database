@@ -39,11 +39,11 @@ class EventFilterApi(MethodView):
 
         match mode:
             case "test-query":
-                return self.test_query(request.get_json()), 200
+                return self.test_query(request.get_json(), doc_id)
             case "save-event-query":
                 return self.save_event_query(request.get_json(), doc_id)
 
-    def test_query(self, data):
+    def test_query(self, data, doc_id):
 
         # Format for our data portion of the aggregate pipeline for all facets
         format = [
@@ -75,6 +75,7 @@ class EventFilterApi(MethodView):
         match_date = {}
         match_name = {}
         match_location = {}
+        query_name = data["queryName"]
 
         if "dateRange" in data:
 
@@ -143,31 +144,53 @@ class EventFilterApi(MethodView):
             {"$replaceRoot": {"newRoot": "$facets"}},
         ]
 
-        cursor = self.db["messages"].aggregate(pipeline, allowDiskUse=True)
+        response = list(self.db["messages"].aggregate(pipeline, allowDiskUse=True))[0]
+        name_valid: bool = True
+        if query_name != "" and self.check_duplicate_query_name(query_name, doc_id):
+            name_valid = False
 
-        return next(cursor, None)
+        return {
+            "query_data": response,
+            "query_name": {
+                "name_passed": query_name != "",
+                "name_valid": name_valid,
+            },
+        }, 200
 
     def save_event_query(self, data, doc_id):
         pipeline, fields = EventFilterApi.construct_query(data)
+        query_name = data["queryName"]
         db_connection = self.db["custom-queries"]
         pipeline_string = dumps(pipeline)
 
-        custom_query = {
-            "query-body": pipeline_string,
-            "event-fields": fields,
-            "query-finished": False,
-            "query-name": "\0",
-        }
+        valid_id = self.validate_id(doc_id)
 
-        if not self.validate_id(doc_id):
+        # Check if a query already exists with a given name
+        # Return an error if one does exist that isn't the one currently being edited
+        if self.check_duplicate_query_name(query_name, doc_id):
+            return {"invalid": "duplicate query name detected"}, 409
+
+        if not valid_id:  # Create a new query
+            custom_query = {
+                "query-body": pipeline_string,
+                "event-fields": fields,
+                "query-finished": False,
+                "query-name": query_name,
+            }
             result = db_connection.insert_one(custom_query)
             document_id = str(result.inserted_id)
             return {"document_id": document_id}, 201
 
-        else:
+        else:  # Update an existing custom query
             db_connection.update_one(
                 {"_id": ObjectId(doc_id)},
-                {"$push": {"queries": custom_query}},  # specify array field
+                {
+                    "$push": {
+                        "query-body": pipeline_string,
+                        "event-fields": fields,
+                        "query-name": query_name,
+                    }
+                },
             )
 
             return {"document_id": doc_id}, 200
@@ -209,3 +232,17 @@ class EventFilterApi(MethodView):
             and self.db["custom-queries"].find_one({"_id": ObjectId(doc_id)})
             is not None
         )
+
+    def check_duplicate_query_name(self, query_name: str, doc_id: str):
+        """
+        Get if a query name already exists in a document that is not this one.
+        Returns True if the name is a duplicate
+        """
+        db_connection = self.db["custom-queries"]
+
+        matching_document = db_connection.find_one({"query-name": query_name})
+        if matching_document is not None and (
+            not self.validate_id(doc_id) or matching_document["_id"] != ObjectId(doc_id)
+        ):
+            return True
+        return False

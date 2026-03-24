@@ -4,7 +4,6 @@
     // File Layout
     // "rootDir": "./src",
     // "outDir": "./dist",
-
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
     "module": "nodenext",
@@ -14,17 +13,13 @@
     // "lib": ["esnext"],
     // "types": ["node"],
     // and npm install -D @types/node
-
     // Other Outputs
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
-
     // Stricter Typechecking Options
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
-
-
     // Recommended Options
     "strict": true,
     "jsx": "react-jsx",
@@ -35,9 +30,10 @@
     "skipLibCheck": true,
     "allowImportingTsExtensions": true,
     "noEmit": true,
-
+    "ignoreDeprecations": "6.0",
     "baseUrl": "src"
   },
-
-  "include": ["src"]
+  "include": [
+    "src"
+  ]
 }
