@@ -1,4 +1,4 @@
-import { JSX, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
     Dropdown,
     DropdownToggle,
@@ -13,6 +13,8 @@ import {
     InputGroup,
     Button,
 } from "reactstrap";
+
+import { CardHeader } from "reactstrap";
 
 import { ArrowRight } from "react-feather";
 
@@ -42,15 +44,6 @@ const FilterEvent = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, cu
     // This allows the test button to run even if the savedName field is null
     const [submitter, setSubmitter] = useState<string | null>(null);
 
-    const savedNameInput: JSX.Element = (
-        <Input
-            required={submitter !== "test-query"}
-            id='query-name'
-            type='text'
-            onChange={(e) => handleChange("queryName", e.target.value)}
-            placeholder='Amazing BMS Query...'
-        />
-    );
     // Update the drop down showing
     const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
     const toggleModal = () => setResponseData(null);
@@ -315,6 +308,9 @@ const FilterEvent = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, cu
 
     return (
         <>
+            <CardHeader className='center-align'>
+                <h1 className='query-selector'>Filter Event</h1>
+            </CardHeader>
             {/* Dropdown for field selection*/}
             <Dropdown isOpen={dropdownOpen} toggle={toggleDropdown}>
                 <DropdownToggle caret color='primary'>
@@ -340,7 +336,14 @@ const FilterEvent = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, cu
                             <Label for='query-name'>
                                 <h2 className='basic-query-title'>Query Name</h2>
                             </Label>
-                            {savedNameInput}
+                            <Input
+                                required={submitter !== "test-query"}
+                                id='query-name'
+                                type='text'
+                                onChange={(e) => handleChange("queryName", e.target.value)}
+                                placeholder='Amazing BMS Query...'
+                                bsSize='lg'
+                            />
                         </InputGroup>
                     </Col>
                     <Col className='center-align'>

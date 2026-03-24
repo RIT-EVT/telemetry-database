@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import FilterEvent from "./FilterEvent";
 import FilterMessages from "./FilterMessages";
 
-import { Card, CardHeader, Form } from "reactstrap";
+import { Card, Form } from "reactstrap";
 
 import { QueryStep, QueryFunctions } from "./BasicQueryDataTypes";
 import NavigationButtons from "./Navigation.tsx";
@@ -61,8 +61,6 @@ function BasicQuery() {
         }
     }, [queryStep, currentDocId]);
 
-    // TODO add back button
-
     return (
         <Form
             onSubmit={(e) => {
@@ -70,12 +68,7 @@ function BasicQuery() {
                 handleSubmitRef.current(e);
             }}
         >
-            <Card className='p-3'>
-                <CardHeader className='center-align'>
-                    <h1 className='query-selector'>Basic Query</h1>
-                </CardHeader>
-                {queryBody()}
-            </Card>
+            <Card className='p-3'>{queryBody()}</Card>
             <NavigationButtons previousStep={queryStep !== 0} nextStep={getMaxEnumValue(QueryStep) !== queryStep} />
         </Form>
     );

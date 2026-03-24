@@ -1,7 +1,7 @@
 import { QueryFunctions } from "./BasicQueryDataTypes";
 import { BuildURI } from "Utils/ServerUtils.ts";
 import React, { useEffect, useState } from "react";
-import { Input, Row, Col, Container, Label, InputGroup } from "reactstrap";
+import { Input, Row, Col, Container, Label, InputGroup, CardHeader } from "reactstrap";
 
 const FilterMessages = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, currentDocId }: QueryFunctions) => {
     const auth_token = sessionStorage.getItem("authToken");
@@ -67,9 +67,14 @@ const FilterMessages = ({ updateQueryStep, updateQueryDocument, setHandleSubmit,
         }).then(handleMessageFilterGet);
     }, []);
     return (
-        <Container>
-            <Row xs={3}>{canFrameCheckBoxes}</Row>
-        </Container>
+        <>
+            <CardHeader className='center-align'>
+                <h1 className='query-selector'>Filter Messages</h1>
+            </CardHeader>
+            <Container>
+                <Row xs={3}>{canFrameCheckBoxes}</Row>
+            </Container>
+        </>
     );
 };
 
