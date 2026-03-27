@@ -1,18 +1,22 @@
-import { QueryFunctions } from "./BasicQueryDataTypes";
+import { QueryFunctions, QueryDataFormat } from "./BasicQueryDataTypes";
 import { BuildURI } from "Utils/ServerUtils.ts";
 import React, { useEffect, useState } from "react";
 import { Input, Row, Col, Container, Label, InputGroup, CardHeader } from "reactstrap";
+import { saveItem, getItem } from "Utils/SessionStorageLoader.ts";
 
 const FilterMessages = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, currentDocId }: QueryFunctions) => {
-    const auth_token = sessionStorage.getItem("authToken");
+    const auth_token = getItem("authToken");
     const [canFrameCheckBoxes, setCANCheckBoxes] = useState<React.ReactElement>();
     const [selectedBoxes, setBoxesChecked] = useState<Map<string, boolean>>();
+    const [currentQueryData, setCurrentQueryData] = useState<QueryDataFormat>();
 
     const updateSelectedCheckBox = (e: React.ChangeEvent<HTMLInputElement>): void => {
-        console.log("input");
         const newMap = selectedBoxes;
         const targetElement = e.target as HTMLInputElement;
-        newMap?.set(targetElement.id, targetElement.value === "checked");
+
+        const checked: boolean = targetElement.value === "checked";
+
+        newMap?.set(targetElement.id, checked);
 
         setBoxesChecked(newMap);
     };

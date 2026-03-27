@@ -21,7 +21,8 @@ import { ArrowRight } from "react-feather";
 import { BuildURI } from "Utils/ServerUtils.ts";
 import QueryResponse from "./QueryResponseModal/QueryResponse";
 
-import { ResponseData, QueryStep, QueryFunctions } from "./BasicQueryDataTypes";
+import { ResponseData, QueryStep, QueryFunctions, QueryDataFormat } from "./BasicQueryDataTypes";
+import { saveItem, getItem, removeItem } from "Utils/SessionStorageLoader.ts";
 
 const BasicOptions = ["Date", "Date Range", "Event Name", "Event Location"];
 
@@ -40,6 +41,8 @@ const FilterEvent = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, cu
         eventLocation: "",
         queryName: "",
     });
+
+    const [currentQueryData, setCurrentQueryData] = useState<QueryDataFormat>();
 
     // This allows the test button to run even if the savedName field is null
     const [submitter, setSubmitter] = useState<string | null>(null);
@@ -71,11 +74,9 @@ const FilterEvent = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, cu
 
     // Update the value of the fields on user change
     const handleChange = (key: string, value: string) => {
-        setFormValues((prev) => ({
-            ...prev,
-            [key]: value,
-        }));
+        setFormValues((prev) => ({ ...prev, [key]: value }));
     };
+
     //#region Data Transmission
 
     // Form submitting
@@ -85,28 +86,26 @@ const FilterEvent = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, cu
         // Get the button that caused the submit
         const clickedButton = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement;
 
-        const payload = formatPayload();
-
         if (clickedButton.value === "test-query") {
-            testQuery(payload);
+            testQuery();
             setSubmitter(null); // Reset the query name to be required
             return;
         } else if (clickedButton.value === "next-step") {
-            nextStage(payload);
+            nextStage();
             return;
         }
     };
 
     // Get the events filtered out by the query
-    const testQuery = async (payload: Record<string, string>) => {
+    const testQuery = async () => {
         const response = await fetch(
-            `${BuildURI("event_filter")}?mode=test-query&doc_id=${currentDocId}&auth_token=${sessionStorage.getItem("authToken")}`,
+            `${BuildURI("event_filter")}?mode=test-query&doc_id=${currentDocId}&auth_token=${getItem("authToken")}`,
             {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(payload),
+                body: JSON.stringify(currentQueryData),
             },
         );
         if (response.ok) {
@@ -119,16 +118,16 @@ const FilterEvent = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, cu
     };
 
     // Move on to next stage
-    const nextStage = async (payload: Record<string, string>) => {
+    const nextStage = async () => {
         try {
             const response = await fetch(
-                `${BuildURI("event_filter")}?mode=save-event-query&doc_id=${currentDocId}&auth_token=${sessionStorage.getItem("authToken")}`,
+                `${BuildURI("event_filter")}?mode=save-event-query&doc_id=${currentDocId}&auth_token=${getItem("authToken")}`,
                 {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify(payload),
+                    body: JSON.stringify(currentQueryData),
                 },
             );
 
@@ -143,44 +142,6 @@ const FilterEvent = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, cu
         } catch (err) {
             console.error("Submit error:", err);
         }
-    };
-
-    // Format data for sending
-    const formatPayload = (): Record<string, string> => {
-        // Format payload for backend
-        const payload: Record<string, string> = {};
-
-        if (selectedOptions.includes("Date")) {
-            const start = new Date(formValues.date);
-
-            const end = new Date(formValues.date);
-            // Check the whole first day
-            end.setDate(end.getDate() + 1);
-
-            payload.dateRange = JSON.stringify({ start, end });
-        }
-
-        if (selectedOptions.includes("Date Range")) {
-            const start = new Date(formValues.startDate);
-
-            const end = new Date(formValues.endDate);
-            // Inclusive search of last date
-            end.setDate(end.getDate() + 1);
-
-            payload.dateRange = JSON.stringify({ start, end });
-        }
-
-        if (selectedOptions.includes("Event Name")) {
-            payload.eventName = formValues.eventName;
-        }
-
-        if (selectedOptions.includes("Event Location")) {
-            payload.eventLocation = formValues.eventLocation;
-        }
-
-        payload.queryName = formValues.queryName;
-
-        return payload;
     };
 
     //#endregion
@@ -295,14 +256,53 @@ const FilterEvent = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, cu
                 }
             }),
         );
-    }, [
-        selectedOptions,
-        formValues.eventLocation,
-        formValues.startDate,
-        formValues.endDate,
-        formValues.date,
-        formValues.eventName,
-    ]);
+    }, [selectedOptions, formValues]);
+
+    useEffect(() => {
+        const newQueryData: QueryDataFormat = {
+            query_event: {},
+            query_data: currentQueryData?.query_data ?? { can_name: [""] },
+            query_name: formValues.queryName,
+        };
+
+        if (selectedOptions.includes("Date")) {
+            const start = new Date(formValues.date);
+            const end = new Date(formValues.date);
+            end.setDate(end.getDate() + 1);
+            newQueryData.query_event = {
+                event_start_date: start,
+                event_end_date: end,
+                event_date_single_day: true,
+            };
+        } else if (selectedOptions.includes("Date Range")) {
+            const start = new Date(formValues.startDate);
+            const end = new Date(formValues.endDate);
+            end.setDate(end.getDate() + 1);
+            newQueryData.query_event = {
+                event_start_date: start,
+                event_end_date: end,
+                event_date_single_day: false,
+            };
+        }
+
+        if (selectedOptions.includes("Event Name")) {
+            newQueryData.query_event.event_name = formValues.eventName;
+        }
+        if (selectedOptions.includes("Event Location")) {
+            newQueryData.query_event.event_location = formValues.eventLocation;
+        }
+
+        setCurrentQueryData(newQueryData);
+        saveItem("QueryData", newQueryData);
+    }, [selectedOptions, formValues]);
+
+    useEffect(() => {
+        const queryData = getItem("QueryData") as QueryDataFormat;
+        if (!queryData) {
+        } else {
+            setCurrentQueryData(queryData);
+        }
+    }, []);
 
     setHandleSubmit(handleSubmit);
 

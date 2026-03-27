@@ -19,6 +19,7 @@ import "./LoginPage.css";
 
 import { useNavigate } from "react-router-dom";
 import { BuildURI } from "../Utils/ServerUtils";
+import { getItem } from "../Utils/SessionStorageLoader";
 
 /**
  * Display a username password prompt to verify who the user is
@@ -63,7 +64,7 @@ const LoginPage = ({ onLogin }) => {
     };
 
     useEffect(() => {
-        if (sessionStorage.getItem("authToken")) {
+        if (getItem("authToken")) {
             navigate("/");
         }
     }, [navigate]);
@@ -177,7 +178,7 @@ const SignupPage = ({ onSignup }) => {
     };
 
     useEffect(() => {
-        if (sessionStorage.getItem("authToken")) {
+        if (getItem("authToken")) {
             navigate("/");
         }
     }, [navigate]);

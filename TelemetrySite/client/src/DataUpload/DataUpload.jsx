@@ -8,6 +8,8 @@ import {
     incrementRunOrderNumber,
     resetRunOrderNumber,
 } from "../Utils/ServerUtils.ts";
+import { saveItem, getItem, removeItem } from "../Utils/SessionStorageLoader.ts";
+
 import { Container, Col, Row, Card, CardBody, Input, Button, Form } from "reactstrap";
 import { useNavigate } from "react-router-dom";
 
@@ -29,8 +31,8 @@ function DataUpload() {
      * @param {string} url - url to redirect the user to
      */
     function RedirectToContext(url) {
-        sessionStorage.setItem("DataSubmitted", false);
-        sessionStorage.removeItem("BikeData");
+        saveItem("DataSubmitted", false);
+        removeItem("BikeData");
         navigate(url);
     }
 
@@ -52,7 +54,7 @@ function DataUpload() {
                         <Button
                             className='redirectButton'
                             onClick={() => {
-                                sessionStorage.removeItem("EventData");
+                                removeItem("EventData");
                                 resetRunOrderNumber();
                                 RedirectToContext("/context-upload");
                             }}
@@ -75,7 +77,7 @@ function DataUpload() {
      */
     async function SubmitFile(event) {
         event.preventDefault(); // Prevent page reload
-        const contextData = sessionStorage.getItem("BikeData");
+        const contextData = getItem("BikeData");
 
         if (!contextData) {
             console.error("No data from context saved");
@@ -107,7 +109,7 @@ function DataUpload() {
             formData.append("runOrderNumber", runOrderNumber);
 
             try {
-                const response = await fetch(BuildURI("data_upload") + "/" + sessionStorage.getItem("authToken"), {
+                const response = await fetch(BuildURI("data_upload") + "/" + getItem("authToken"), {
                     method: "POST",
                     body: formData,
                 });
@@ -138,12 +140,9 @@ function DataUpload() {
          */
         const FetchProgress = async () => {
             try {
-                const fetchProgressResponse = await fetch(
-                    BuildURI("data_upload") + "/" + sessionStorage.getItem("authToken"),
-                    {
-                        method: "GET",
-                    },
-                );
+                const fetchProgressResponse = await fetch(BuildURI("data_upload") + "/" + getItem("authToken"), {
+                    method: "GET",
+                });
 
                 if (!fetchProgressResponse.ok) {
                     console.error("Network response was not ok: " + fetchProgressResponse.statusText);
@@ -216,7 +215,7 @@ function DataUpload() {
         postDataResponse.then((responseValue) => {
             if (responseValue !== false) {
                 dataSubmitted = true;
-                sessionStorage.setItem("DataSubmitted", true);
+                saveItem("DataSubmitted", true);
 
                 clearInterval(interval);
                 setProgressBar(null);
@@ -231,7 +230,7 @@ function DataUpload() {
                     eventLocation: parsedContextData.event.location,
                 };
 
-                sessionStorage.setItem("EventData", JSON.stringify(eventObject));
+                saveItem("EventData", JSON.stringify(eventObject));
 
                 DisplayRedirect();
             }
@@ -241,7 +240,7 @@ function DataUpload() {
     useEffect(() => {
         //make sure a refresh doesn't make the user resubmit data
 
-        if (sessionStorage.getItem("DataSubmitted") !== null && sessionStorage.getItem("DataSubmitted") === "true") {
+        if (getItem("DataSubmitted") && getItem("DataSubmitted")) {
             DisplayRedirect();
         } else {
             setBodyDisplay(
@@ -272,7 +271,7 @@ function DataUpload() {
                             </Col>
                         </Row>
                     </Container>
-                    <Button className='submit-btn'>Submit {sessionStorage.getItem("EventData") ? "Run" : null}</Button>
+                    <Button className='submit-btn'>Submit {getItem("EventData") ? "Run" : null}</Button>
                 </Form>,
             );
         }

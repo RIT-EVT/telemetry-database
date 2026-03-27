@@ -11,7 +11,7 @@ import DataVisualizer from "./DataVisualizer/DataVisualizer.tsx";
 import ErrorModal from "./Modal/Error/Error.jsx";
 import Header from "./Header/Header.jsx";
 import Home from "./Home/Home.jsx";
-
+import { saveItem, getItem, removeItem } from "./Utils/SessionStorageLoader.ts";
 /**
  * Render the main application and contain all the logic for what to display
  */
@@ -30,18 +30,18 @@ function App() {
 
     function HandleLogin(loginData) {
         SetToken(loginData);
-        sessionStorage.setItem("authToken", loginData);
+        saveItem("authToken", loginData);
         navigate("/");
     }
 
     function HandleSignup(signupData) {
         SetToken(signupData);
-        sessionStorage.setItem("authToken", signupData);
+        saveItem("authToken", signupData);
         navigate("/");
     }
 
     function HandleSignout() {
-        sessionStorage.removeItem("authToken");
+        removeItem("authToken");
         SetToken(null);
         navigate("/login");
     }
@@ -76,7 +76,7 @@ function App() {
     }, [ServerStatus, IgnoreError, location, navigate, CheckBackendConnection]);
 
     useEffect(() => {
-        const savedToken = sessionStorage.getItem("authToken");
+        const savedToken = getItem("authToken");
 
         if (savedToken) {
             SetToken(savedToken);

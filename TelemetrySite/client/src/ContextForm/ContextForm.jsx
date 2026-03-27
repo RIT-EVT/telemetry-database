@@ -10,7 +10,7 @@ import { Form, Button, Card, Col, Row, CardTitle, CardBody, Container } from "re
 
 import "./ContextForm.css";
 
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 
 import ContextJSONIdValues from "./JsonFiles/ContextForm.json";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -18,6 +18,7 @@ import DynamicForm from "./DynamicForm";
 import SelectCreator from "./SelectorCreator";
 
 import { BuildURI } from "../Utils/ServerUtils.ts";
+import { saveItem, getItem, removeItem } from "../Utils/SessionStorageLoader.ts";
 
 /**
  * Create needed context forms. Return the configured elements
@@ -318,7 +319,7 @@ function ContextForm(props) {
         }
         //Save this data and pass it to the next step
         //Save the data in session storage in case user loses wifi/refreshes page
-        sessionStorage.setItem("BikeData", JSON.stringify(collectedData));
+        saveItem("BikeData", collectedData);
 
         //if there is any data saved in a new config send it to the backend
         if (Object.values(newConfigItems).some((item) => Object.keys(item).length > 0)) {
@@ -402,14 +403,14 @@ function ContextForm(props) {
         if (location.pathname === "/new-run") {
             var eventData;
 
-            if ((eventData = JSON.parse(sessionStorage.getItem("EventData"))) !== null) {
+            if ((eventData = getItem("EventData")) !== null) {
                 SetEventData(eventData);
             } else {
                 console.error("Data for event was unsaved");
             }
         } else {
             //ensure no data leaks from past runs
-            sessionStorage.removeItem("EventData");
+            removeItem("EventData");
         }
     }, [location.pathname]);
     return (

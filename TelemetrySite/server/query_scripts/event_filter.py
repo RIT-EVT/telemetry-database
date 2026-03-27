@@ -154,6 +154,7 @@ class EventFilterApi(MethodView):
             "query_name": {
                 "name_passed": query_name != "",
                 "name_valid": name_valid,
+                "name": query_name,
             },
         }, 200
 

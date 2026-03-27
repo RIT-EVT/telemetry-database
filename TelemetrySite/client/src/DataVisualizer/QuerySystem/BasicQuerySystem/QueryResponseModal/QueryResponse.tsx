@@ -1,30 +1,32 @@
 import { Modal, ModalBody, ModalHeader, ModalFooter, Button, Collapse, Container, Table, Row, Col } from "reactstrap";
-import { useState, useEffect, ReactElement } from "react";
+import { useState, useEffect } from "react";
 import { ChevronDown, ChevronUp } from "react-feather";
 import "./QueryResponse.css";
 import { QueryResponseProps, QueryResponseResult, ResponseFormat, EventData } from "../BasicQueryDataTypes";
 
 const QueryResponse = ({ toggleModal, response }: QueryResponseProps) => {
     const [displayData, setDisplayData] = useState<boolean[]>([]);
+    const [displayQueryNameResponse, setQueryNameDisplay] = useState<boolean>(false);
+
+    const responseKeys = response ? (Object.keys(response.query_data) as Array<keyof QueryResponseResult>) : [];
 
     const updateDataDisplay = (index: number) => {
         setDisplayData((prev) => prev.map((open, i) => (i === index ? !open : open)));
     };
 
+    const updateQueryNameDisplay = () => {
+        setQueryNameDisplay(!displayQueryNameResponse);
+    };
+
     useEffect(() => {
         if (!response) return;
-        const keys = Object.keys(response);
-        setDisplayData(new Array(keys.length).fill(false));
+        setDisplayData(new Array(responseKeys.length).fill(false));
     }, [response]);
 
     if (!response) return null;
 
-    const responseKeys = Object.keys(response.query_data) as Array<keyof QueryResponseResult>;
-    const queryNameValidDisplay = (): ReactElement | null => {
-        if (!response.query_name.name_passed) return null;
+    const { name_passed, name_valid, name } = response.query_name;
 
-        return <Row>Query Response name</Row>;
-    };
     return (
         <Modal className='white-border' isOpen={responseKeys.length !== 0} toggle={toggleModal} size='xl'>
             <ModalHeader className='background header'>Query Test Result</ModalHeader>
@@ -32,7 +34,6 @@ const QueryResponse = ({ toggleModal, response }: QueryResponseProps) => {
             <ModalBody className='background'>
                 <Container>
                     <Col>
-                        {queryNameValidDisplay()}
                         {responseKeys.map((objectKey, index) => {
                             const currentData = response.query_data[objectKey];
                             if (!currentData) return null;
@@ -53,11 +54,36 @@ const QueryResponse = ({ toggleModal, response }: QueryResponseProps) => {
                                             </Button>
                                         </h6>
                                     </div>
-
+                                    {/* The below !!displayData[index] is not an error. The first ! makes it a boolean then !! reverts it */}
                                     <Collapse isOpen={!!displayData[index]}>{ConstructTable(currentData)}</Collapse>
                                 </Row>
                             );
                         })}
+
+                        {name_passed && (
+                            <Row className='mx-0 white'>
+                                <h6 className='px-0'>
+                                    Query Name{" "}
+                                    <Button className='no-background' onClick={updateQueryNameDisplay}>
+                                        {displayQueryNameResponse ? (
+                                            <ChevronUp color={"white"} />
+                                        ) : (
+                                            <ChevronDown color={"white"} />
+                                        )}
+                                    </Button>
+                                </h6>
+                                <Collapse isOpen={displayQueryNameResponse}>
+                                    <p className='px-0'>
+                                        <strong>{name}</strong> —
+                                        {name_valid ? (
+                                            <span className='text-success'>Valid.</span>
+                                        ) : (
+                                            <span className='text-danger'>Invalid. Name already in use.</span>
+                                        )}
+                                    </p>
+                                </Collapse>
+                            </Row>
+                        )}
                     </Col>
                 </Container>
             </ModalBody>
@@ -80,8 +106,9 @@ const ConstructTable = (tableData: ResponseFormat) => {
                 </p>
             </div>
         );
+
     return (
-        <Table className={"response-table"} hover>
+        <Table className='response-table' hover>
             <thead>
                 <tr>
                     <th>Event Name</th>
@@ -90,15 +117,14 @@ const ConstructTable = (tableData: ResponseFormat) => {
                 </tr>
             </thead>
             <tbody>
-                {tableData.events.map((tableData: EventData) => {
-                    return (
-                        <tr>
-                            <td>{tableData.name}</td>
-                            <td>{tableData.location}</td>
-                            <td>{tableData.date}</td>
-                        </tr>
-                    );
-                })}
+                {/* Fix: add key prop to <tr> */}
+                {tableData.events.map((event: EventData) => (
+                    <tr key={`${event.name}-${event.date}`}>
+                        <td>{event.name}</td>
+                        <td>{event.location}</td>
+                        <td>{event.date}</td>
+                    </tr>
+                ))}
             </tbody>
         </Table>
     );

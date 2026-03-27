@@ -27,6 +27,7 @@ type ResponseData = {
     query_name: {
         name_passed: boolean;
         name_valid: boolean;
+        name: string;
     };
 };
 
@@ -47,6 +48,23 @@ type NavButtonsInput = {
     previousStep: boolean;
 };
 
+/**
+ * Formatted data for how we save the query and pass it to the backend
+ */
+interface QueryDataFormat {
+    query_event: {
+        event_start_date?: Date;
+        event_end_date?: Date;
+        event_date_single_day?: boolean;
+        event_name?: string;
+        event_location?: string;
+    };
+    query_data: {
+        can_name: [string]; // TODO add more advanced customizability for graphing
+    };
+    query_name: string;
+}
+
 export { QueryStep };
 
 export type {
@@ -57,4 +75,5 @@ export type {
     EventData,
     QueryFunctions,
     NavButtonsInput,
+    QueryDataFormat,
 };

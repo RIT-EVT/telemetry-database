@@ -9,13 +9,14 @@ import { Card, Form } from "reactstrap";
 import { QueryStep, QueryFunctions } from "./BasicQueryDataTypes";
 import NavigationButtons from "./Navigation.tsx";
 import { getMaxEnumValue } from "Utils/EnumUtils.ts";
+import { saveItem, getItem, removeItem } from "Utils/SessionStorageLoader.ts";
 
 function BasicQuery() {
     const [queryStep, setQueryStep] = useState<QueryStep>(() => {
-        const stored = sessionStorage.getItem("QueryStep");
+        const stored = getItem("QueryStep");
         return stored !== null ? (Number(stored) as QueryStep) : QueryStep.FilterEvent; // Convert from string to number to QueryStep
     });
-    const [currentDocId, setCurrentQueryDocument] = useState<String>(window.sessionStorage.getItem("DocId") as String);
+    const [currentDocId, setCurrentQueryDocument] = useState<String>(getItem("DocId") as String);
     const handleSubmitRef = useRef<(e: React.FormEvent) => void>((e) => {});
 
     // Update the handler
@@ -25,12 +26,12 @@ function BasicQuery() {
 
     const updateQueryStep = (newQuery: QueryStep) => {
         setQueryStep(newQuery);
-        window.sessionStorage.setItem("QueryStep", newQuery.toString());
+        saveItem("QueryStep", newQuery.toString());
     };
 
     const updateQueryDocument = (newQueryDocID: String) => {
         setCurrentQueryDocument(newQueryDocID);
-        window.sessionStorage.setItem("DocId", newQueryDocID.toString());
+        saveItem("DocId", newQueryDocID.toString());
     };
 
     const queryFunctions: QueryFunctions = {
