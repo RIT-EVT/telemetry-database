@@ -212,7 +212,7 @@ class EventFilterApi(MethodView):
                         "$lt": data_key_value["end"],
                     }
                     queryFields[key] = (
-                        f"{data_key_value["start"]}-{data_key_value["end"]}"
+                        f"{data_key_value['start']}-{data_key_value['end']}"
                     )
 
                     break
