@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
     Dropdown,
     DropdownToggle,
@@ -43,7 +43,7 @@ const FilterEvent = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, cu
     });
 
     const [currentQueryData, setCurrentQueryData] = useState<QueryDataFormat>();
-
+    const currentQueryDataRef = useRef<QueryDataFormat>();
     // This allows the test button to run even if the savedName field is null
     const [submitter, setSubmitter] = useState<string | null>(null);
 
@@ -105,7 +105,7 @@ const FilterEvent = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, cu
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(currentQueryData),
+                body: JSON.stringify(currentQueryDataRef.current),
             },
         );
         if (response.ok) {
@@ -127,7 +127,7 @@ const FilterEvent = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, cu
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify(currentQueryData),
+                    body: JSON.stringify(currentQueryDataRef.current),
                 },
             );
 
@@ -183,7 +183,7 @@ const FilterEvent = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, cu
         if (selectedOptions.includes("Event Location")) {
             newQueryData.query_event.event_location = formValues.eventLocation;
         }
-
+        console.log(newQueryData);
         setCurrentQueryData(newQueryData);
         saveItem("QueryData", newQueryData);
     };
@@ -302,6 +302,8 @@ const FilterEvent = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, cu
 
     const loadCurrentQueryData = () => {
         let queryData = getItem("QueryData") as QueryDataFormat;
+        console.log(queryData);
+
         if (!queryData) {
             // If no data was loaded from local storage
             // Create a new empty data set
@@ -360,6 +362,10 @@ const FilterEvent = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, cu
     useEffect(() => {
         setHandleSubmit(handleSubmit);
     }, [selectedOptions, formValues]);
+
+    useEffect(() => {
+        currentQueryDataRef.current = currentQueryData;
+    }, [currentQueryData]);
 
     return (
         <>

@@ -69,11 +69,9 @@ const FilterMessages = ({ updateQueryStep, updateQueryDocument, setHandleSubmit,
         if (!data) return;
 
         const clickedButton = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement;
-        console.log(currentDocId);
         if (clickedButton.value === "submit") {
             saveItem("QueryData", data);
             updateQueryStep(QueryStep.FilterCanMessages);
-            console.log(data);
             const response = await fetch(
                 `${BuildURI("message_filter")}?doc_id=${currentDocId}&auth_token=${getItem("authToken")}`,
                 {
@@ -88,6 +86,7 @@ const FilterMessages = ({ updateQueryStep, updateQueryDocument, setHandleSubmit,
             if (!response.ok) {
                 throw new Error(`Request failed with code ${response.status} and text ${response.statusText}`);
             }
+            updateQueryStep(QueryStep.ConfirmQuery);
         } else if (clickedButton.value === "previous-step") {
             saveItem("QueryData", data);
             updateQueryStep(QueryStep.FilterEvent);
@@ -115,6 +114,7 @@ const FilterMessages = ({ updateQueryStep, updateQueryDocument, setHandleSubmit,
     }, []);
 
     useEffect(() => {
+        console.log(currentQueryData);
         if (!currentQueryData?.query_data.possible_can_names) return;
         currentQueryDataRef.current = currentQueryData;
 

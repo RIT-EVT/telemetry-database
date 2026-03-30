@@ -73,7 +73,7 @@ class MessageFilterApi(MethodView):
             return {"error": "Invalid ID"}, HttpResponseType.BAD_REQUEST
 
         data = request.get_json()
-        pipeline, fields = MessageFilterApi.construct_query(data)
+        
         # Extract CAN signal names from request
 
         can_names = data.get("query_data", {}).get("can_name", [])
@@ -85,14 +85,14 @@ class MessageFilterApi(MethodView):
             return {"error": "Query doc not found"}, 404
 
         # Get the existing pipeline stages (already built for event filtering)
-
+        event_body = loads(query_doc["query-event-body"])
         # Append stages to unwind and filter messages by signalName
         message_filter_stages = [
             {"$unwind": "$event.run.messages"},
             {"$match": {"event.run.messages.signal": {"$in": can_names}}},
             {"$group": {"_id": "$_id", "messages": {"$push": "$event.run.messages"}}},
         ]
-        full_pipeline = pipeline + message_filter_stages
+        full_pipeline = event_body + message_filter_stages
         full_pipeline = dumps(full_pipeline)
 
         # Update the query doc with the completed pipeline
@@ -108,30 +108,3 @@ class MessageFilterApi(MethodView):
         )
 
         return 201
-
-    @staticmethod
-    def construct_query(data):
-
-        pipeline = [{"$match": {}}]
-        queryFields = {}
-
-        event_data = data.get("query_event", {})
-
-        if "event_start_date" in event_data and "event_end_date" in event_data:
-            pipeline[0]["$match"]["event.date"] = {
-                "$gte": event_data["event_start_date"],
-                "$lt": event_data["event_end_date"],
-            }
-            queryFields["dateRange"] = (
-                f"{event_data['event_start_date']}-{event_data['event_end_date']}"
-            )
-
-        if "event_name" in event_data:
-            pipeline[0]["$match"]["event.name"] = event_data["event_name"]
-            queryFields["eventName"] = event_data["event_name"]
-
-        if "event_location" in event_data:
-            pipeline[0]["$match"]["event.location"] = event_data["event_location"]
-            queryFields["eventLocation"] = event_data["event_location"]
-
-        return pipeline, queryFields

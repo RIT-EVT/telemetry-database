@@ -58,8 +58,11 @@ function BasicQuery() {
     useEffect(() => {
         if (!currentDocId) {
             updateQueryDocument("NULL");
-            updateQueryStep(QueryStep.FilterEvent);
-            removeItem("QueryData");
+            if (QueryStep.FilterEvent !== queryStep) {
+                updateQueryStep(QueryStep.FilterEvent);
+                removeItem("QueryData");
+            }
+            console.log("removing data");
         } else if (!queryStep) {
             updateQueryStep(QueryStep.FilterEvent);
         }
@@ -72,7 +75,7 @@ function BasicQuery() {
                 handleSubmitRef.current(e);
             }}
         >
-            <Card className='p-3'>{queryBody()}</Card>
+            <Card className="p-3">{queryBody()}</Card>
             <NavigationButtons
                 previousStep={queryStep !== 0}
                 nextStep={getMaxEnumValue(QueryStep) !== queryStep}

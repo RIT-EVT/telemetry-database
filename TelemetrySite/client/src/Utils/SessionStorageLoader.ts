@@ -11,10 +11,14 @@ const saveItem = (name: string, saveObject: any): boolean => {
 
 const getItem = (name: string): any | null => {
     const value = sessionStorage.getItem(name);
-    if (!value) return null;
-    const parsed = JSON.parse(value as string);
+    if (value === null) return null; // getItem returns null (not undefined) when missing
 
-    return parsed;
+    try {
+        return JSON.parse(value);
+    } catch (e) {
+        console.warn(`sessionStorage key "${name}" contains invalid JSON:`, value);
+        return null;
+    }
 };
 
 const removeItem = (name: string): boolean => {

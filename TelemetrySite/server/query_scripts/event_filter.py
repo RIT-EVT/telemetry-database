@@ -2,8 +2,9 @@ from flask.views import MethodView
 from utils import validate_user
 from http_codes import HttpResponseType
 from flask import request
-from json import loads, dumps
+from json import dumps
 from bson import ObjectId
+import query_scripts.query_utils as query_utils
 
 
 class EventFilterApi(MethodView):
@@ -21,7 +22,7 @@ class EventFilterApi(MethodView):
             return response.error()
 
         # ID isn't an ID or it doesn't correspond to a doc in the db
-        if not self.validate_id(doc_id):
+        if not query_utils.validate_id(self.db, doc_id):
             return HttpResponseType.BAD_REQUEST.error()
 
         self.db["custom"]
@@ -144,7 +145,8 @@ class EventFilterApi(MethodView):
 
         response = list(self.db["messages"].aggregate(pipeline, allowDiskUse=True))[0]
         name_valid: bool = True
-        if query_name != "" and self.check_duplicate_query_name(query_name, doc_id):
+        duplicate = query_utils.check_duplicate_query_name(self.db, query_name, doc_id)
+        if query_name == "" or duplicate:
             name_valid = False
 
         return {
@@ -157,21 +159,22 @@ class EventFilterApi(MethodView):
         }, 200
 
     def save_event_query(self, data, doc_id):
-        pipeline, fields = EventFilterApi.construct_query(data)
+        pipeline, fields = query_utils.construct_event_query(data)
         query_name = data["query_name"]
         db_connection = self.db["custom-queries"]
         pipeline_string = dumps(pipeline)
-
-        valid_id = self.validate_id(doc_id)
+        
+        document = query_utils.get_valid_doc(self.db, doc_id)
 
         # Check if a query already exists with a given name
         # Return an error if one does exist that isn't the one currently being edited
-        if self.check_duplicate_query_name(query_name, doc_id):
+        if query_utils.check_duplicate_query_name(self.db, query_name, doc_id):
             return {"invalid": "duplicate query name detected"}, 409
 
-        if not valid_id:  # Create a new query
+        if document is None:  # Create a new query
             custom_query = {
                 "query-body": pipeline_string,
+                "query-event-body": pipeline_string,
                 "event-fields": fields,
                 "query-finished": False,
                 "query-name": query_name,
@@ -179,14 +182,17 @@ class EventFilterApi(MethodView):
             }
             result = db_connection.insert_one(custom_query)
             document_id = str(result.inserted_id)
+
             return {"document_id": document_id}, 201
 
         else:  # Update an existing custom query
+
             db_connection.update_one(
                 {"_id": ObjectId(doc_id)},
                 {
                     "$set": {
                         "query-body": pipeline_string,
+                        "query-event-body": pipeline_string,
                         "event-fields": fields,
                         "query-name": query_name,
                         "query_js_body": data
@@ -195,48 +201,3 @@ class EventFilterApi(MethodView):
             )   
 
             return {"document_id": doc_id}, 200
-
-    @staticmethod
-    def construct_query(data):
-
-        pipeline = [{"$match": {}}]
-        queryFields = {}
-
-        event_data = data.get("query_event", {})
-
-        if "event_start_date" in event_data and "event_end_date" in event_data:
-            pipeline[0]["$match"]["event.date"] = {
-                "$gte": event_data["event_start_date"],
-                "$lt": event_data["event_end_date"],
-            }
-            queryFields["dateRange"] = f"{event_data['event_start_date']}-{event_data['event_end_date']}"
-
-        if "event_name" in event_data:
-            pipeline[0]["$match"]["event.name"] = event_data["event_name"]
-            queryFields["eventName"] = event_data["event_name"]
-
-        if "event_location" in event_data:
-            pipeline[0]["$match"]["event.location"] = event_data["event_location"]
-            queryFields["eventLocation"] = event_data["event_location"]
-
-        return pipeline, queryFields
-    def validate_id(self, doc_id):
-        return (
-            ObjectId.is_valid(doc_id)
-            and self.db["custom-queries"].find_one({"_id": ObjectId(doc_id)})
-            is not None
-        )
-
-    def check_duplicate_query_name(self, query_name: str, doc_id: str):
-        """
-        Get if a query name already exists in a document that is not this one.
-        Returns True if the name is a duplicate
-        """
-        db_connection = self.db["custom-queries"]
-
-        matching_document = db_connection.find_one({"query-name": query_name})
-        if matching_document is not None and (
-            not self.validate_id(doc_id) or matching_document["_id"] != ObjectId(doc_id)
-        ):
-            return True
-        return False

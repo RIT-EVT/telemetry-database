@@ -13,7 +13,7 @@ from data_upload_scripts.data_upload_api import DataUploadApi
 from bike_config_scripts.bike_config_api import BikeConfigApi
 from user_auth_scripts.user_auth_api import UserAuthApi
 from query_scripts.event_filter import EventFilterApi
-from query_scripts.message_data import MessageFilterApi
+from query_scripts.message_filter import MessageFilterApi
 from utils import create_db_connection   # your existing DB util
 
 
