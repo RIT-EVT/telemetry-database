@@ -82,7 +82,6 @@ const FilterEvent = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, cu
     // Form submitting
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-
         // Get the button that caused the submit
         const clickedButton = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement;
 
@@ -98,6 +97,7 @@ const FilterEvent = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, cu
 
     // Get the events filtered out by the query
     const testQuery = async () => {
+        console.log("running");
         const response = await fetch(
             `${BuildURI("event_filter")}?mode=test-query&doc_id=${currentDocId}&auth_token=${getItem("authToken")}`,
             {
@@ -146,122 +146,14 @@ const FilterEvent = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, cu
 
     //#endregion
 
-    useEffect(() => {
-        const getCurrentDate = () => {
-            const date = new Date();
+    const updateSavedQuery = () => {
+        // If we don't have data yet, wait for the localStorage to load
+        if (!currentQueryData) return;
 
-            return `${date.getFullYear()}-${(date.getMonth() < 9 ? "0" : "") + (date.getMonth() + 1)}-${
-                (date.getDay() < 9 ? "0" : "") + (date.getDay() + 1)
-            }`;
-        };
-        let currentDate = getCurrentDate();
-
-        // Updates the displayed inputs when the selections a new option
-        setDataFields(
-            selectedOptions.map((option) => {
-                switch (option) {
-                    case "Date":
-                        return (
-                            <FormGroup key={option} className='mt-3'>
-                                <Label for='date'>
-                                    <h2 className='basic-query-title'>Date</h2>
-                                </Label>
-                                <Input
-                                    type='date'
-                                    id='date'
-                                    value={formValues.date}
-                                    onChange={(e) => handleChange("date", e.target.value)}
-                                    required
-                                    max={currentDate}
-                                />
-                            </FormGroup>
-                        );
-
-                    case "Date Range":
-                        return (
-                            <FormGroup key={option} className='mt-3'>
-                                <Row className='vertical-align'>
-                                    <Label for='start-date'>
-                                        <h2 className='basic-query-title'>Date Range</h2>
-                                    </Label>
-                                    <Col md='5' xs='12'>
-                                        <Input
-                                            type='date'
-                                            id='start-date'
-                                            value={formValues.startDate}
-                                            max={formValues.endDate || currentDate}
-                                            onChange={(e) => handleChange("startDate", e.target.value)}
-                                            required
-                                        />
-                                    </Col>
-
-                                    <Col
-                                        md='2'
-                                        xs='12'
-                                        className='text-center d-flex align-items-end justify-content-center'
-                                    >
-                                        <ArrowRight className='arrow' />
-                                    </Col>
-
-                                    <Col md='5' xs='12'>
-                                        <Input
-                                            type='date'
-                                            id='end-date'
-                                            value={formValues.endDate}
-                                            min={formValues.startDate || "2000-01-01"}
-                                            max={currentDate}
-                                            onChange={(e) => handleChange("endDate", e.target.value)}
-                                            required
-                                        />
-                                    </Col>
-                                </Row>
-                            </FormGroup>
-                        );
-
-                    case "Event Name":
-                        return (
-                            <FormGroup key={option} className='mt-3'>
-                                <Label for='event-name'>
-                                    <h2 className='basic-query-title'>Event Name</h2>
-                                </Label>
-                                <Input
-                                    type='text'
-                                    placeholder='Enter Name'
-                                    id='event-name'
-                                    value={formValues.eventName}
-                                    onChange={(e) => handleChange("eventName", e.target.value)}
-                                    required
-                                />
-                            </FormGroup>
-                        );
-                    case "Event Location":
-                        return (
-                            <FormGroup key={option} className='mt-3'>
-                                <Label for='event-location'>
-                                    <h2 className='basic-query-title'>Event Location</h2>{" "}
-                                </Label>
-                                <Input
-                                    type='text'
-                                    id='event-location'
-                                    placeholder='Enter Location'
-                                    value={formValues.eventLocation}
-                                    onChange={(e) => handleChange("eventLocation", e.target.value)}
-                                    required
-                                />
-                            </FormGroup>
-                        );
-
-                    default:
-                        return <FormGroup></FormGroup>;
-                }
-            }),
-        );
-    }, [selectedOptions, formValues]);
-
-    useEffect(() => {
+        // Update the query to save
         const newQueryData: QueryDataFormat = {
             query_event: {},
-            query_data: currentQueryData?.query_data ?? { can_name: [""] },
+            query_data: currentQueryData?.query_data ?? { can_name: [], possible_can_names: [] },
             query_name: formValues.queryName,
         };
 
@@ -277,7 +169,7 @@ const FilterEvent = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, cu
         } else if (selectedOptions.includes("Date Range")) {
             const start = new Date(formValues.startDate);
             const end = new Date(formValues.endDate);
-            end.setDate(end.getDate() + 1);
+            end.setDate(end.getDate());
             newQueryData.query_event = {
                 event_start_date: start,
                 event_end_date: end,
@@ -294,32 +186,200 @@ const FilterEvent = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, cu
 
         setCurrentQueryData(newQueryData);
         saveItem("QueryData", newQueryData);
-    }, [selectedOptions, formValues]);
+    };
+
+    const updateDataFieldContents = () => {
+        const getCurrentDate = () => {
+            const date = new Date();
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, "0");
+            const day = String(date.getDate()).padStart(2, "0"); // getDate() not getDay()
+            return `${year}-${month}-${day}`;
+        };
+        let currentDate = getCurrentDate();
+
+        // Updates the displayed inputs when the selections a new option
+        setDataFields(
+            selectedOptions.map((option) => {
+                switch (option) {
+                    case "Date":
+                        return (
+                            <FormGroup key={option} className="mt-3">
+                                <Label for="date">
+                                    <h2 className="basic-query-title">Date</h2>
+                                </Label>
+                                <Input
+                                    type="date"
+                                    id="date"
+                                    value={formValues.date}
+                                    onChange={(e) => handleChange("date", e.target.value)}
+                                    required
+                                    max={currentDate}
+                                />
+                            </FormGroup>
+                        );
+
+                    case "Date Range":
+                        return (
+                            <FormGroup key={option} className="mt-3">
+                                <Row className="vertical-align">
+                                    <Label for="start-date">
+                                        <h2 className="basic-query-title">Date Range</h2>
+                                    </Label>
+                                    <Col md="5" xs="12">
+                                        <Input
+                                            type="date"
+                                            id="start-date"
+                                            value={formValues.startDate}
+                                            max={formValues.endDate || currentDate}
+                                            onChange={(e) => handleChange("startDate", e.target.value)}
+                                            required
+                                        />
+                                    </Col>
+
+                                    <Col
+                                        md="2"
+                                        xs="12"
+                                        className="text-center d-flex align-items-end justify-content-center"
+                                    >
+                                        <ArrowRight className="arrow" />
+                                    </Col>
+
+                                    <Col md="5" xs="12">
+                                        <Input
+                                            type="date"
+                                            id="end-date"
+                                            value={formValues.endDate}
+                                            min={formValues.startDate || "2000-01-01"}
+                                            max={currentDate}
+                                            onChange={(e) => handleChange("endDate", e.target.value)}
+                                            required
+                                        />
+                                    </Col>
+                                </Row>
+                            </FormGroup>
+                        );
+
+                    case "Event Name":
+                        return (
+                            <FormGroup key={option} className="mt-3">
+                                <Label for="event-name">
+                                    <h2 className="basic-query-title">Event Name</h2>
+                                </Label>
+                                <Input
+                                    type="text"
+                                    placeholder="Enter Name"
+                                    id="event-name"
+                                    value={formValues.eventName}
+                                    onChange={(e) => handleChange("eventName", e.target.value)}
+                                    required
+                                />
+                            </FormGroup>
+                        );
+                    case "Event Location":
+                        return (
+                            <FormGroup key={option} className="mt-3">
+                                <Label for="event-location">
+                                    <h2 className="basic-query-title">Event Location</h2>{" "}
+                                </Label>
+                                <Input
+                                    type="text"
+                                    id="event-location"
+                                    placeholder="Enter Location"
+                                    value={formValues.eventLocation}
+                                    onChange={(e) => handleChange("eventLocation", e.target.value)}
+                                    required
+                                />
+                            </FormGroup>
+                        );
+
+                    default:
+                        return <FormGroup></FormGroup>;
+                }
+            }),
+        );
+    };
+
+    const loadCurrentQueryData = () => {
+        let queryData = getItem("QueryData") as QueryDataFormat;
+        if (!queryData) {
+            // If no data was loaded from local storage
+            // Create a new empty data set
+            queryData = {
+                query_event: {},
+                query_data: {
+                    can_name: [],
+                    possible_can_names: [],
+                },
+                query_name: "\0",
+            };
+        }
+
+        // Restore selected options
+        const restoredOptions: string[] = [];
+        if (queryData.query_event.event_date_single_day === true) {
+            restoredOptions.push("Date");
+        } else if (queryData.query_event.event_start_date || queryData.query_event.event_end_date) {
+            restoredOptions.push("Date Range");
+        }
+        if (queryData.query_event.event_name) restoredOptions.push("Event Name");
+        if (queryData.query_event.event_location) restoredOptions.push("Event Location");
+        setSelectedOptions(restoredOptions);
+
+        const toDateString = (value: any): string => {
+            if (!value) return "";
+            try {
+                return new Date(value).toISOString().split("T")[0] as string;
+            } catch {
+                return "";
+            }
+        };
+        // Restore form values
+        setFormValues({
+            date: queryData.query_event.event_date_single_day
+                ? toDateString(queryData.query_event.event_start_date)
+                : "",
+            startDate: !queryData.query_event.event_date_single_day
+                ? toDateString(queryData.query_event.event_start_date)
+                : "",
+            endDate: toDateString(queryData.query_event.event_end_date),
+            eventName: queryData.query_event.event_name ?? "",
+            eventLocation: queryData.query_event.event_location ?? "",
+            queryName: queryData.query_name ?? "",
+        });
+
+        setCurrentQueryData(queryData);
+    };
+
+    useEffect(updateDataFieldContents, [selectedOptions, formValues]);
+
+    useEffect(updateSavedQuery, [selectedOptions, formValues]);
+
+    useEffect(loadCurrentQueryData, []);
 
     useEffect(() => {
-        const queryData = getItem("QueryData") as QueryDataFormat;
-        if (!queryData) {
-        } else {
-            setCurrentQueryData(queryData);
-        }
-    }, []);
-
-    setHandleSubmit(handleSubmit);
+        setHandleSubmit(handleSubmit);
+    }, [selectedOptions, formValues]);
 
     return (
         <>
-            <CardHeader className='center-align'>
-                <h1 className='query-selector'>Filter Event</h1>
+            <CardHeader className="center-align">
+                <h1 className="query-selector">Filter Event</h1>
             </CardHeader>
             {/* Dropdown for field selection*/}
             <Dropdown isOpen={dropdownOpen} toggle={toggleDropdown}>
-                <DropdownToggle caret color='primary'>
+                <DropdownToggle caret color="primary">
                     Filter Event
                 </DropdownToggle>
                 <DropdownMenu>
                     {BasicOptions.map((option) => (
                         <DropdownItem key={option} toggle={false} onClick={() => toggleOption(option)}>
-                            <Input type='checkbox' checked={selectedOptions.includes(option)} readOnly className='me-2' />
+                            <Input
+                                type="checkbox"
+                                checked={selectedOptions.includes(option)}
+                                readOnly
+                                className="me-2"
+                            />
                             {option}
                         </DropdownItem>
                     ))}
@@ -329,30 +389,31 @@ const FilterEvent = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, cu
             {/* Input fields */}
             {dataFields}
 
-            <Container className='top-padding px-0'>
-                <Row xs='2' className='align-items-center'>
+            <Container className="top-padding px-0">
+                <Row xs="2" className="align-items-center">
                     <Col>
                         <InputGroup>
-                            <Label for='query-name'>
-                                <h2 className='basic-query-title'>Query Name</h2>
+                            <Label for="query-name">
+                                <h2 className="basic-query-title">Query Name</h2>
                             </Label>
                             <Input
                                 required={submitter !== "test-query"}
-                                id='query-name'
-                                type='text'
+                                id="query-name"
+                                type="text"
                                 onChange={(e) => handleChange("queryName", e.target.value)}
-                                placeholder='Amazing BMS Query...'
-                                bsSize='lg'
+                                placeholder="Amazing BMS Query..."
+                                bsSize="lg"
+                                value={formValues.queryName ?? ""}
                             />
                         </InputGroup>
                     </Col>
-                    <Col className='center-align'>
+                    <Col className="center-align">
                         <Button
                             disabled={selectedOptions.length === 0}
-                            value='test-query'
-                            type='submit'
+                            value="test-query"
+                            type="submit"
                             onMouseDown={() => setSubmitter("test-query")}
-                            color='info'
+                            color="info"
                         >
                             Test Query
                         </Button>

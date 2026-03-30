@@ -1,7 +1,6 @@
 enum QueryStep {
     FilterEvent = 0,
     FilterCanMessages = 1,
-    SaveQuery = 2,
 }
 
 type EventData = {
@@ -46,6 +45,7 @@ type QueryFunctions = {
 type NavButtonsInput = {
     nextStep: boolean;
     previousStep: boolean;
+    submitQuery: boolean;
 };
 
 /**
@@ -60,7 +60,8 @@ interface QueryDataFormat {
         event_location?: string;
     };
     query_data: {
-        can_name: [string]; // TODO add more advanced customizability for graphing
+        can_name: string[]; // TODO add more advanced customizability for graphing
+        possible_can_names: string[];
     };
     query_name: string;
 }

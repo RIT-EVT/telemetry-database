@@ -57,6 +57,7 @@ function BasicQuery() {
         if (!currentDocId) {
             updateQueryDocument("NULL");
             updateQueryStep(QueryStep.FilterEvent);
+            removeItem("QueryData");
         } else if (!queryStep) {
             updateQueryStep(QueryStep.FilterEvent);
         }
@@ -69,8 +70,12 @@ function BasicQuery() {
                 handleSubmitRef.current(e);
             }}
         >
-            <Card className='p-3'>{queryBody()}</Card>
-            <NavigationButtons previousStep={queryStep !== 0} nextStep={getMaxEnumValue(QueryStep) !== queryStep} />
+            <Card className="p-3">{queryBody()}</Card>
+            <NavigationButtons
+                previousStep={queryStep !== 0}
+                nextStep={getMaxEnumValue(QueryStep) !== queryStep}
+                submitQuery={getMaxEnumValue(QueryStep) === queryStep}
+            />
         </Form>
     );
 }

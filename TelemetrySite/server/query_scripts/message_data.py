@@ -59,4 +59,4 @@ class MessageFilterApi(MethodView):
         if query_response.__len__() > 0 and "signals" in query_response[0]:
             return {"response": query_response[0]["signals"]}, HttpResponseType.OK
         else:
-            return {"response": -1}, HttpResponseType.OK
+            return {"response": []}, HttpResponseType.OK

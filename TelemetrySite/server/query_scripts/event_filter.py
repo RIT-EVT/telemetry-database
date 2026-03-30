@@ -70,38 +70,36 @@ class EventFilterApi(MethodView):
             {"$project": {"_id": 0, "count": 1, "events": 1}},
         ]
 
+        event_data = data["query_event"]
+
         facets = {}
 
         match_date = {}
         match_name = {}
         match_location = {}
-        query_name = data["queryName"]
+        query_name = data["query_name"]  # was "queryName", now "query_name"
 
-        if "dateRange" in data:
-
-            # parse date from a string to a json object
-            dateRange = loads(data["dateRange"])
-
+        if "event_start_date" in event_data and "event_end_date" in event_data:
             match_date = {
-                "event.date": {
-                    "$gte": dateRange["start"],
-                    "$lt": dateRange["end"],
-                }
-            }
+        "event.date": {
+            "$gte": event_data["event_start_date"],
+            "$lt": event_data["event_end_date"],
+        }
+    }
             facets["matchDate"] = [
-                {"$match": match_date},
-                *format,
-            ]
+        {"$match": match_date},
+        *format,
+    ]
 
-        if "eventName" in data:
-            match_name = {"event.name": data["eventName"]}
+        if "event_name" in event_data:
+            match_name = {"event.name": event_data["event_name"]}
             facets["matchName"] = [
-                {"$match": match_name},
-                *format,
-            ]
+        {"$match": match_name},
+        *format,
+    ]
 
-        if "eventLocation" in data:
-            match_location = {"event.location": data["eventLocation"]}
+        if "event_location" in event_data:
+            match_location = {"event.location": event_data["event_location"]}
             facets["matchLocation"] = [
                 {"$match": match_location},
                 *format,
@@ -160,7 +158,7 @@ class EventFilterApi(MethodView):
 
     def save_event_query(self, data, doc_id):
         pipeline, fields = EventFilterApi.construct_query(data)
-        query_name = data["queryName"]
+        query_name = data["query_name"]
         db_connection = self.db["custom-queries"]
         pipeline_string = dumps(pipeline)
 
@@ -186,13 +184,13 @@ class EventFilterApi(MethodView):
             db_connection.update_one(
                 {"_id": ObjectId(doc_id)},
                 {
-                    "$push": {
+                    "$set": {
                         "query-body": pipeline_string,
                         "event-fields": fields,
                         "query-name": query_name,
                     }
                 },
-            )
+            )   
 
             return {"document_id": doc_id}, 200
 
@@ -202,31 +200,24 @@ class EventFilterApi(MethodView):
         pipeline = [{"$match": {}}]
         queryFields = {}
 
-        for key in data.keys():
-            match key:
-                case "dateRange":
-                    data_key_value = loads(data[key])
+        event_data = data.get("query_event", {})
 
-                    pipeline[0]["$match"]["event.date"] = {
-                        "$gte": data_key_value["start"],
-                        "$lt": data_key_value["end"],
-                    }
-                    queryFields[key] = (
-                        f"{data_key_value['start']}-{data_key_value['end']}"
-                    )
+        if "event_start_date" in event_data and "event_end_date" in event_data:
+            pipeline[0]["$match"]["event.date"] = {
+                "$gte": event_data["event_start_date"],
+                "$lt": event_data["event_end_date"],
+            }
+            queryFields["dateRange"] = f"{event_data['event_start_date']}-{event_data['event_end_date']}"
 
-                    break
-                case "eventName":
-                    pipeline[0]["$match"]["event.name"] = data[key]
-                    queryFields[key] = data[key]
-                    break
-                case "eventLocation":
-                    pipeline[0]["$match"]["event.location"] = data[key]
-                    queryFields[key] = data[key]
-                    break
+        if "event_name" in event_data:
+            pipeline[0]["$match"]["event.name"] = event_data["event_name"]
+            queryFields["eventName"] = event_data["event_name"]
+
+        if "event_location" in event_data:
+            pipeline[0]["$match"]["event.location"] = event_data["event_location"]
+            queryFields["eventLocation"] = event_data["event_location"]
 
         return pipeline, queryFields
-
     def validate_id(self, doc_id):
         return (
             ObjectId.is_valid(doc_id)
