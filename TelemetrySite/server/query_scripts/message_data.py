@@ -2,7 +2,7 @@ from flask.views import MethodView
 from utils import validate_user
 from http_codes import HttpResponseType
 from flask import request
-from json import loads
+from json import loads, dumps
 from bson import ObjectId
 
 
@@ -60,3 +60,85 @@ class MessageFilterApi(MethodView):
             return {"response": query_response[0]["signals"]}, HttpResponseType.OK
         else:
             return {"response": []}, HttpResponseType.OK
+
+    def post(self):
+        doc_id = request.args.get("doc_id")
+        auth_token = request.args.get("auth_token")
+        print(doc_id)
+        data = request.get_json()
+        pipeline, fields = MessageFilterApi.construct_query(data)
+        # Extract CAN signal names from request
+        print(data)
+        can_names = data.get("query_data", {}).get("can_name", [])
+        query_name = data.get("query_name", "")
+
+        # Fetch the existing query doc
+        query_doc = self.db["custom-queries"].find_one({"_id": ObjectId(doc_id)})
+        if not query_doc:
+            return {"error": "Query doc not found"}, 404
+
+        # Get the existing pipeline stages (already built for event filtering)
+        
+        # Append stages to unwind and filter messages by signalName
+
+        # Append stages to unwind and filter messages by signalName
+        message_filter_stages = [
+            {
+                "$unwind": "$event.run.messages"
+            },
+            {
+                "$match": {
+                    "event.run.messages.signal": {"$in": can_names}
+                }
+            },
+            {
+                "$group": {
+                    "_id": "$_id",
+                    "messages": {
+                        "$push": "$event.run.messages"
+                    }
+                }
+            }
+        ]
+        full_pipeline = pipeline + message_filter_stages
+        full_pipeline = dumps(full_pipeline)
+
+        # Update the query doc with the completed pipeline and mark as finished
+        updated_doc = self.db["custom-queries"].update_one(
+            {"_id": ObjectId(doc_id)},
+            {
+                "$set": {
+                    "query-body": full_pipeline,
+                    "query-finished": True,
+                    "query-name": query_name,
+                    "query_js_body": data
+                }
+            }
+        )
+
+        return 201
+        
+    @staticmethod
+    def construct_query(data):
+
+        pipeline = [{"$match": {}}]
+        queryFields = {}
+
+        event_data = data.get("query_event", {})
+
+        if "event_start_date" in event_data and "event_end_date" in event_data:
+            pipeline[0]["$match"]["event.date"] = {
+                "$gte": event_data["event_start_date"],
+                "$lt": event_data["event_end_date"],
+            }
+            queryFields["dateRange"] = f"{event_data['event_start_date']}-{event_data['event_end_date']}"
+
+        if "event_name" in event_data:
+            pipeline[0]["$match"]["event.name"] = event_data["event_name"]
+            queryFields["eventName"] = event_data["event_name"]
+
+        if "event_location" in event_data:
+            pipeline[0]["$match"]["event.location"] = event_data["event_location"]
+            queryFields["eventLocation"] = event_data["event_location"]
+
+        return pipeline, queryFields

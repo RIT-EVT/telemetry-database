@@ -97,7 +97,7 @@ const FilterEvent = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, cu
 
     // Get the events filtered out by the query
     const testQuery = async () => {
-        console.log("running");
+        console.log(formValues.queryName);
         const response = await fetch(
             `${BuildURI("event_filter")}?mode=test-query&doc_id=${currentDocId}&auth_token=${getItem("authToken")}`,
             {
@@ -110,7 +110,7 @@ const FilterEvent = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, cu
         );
         if (response.ok) {
             const data = await response.json();
-
+            console.log(data);
             setResponseData(data);
         } else {
             console.error(`An error occurred in testQuery. Fetch request returned with code ${response.status}`);
@@ -311,7 +311,7 @@ const FilterEvent = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, cu
                     can_name: [],
                     possible_can_names: [],
                 },
-                query_name: "\0",
+                query_name: "",
             };
         }
 

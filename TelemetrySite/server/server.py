@@ -6,6 +6,7 @@ import dotenv
 import json
 import os
 import logging
+from MATLAB_access_scripts.MATLAB_access_api import MATLAB_access_api
 from http_codes import HttpResponseType
 
 from data_upload_scripts.data_upload_api import DataUploadApi
@@ -13,7 +14,7 @@ from bike_config_scripts.bike_config_api import BikeConfigApi
 from user_auth_scripts.user_auth_api import UserAuthApi
 from query_scripts.event_filter import EventFilterApi
 from query_scripts.message_data import MessageFilterApi
-from utils import create_db_connection  # your existing DB util
+from utils import create_db_connection   # your existing DB util
 
 
 def create_app(db=None):
@@ -48,6 +49,9 @@ def create_app(db=None):
         MessageFilterApi,
         "/MessageFilter",
         resource_class_kwargs={"db": db},
+    )
+    api.add_resource(
+        MATLAB_access_api, "/MATLAB", resource_class_kwargs={"db": db}
     )
 
     @app.route("/")

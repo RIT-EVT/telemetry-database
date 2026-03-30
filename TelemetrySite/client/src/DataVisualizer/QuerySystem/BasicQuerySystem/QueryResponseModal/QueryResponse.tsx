@@ -28,10 +28,10 @@ const QueryResponse = ({ toggleModal, response }: QueryResponseProps) => {
     const { name_passed, name_valid, name } = response.query_name;
 
     return (
-        <Modal className='white-border' isOpen={responseKeys.length !== 0} toggle={toggleModal} size='xl'>
-            <ModalHeader className='background header'>Query Test Result</ModalHeader>
+        <Modal className="white-border" isOpen={responseKeys.length !== 0} toggle={toggleModal} size="xl">
+            <ModalHeader className="background header">Query Test Result</ModalHeader>
 
-            <ModalBody className='background'>
+            <ModalBody className="background">
                 <Container>
                     <Col>
                         {responseKeys.map((objectKey, index) => {
@@ -45,7 +45,7 @@ const QueryResponse = ({ toggleModal, response }: QueryResponseProps) => {
                                     <div>
                                         <h6>
                                             {title}{" "}
-                                            <Button className='no-background' onClick={() => updateDataDisplay(index)}>
+                                            <Button className="no-background" onClick={() => updateDataDisplay(index)}>
                                                 {displayData[index] ? (
                                                     <ChevronUp color={"white"} />
                                                 ) : (
@@ -61,10 +61,10 @@ const QueryResponse = ({ toggleModal, response }: QueryResponseProps) => {
                         })}
 
                         {name_passed && (
-                            <Row className='mx-0 white'>
-                                <h6 className='px-0'>
+                            <Row className="mx-0 white">
+                                <h6 className="px-0">
                                     Query Name{" "}
-                                    <Button className='no-background' onClick={updateQueryNameDisplay}>
+                                    <Button className="no-background" onClick={updateQueryNameDisplay}>
                                         {displayQueryNameResponse ? (
                                             <ChevronUp color={"white"} />
                                         ) : (
@@ -73,12 +73,12 @@ const QueryResponse = ({ toggleModal, response }: QueryResponseProps) => {
                                     </Button>
                                 </h6>
                                 <Collapse isOpen={displayQueryNameResponse}>
-                                    <p className='px-0'>
+                                    <p className="px-0">
                                         <strong>{name}</strong> —
                                         {name_valid ? (
-                                            <span className='text-success'>Valid.</span>
+                                            <span className="text-success">Valid.</span>
                                         ) : (
-                                            <span className='text-danger'>Invalid. Name already in use.</span>
+                                            <span className="text-danger">Invalid. Name already in use.</span>
                                         )}
                                     </p>
                                 </Collapse>
@@ -88,8 +88,8 @@ const QueryResponse = ({ toggleModal, response }: QueryResponseProps) => {
                 </Container>
             </ModalBody>
 
-            <ModalFooter className='background'>
-                <Button color='danger' onClick={toggleModal}>
+            <ModalFooter className="background">
+                <Button color="danger" onClick={toggleModal}>
                     Exit
                 </Button>
             </ModalFooter>
@@ -100,7 +100,7 @@ const QueryResponse = ({ toggleModal, response }: QueryResponseProps) => {
 const ConstructTable = (tableData: ResponseFormat) => {
     if (tableData.count === 0)
         return (
-            <div className='no-runs-found'>
+            <div className="no-runs-found">
                 <p>
                     <b>No Runs Found Matching This Criteria</b>
                 </p>
@@ -108,7 +108,7 @@ const ConstructTable = (tableData: ResponseFormat) => {
         );
 
     return (
-        <Table className='response-table' hover>
+        <Table className="response-table" hover>
             <thead>
                 <tr>
                     <th>Event Name</th>

@@ -51,7 +51,6 @@ const FilterMessages = ({ updateQueryStep, updateQueryDocument, setHandleSubmit,
 
         const responseData = await response.json();
         const names: string[] = responseData.response;
-        console.log(names);
 
         // Store the raw names so the JSX below can render them reactively
         setCanNames(names);
@@ -64,16 +63,31 @@ const FilterMessages = ({ updateQueryStep, updateQueryDocument, setHandleSubmit,
         });
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const data = currentQueryDataRef.current; // ← always current, never stale
+        const data = currentQueryDataRef.current;
         if (!data) return;
 
         const clickedButton = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement;
-
+        console.log(currentDocId);
         if (clickedButton.value === "submit") {
             saveItem("QueryData", data);
             updateQueryStep(QueryStep.FilterCanMessages);
+            console.log(data);
+            const response = await fetch(
+                `${BuildURI("message_filter")}?doc_id=${currentDocId}&auth_token=${getItem("authToken")}`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(data),
+                },
+            );
+
+            if (!response.ok) {
+                throw new Error(`Request failed with code ${response.status} and text ${response.statusText}`);
+            }
         } else if (clickedButton.value === "previous-step") {
             saveItem("QueryData", data);
             updateQueryStep(QueryStep.FilterEvent);

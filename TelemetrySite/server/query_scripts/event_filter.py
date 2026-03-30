@@ -77,7 +77,7 @@ class EventFilterApi(MethodView):
         match_date = {}
         match_name = {}
         match_location = {}
-        query_name = data["query_name"]  # was "queryName", now "query_name"
+        query_name = data["query_name"]  
 
         if "event_start_date" in event_data and "event_end_date" in event_data:
             match_date = {
@@ -175,6 +175,7 @@ class EventFilterApi(MethodView):
                 "event-fields": fields,
                 "query-finished": False,
                 "query-name": query_name,
+                "query_js_body": data
             }
             result = db_connection.insert_one(custom_query)
             document_id = str(result.inserted_id)
@@ -188,6 +189,7 @@ class EventFilterApi(MethodView):
                         "query-body": pipeline_string,
                         "event-fields": fields,
                         "query-name": query_name,
+                        "query_js_body": data
                     }
                 },
             )   
