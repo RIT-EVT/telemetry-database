@@ -3,6 +3,7 @@ import "./BasicQuery.css";
 import { useEffect, useState, useRef } from "react";
 import FilterEvent from "./FilterEvent";
 import FilterMessages from "./FilterMessages";
+import ConfirmQuery from "./ConfirmQuery.tsx";
 
 import { Card, Form } from "reactstrap";
 
@@ -47,7 +48,8 @@ function BasicQuery() {
                 return <FilterEvent {...queryFunctions} />;
             case QueryStep.FilterCanMessages:
                 return <FilterMessages {...queryFunctions} />;
-
+            case QueryStep.ConfirmQuery:
+                return <ConfirmQuery {...queryFunctions} />;
             default:
                 return <div></div>;
         }
@@ -70,7 +72,7 @@ function BasicQuery() {
                 handleSubmitRef.current(e);
             }}
         >
-            <Card className="p-3">{queryBody()}</Card>
+            <Card className='p-3'>{queryBody()}</Card>
             <NavigationButtons
                 previousStep={queryStep !== 0}
                 nextStep={getMaxEnumValue(QueryStep) !== queryStep}

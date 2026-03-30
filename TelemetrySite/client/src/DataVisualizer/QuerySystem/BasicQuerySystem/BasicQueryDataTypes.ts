@@ -1,6 +1,7 @@
 enum QueryStep {
     FilterEvent = 0,
     FilterCanMessages = 1,
+    ConfirmQuery = 2,
 }
 
 type EventData = {
