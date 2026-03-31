@@ -4,6 +4,7 @@ from http_codes import HttpResponseType
 from flask import request
 from json import loads, dumps
 from bson import ObjectId
+import query_scripts.query_utils as query_utils
 
 
 class MessageFilterApi(MethodView):
@@ -31,7 +32,7 @@ class MessageFilterApi(MethodView):
         if document == None:
             return {"error": "No document found"}, HttpResponseType.BAD_REQUEST
 
-        query_body = loads(document["query-body"])
+        query_body = loads(document["query-event-body"])
 
         # Combine the signals for all the events matching the first stage
         # Unique signal names are cached during upload
@@ -73,7 +74,7 @@ class MessageFilterApi(MethodView):
             return {"error": "Invalid ID"}, HttpResponseType.BAD_REQUEST
 
         data = request.get_json()
-        
+
         # Extract CAN signal names from request
 
         can_names = data.get("query_data", {}).get("can_name", [])
@@ -101,6 +102,7 @@ class MessageFilterApi(MethodView):
             {
                 "$set": {
                     "query-body": full_pipeline,
+                    "query-message-body": dumps(message_filter_stages),
                     "query-name": query_name,
                     "query_js_body": data,
                 }

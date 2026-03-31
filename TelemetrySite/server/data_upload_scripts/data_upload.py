@@ -29,7 +29,7 @@ def submit_data(mf4_file, dbc_file, context_data, runOrderNumber, db):
     config_values = create_config(can_id_values, dbc_decoded)
     # turn data from CAN messages -> list
     data_values_json, signal_names = parse_data(mf4_file, config_values, can_id_values)
-
+    print(context_data)
     context_data = json.loads(context_data)
 
     with open(mf4_file, "rb") as f:

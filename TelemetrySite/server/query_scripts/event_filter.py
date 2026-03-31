@@ -2,7 +2,7 @@ from flask.views import MethodView
 from utils import validate_user
 from http_codes import HttpResponseType
 from flask import request
-from json import dumps
+from json import dumps, loads
 from bson import ObjectId
 import query_scripts.query_utils as query_utils
 
@@ -78,26 +78,26 @@ class EventFilterApi(MethodView):
         match_date = {}
         match_name = {}
         match_location = {}
-        query_name = data["query_name"]  
+        query_name = data["query_name"]
 
         if "event_start_date" in event_data and "event_end_date" in event_data:
             match_date = {
-        "event.date": {
-            "$gte": event_data["event_start_date"],
-            "$lt": event_data["event_end_date"],
-        }
-    }
+                "event.date": {
+                    "$gte": event_data["event_start_date"],
+                    "$lt": event_data["event_end_date"],
+                }
+            }
             facets["matchDate"] = [
-        {"$match": match_date},
-        *format,
-    ]
+                {"$match": match_date},
+                *format,
+            ]
 
         if "event_name" in event_data:
             match_name = {"event.name": event_data["event_name"]}
             facets["matchName"] = [
-        {"$match": match_name},
-        *format,
-    ]
+                {"$match": match_name},
+                *format,
+            ]
 
         if "event_location" in event_data:
             match_location = {"event.location": event_data["event_location"]}
@@ -163,7 +163,7 @@ class EventFilterApi(MethodView):
         query_name = data["query_name"]
         db_connection = self.db["custom-queries"]
         pipeline_string = dumps(pipeline)
-        
+
         document = query_utils.get_valid_doc(self.db, doc_id)
 
         # Check if a query already exists with a given name
@@ -175,10 +175,11 @@ class EventFilterApi(MethodView):
             custom_query = {
                 "query-body": pipeline_string,
                 "query-event-body": pipeline_string,
+                "query-message-body": "",
                 "event-fields": fields,
                 "query-finished": False,
                 "query-name": query_name,
-                "query_js_body": data
+                "query_js_body": data,
             }
             result = db_connection.insert_one(custom_query)
             document_id = str(result.inserted_id)
@@ -191,13 +192,20 @@ class EventFilterApi(MethodView):
                 {"_id": ObjectId(doc_id)},
                 {
                     "$set": {
-                        "query-body": pipeline_string,
+                        "query-body": dumps(
+                            pipeline
+                            + (
+                                loads(document["query-message-body"])
+                                if document["query-message-body"]
+                                else []
+                            )
+                        ),
                         "query-event-body": pipeline_string,
                         "event-fields": fields,
                         "query-name": query_name,
-                        "query_js_body": data
+                        "query_js_body": data,
                     }
                 },
-            )   
+            )
 
             return {"document_id": doc_id}, 200

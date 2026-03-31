@@ -16,7 +16,7 @@ const FilterMessages = ({ updateQueryStep, updateQueryDocument, setHandleSubmit,
     // The current query being built, loaded from session storage
     const [currentQueryData, setCurrentQueryData] = useState<QueryDataFormat>();
 
-    const currentQueryDataRef = useRef<QueryDataFormat>();
+    const currentQueryDataRef = useRef<QueryDataFormat>(null);
 
     const updateSelectedCheckBox = (e: React.ChangeEvent<HTMLInputElement>): void => {
         const targetElement = e.target as HTMLInputElement;
@@ -54,7 +54,6 @@ const FilterMessages = ({ updateQueryStep, updateQueryDocument, setHandleSubmit,
 
         // Store the raw names so the JSX below can render them reactively
         setCanNames(names);
-
         // Update possible_can_names in the query data if they differ from what we have
         setCurrentQueryData((prev) => {
             if (!prev) return prev;
@@ -69,9 +68,8 @@ const FilterMessages = ({ updateQueryStep, updateQueryDocument, setHandleSubmit,
         if (!data) return;
 
         const clickedButton = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement;
-        if (clickedButton.value === "submit") {
+        if (clickedButton.value === "next-step") {
             saveItem("QueryData", data);
-            updateQueryStep(QueryStep.FilterCanMessages);
             const response = await fetch(
                 `${BuildURI("message_filter")}?doc_id=${currentDocId}&auth_token=${getItem("authToken")}`,
                 {
@@ -114,7 +112,6 @@ const FilterMessages = ({ updateQueryStep, updateQueryDocument, setHandleSubmit,
     }, []);
 
     useEffect(() => {
-        console.log(currentQueryData);
         if (!currentQueryData?.query_data.possible_can_names) return;
         currentQueryDataRef.current = currentQueryData;
 
@@ -129,21 +126,21 @@ const FilterMessages = ({ updateQueryStep, updateQueryDocument, setHandleSubmit,
 
     return (
         <>
-            <CardHeader className="center-align">
-                <h1 className="query-selector">Filter Messages</h1>
+            <CardHeader className='center-align'>
+                <h1 className='query-selector'>Filter Messages</h1>
             </CardHeader>
             <Container>
-                <Row xs={3}>
+                <Row xs={2}>
                     {canNames.map((element: string) => (
                         <Col key={element}>
-                            <InputGroup className="align-items-center">
+                            <InputGroup className='align-items-center'>
                                 <Input
                                     id={element}
-                                    type="checkbox"
+                                    type='checkbox'
                                     checked={selectedBoxes.get(element) ?? false}
                                     onChange={updateSelectedCheckBox}
                                 />
-                                <Label check className="mx-1 my-0 white">
+                                <Label check className='mx-1 my-0 white'>
                                     {element}
                                 </Label>
                             </InputGroup>

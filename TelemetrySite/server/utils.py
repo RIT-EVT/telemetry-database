@@ -27,8 +27,8 @@ def create_db_connection():
     mongo_client = MongoClient(
         connection_string,
         serverSelectionTimeoutMS=2000,  # total time to find a suitable server
-        connectTimeoutMS=1000,  # time to establish TCP connection
-        socketTimeoutMS=1000,  # time to wait for response on socket
+        connectTimeoutMS=30000,  # time to establish TCP connection
+        socketTimeoutMS=30000,  # time to wait for response on socket
     )
 
     db_access = mongo_client["ernie"]

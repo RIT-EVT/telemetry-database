@@ -105,9 +105,9 @@ function DataUpload() {
             const formData = new FormData();
             formData.append("mf4File", mf4File);
             formData.append("dbcFile", dbcFile);
-            formData.append("contextData", contextData);
+            formData.append("contextData", JSON.stringify(contextData));
             formData.append("runOrderNumber", runOrderNumber);
-
+            console.log(contextData);
             try {
                 const response = await fetch(BuildURI("data_upload") + "/" + getItem("authToken"), {
                     method: "POST",
@@ -220,7 +220,7 @@ function DataUpload() {
                 clearInterval(interval);
                 setProgressBar(null);
 
-                const parsedContextData = JSON.parse(contextData);
+                const parsedContextData = contextData;
 
                 //save the needed event details to be displayed on the next page
                 const eventObject = {

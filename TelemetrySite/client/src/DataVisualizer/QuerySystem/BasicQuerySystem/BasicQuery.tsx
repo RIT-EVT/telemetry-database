@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import FilterEvent from "./FilterEvent";
 import FilterMessages from "./FilterMessages";
 import ConfirmQuery from "./ConfirmQuery.tsx";
+import BasicQueryConfirmation from "./BasicQueryConfirmation.tsx";
 
 import { Card, Form } from "reactstrap";
 
@@ -41,7 +42,6 @@ function BasicQuery() {
         setHandleSubmit,
         currentDocId,
     };
-
     const queryBody = () => {
         switch (queryStep) {
             case QueryStep.FilterEvent:
@@ -51,19 +51,18 @@ function BasicQuery() {
             case QueryStep.ConfirmQuery:
                 return <ConfirmQuery {...queryFunctions} />;
             default:
-                return <div></div>;
+                return <BasicQueryConfirmation {...queryFunctions} />;
         }
     };
 
     useEffect(() => {
         if (!currentDocId) {
             updateQueryDocument("NULL");
-            if (QueryStep.FilterEvent !== queryStep) {
+            if (QueryStep.FilterEvent !== queryStep && QueryStep.ConfirmationOfSubmission !== queryStep) {
                 updateQueryStep(QueryStep.FilterEvent);
                 removeItem("QueryData");
             }
-            console.log("removing data");
-        } else if (!queryStep) {
+        } else if (!queryStep && queryStep !== QueryStep.ConfirmationOfSubmission) {
             updateQueryStep(QueryStep.FilterEvent);
         }
     }, [queryStep, currentDocId]);
@@ -75,10 +74,10 @@ function BasicQuery() {
                 handleSubmitRef.current(e);
             }}
         >
-            <Card className="p-3">{queryBody()}</Card>
+            <Card className='p-3'>{queryBody()}</Card>
             <NavigationButtons
-                previousStep={queryStep !== 0}
-                nextStep={getMaxEnumValue(QueryStep) !== queryStep}
+                previousStep={queryStep > 1}
+                nextStep={getMaxEnumValue(QueryStep) !== queryStep && queryStep > 0}
                 submitQuery={getMaxEnumValue(QueryStep) === queryStep}
             />
         </Form>
