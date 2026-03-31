@@ -3,17 +3,17 @@ from flask import request, jsonify
 import json
 from bson import ObjectId
 
-from utils import authenticate_user, check_expired_tokens
+from utils import validate_user
 from http_codes import HttpResponseType
 
 
 class BikeConfigApi(MethodView):
 
-    BIKE_CONFIG_DOC = '67ae8d01097ab8ae923672f8'
-    
+    BIKE_CONFIG_DOC = "67ae8d01097ab8ae923672f8"
+
     def __init__(self, db):
         self.db = db
-    
+
     def get(self, auth_token):
         """
         Get all configs that are currently active
@@ -24,21 +24,21 @@ class BikeConfigApi(MethodView):
         Returns:
             tuple: All configs currently saved
         """
-        
-        if not authenticate_user(auth_token, self.db):
-            return HttpResponseType.UNAUTHORIZED.error()
-        elif check_expired_tokens(auth_token, self.db):
-            return HttpResponseType.UNAUTHORIZED.error()
+
+        user_valid, response = validate_user(auth_token, self.db)
+
+        if not user_valid:
+            return response.error()
 
         db_connection = self.db["configs"]
 
-        config_data = db_connection.find_one({"_id":ObjectId(self.BIKE_CONFIG_DOC)})
+        config_data = db_connection.find_one({"_id": ObjectId(self.BIKE_CONFIG_DOC)})
 
         if config_data:
             config_data["_id"] = str(config_data["_id"])  # Convert ObjectId to string
 
         return {"data": config_data}, HttpResponseType.OK.value
-    
+
     def post(self, auth_token):
         """
         Add new configs to the database
@@ -49,23 +49,25 @@ class BikeConfigApi(MethodView):
         Returns:
             tuple: success message
         """
-        
-        if not authenticate_user(auth_token, self.db):
-            return HttpResponseType.UNAUTHORIZED.error()
-        elif check_expired_tokens(auth_token, self.db):
-            return HttpResponseType.UNAUTHORIZED.error()
-        
+
+        user_valid, response = validate_user(auth_token, self.db)
+
+        if not user_valid:
+            return response.error()
+
         db_connection = self.db["configs"]
         config_data = request.form["configData"]
-    
+
         config_data = json.loads(config_data)
-    
+
         for key in config_data:
-            if len(config_data[key])!=0:
-                db_connection.update_one({"_id":ObjectId(self.BIKE_CONFIG_DOC)}, {"$push":{f"config_data.{key}":config_data[key]}})
+            if len(config_data[key]) != 0:
+                db_connection.update_one(
+                    {"_id": ObjectId(self.BIKE_CONFIG_DOC)},
+                    {"$push": {f"config_data.{key}": config_data[key]}},
+                )
 
         return {"success": "Data created"}, HttpResponseType.CREATED.value
-    
-    
+
     def delete(self):
         return HttpResponseType.NOT_IMPLEMENTED.error()

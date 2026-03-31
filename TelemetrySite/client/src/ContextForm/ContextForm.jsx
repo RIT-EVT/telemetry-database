@@ -6,27 +6,19 @@
  * Forward user to data upload page with context id
  */
 
-import {
-    Form,
-    Button,
-    Card,
-    Col,
-    Row,
-    CardTitle,
-    CardBody,
-    Container,
-} from "reactstrap";
+import { Form, Button, Card, Col, Row, CardTitle, CardBody, Container } from "reactstrap";
 
 import "./ContextForm.css";
 
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 
 import ContextJSONIdValues from "./JsonFiles/ContextForm.json";
 import { useNavigate, useLocation } from "react-router-dom";
 import DynamicForm from "./DynamicForm";
 import SelectCreator from "./SelectorCreator";
 
-import { BuildURI } from "Utils/ServerUtils.jsx";
+import { BuildURI } from "../Utils/ServerUtils.ts";
+import { saveItem, getItem, removeItem } from "../Utils/SessionStorageLoader.ts";
 
 /**
  * Create needed context forms. Return the configured elements
@@ -127,14 +119,10 @@ function ContextForm(props) {
                 }
             } else if (newConfigName !== "") {
                 const targetConfig = DropDownOptions[configName].find(
-                    (savedNames) =>
-                        savedNames[configName + "SavedName"] === newConfigName
+                    (savedNames) => savedNames[configName + "SavedName"] === newConfigName,
                 );
                 // Generate the new form and pass in values to assign
-                const formElement = DynamicForm(
-                    `${configName}Config`,
-                    targetConfig
-                );
+                const formElement = DynamicForm(`${configName}Config`, targetConfig);
                 // If the saved name is a bike, we also need to fill in all the board configs
                 if (configName === "bike") {
                     // Parse the dictionary targetConfig into an array of [key, data] for easier looping
@@ -156,7 +144,7 @@ function ContextForm(props) {
                 }
             }
         },
-        [DropDownOptions, DropDowns]
+        [DropDownOptions, DropDowns],
     );
 
     /**
@@ -164,17 +152,12 @@ function ContextForm(props) {
      */
     const GetConfigData = useMemo(async () => {
         try {
-            const response = await fetch(
-                BuildURI("config_data") + "/" + props.authToken,
-                {
-                    method: "GET",
-                }
-            );
+            const response = await fetch(BuildURI("config_data") + "/" + props.authToken, {
+                method: "GET",
+            });
 
             if (!response.ok) {
-                console.error(
-                    "Network response was not ok: " + response.statusText
-                );
+                console.error("Network response was not ok: " + response.statusText);
             }
             const data = await response.json();
 
@@ -208,9 +191,7 @@ function ContextForm(props) {
      * @return {bool} if there is a duplicate
      */
     function CheckSavedName(savedName, boardName) {
-        return DropDownOptions[boardName].some(
-            (config) => config[boardName + "SavedName"] === savedName
-        );
+        return DropDownOptions[boardName].some((config) => config[boardName + "SavedName"] === savedName);
     }
 
     /**
@@ -224,7 +205,7 @@ function ContextForm(props) {
         // Prevent the form from clearing data
         event.preventDefault();
 
-        const contextValues = ContextJSONIdValues.event.runs[0].context;
+        const contextValues = ContextJSONIdValues.event.run.context;
 
         // Save bike config id values
         const bikeConfig = contextValues.bikeConfig;
@@ -234,67 +215,34 @@ function ContextForm(props) {
         // will never throw an error but may have the value of null if they are not required to be filled out
         const collectedData = {
             event: {
-                name: document.getElementById(ContextJSONIdValues.event.name)
-                    .value,
-                date: document.getElementById(ContextJSONIdValues.event.date)
-                    .value,
-                type: document.getElementById(ContextJSONIdValues.event.type)
-                    .value,
-                location: document.getElementById(
-                    ContextJSONIdValues.event.location
-                ).value,
-                runs: [
-                    {
-                        //this number may be updated by the backend if this is not the first run
-                        orderNumber: 0,
-                        context: {
-                            bikeConfig: {
-                                platformName: document.getElementById(
-                                    bikeConfig.platformName
-                                ).value,
-                                tirePressure: document.getElementById(
-                                    bikeConfig.tirePressure
-                                ).value,
-                                coolantVolume: document.getElementById(
-                                    bikeConfig.coolantVolume
-                                ).value,
-                                bikeSavedName: document.getElementById(
-                                    bikeConfig.bikeSavedName
-                                ).value,
-                                firmwareConfig: {},
+                name: document.getElementById(ContextJSONIdValues.event.name).value,
+                date: document.getElementById(ContextJSONIdValues.event.date).value,
+                type: document.getElementById(ContextJSONIdValues.event.type).value,
+                location: document.getElementById(ContextJSONIdValues.event.location).value,
+                run: {
+                    //this number may be updated by the backend if this is not the first run
+                    orderNumber: 0,
+                    context: {
+                        bikeConfig: {
+                            platformName: document.getElementById(bikeConfig.platformName).value,
+                            tirePressure: document.getElementById(bikeConfig.tirePressure).value,
+                            coolantVolume: document.getElementById(bikeConfig.coolantVolume).value,
+                            bikeSavedName: document.getElementById(bikeConfig.bikeSavedName).value,
+                            firmwareConfig: {},
 
-                                hardwareConfig: {},
-                            },
-                            riderName: document.getElementById(
-                                contextValues.riderName
-                            ).value,
-                            riderWeight: document.getElementById(
-                                contextValues.riderWeight
-                            ).value,
-                            humidity: document.getElementById(
-                                contextValues.humidity
-                            ).value,
-                            airTemp: document.getElementById(
-                                contextValues.airTemp
-                            ).value,
-                            windSpeed: document.getElementById(
-                                contextValues.windSpeed
-                            ).value,
-                            windDirection: document.getElementById(
-                                contextValues.windDirection
-                            ).value,
-                            riderFeedback: document.getElementById(
-                                contextValues.riderFeedback
-                            ).value,
-                            distanceCovered: document.getElementById(
-                                contextValues.distanceCovered
-                            ).value,
-                            startTime: document.getElementById(
-                                contextValues.startTime
-                            ).value,
+                            hardwareConfig: {},
                         },
+                        riderName: document.getElementById(contextValues.riderName).value,
+                        riderWeight: document.getElementById(contextValues.riderWeight).value,
+                        humidity: document.getElementById(contextValues.humidity).value,
+                        airTemp: document.getElementById(contextValues.airTemp).value,
+                        windSpeed: document.getElementById(contextValues.windSpeed).value,
+                        windDirection: document.getElementById(contextValues.windDirection).value,
+                        riderFeedback: document.getElementById(contextValues.riderFeedback).value,
+                        distanceCovered: document.getElementById(contextValues.distanceCovered).value,
+                        startTime: document.getElementById(contextValues.startTime).value,
                     },
-                ],
+                },
             },
         };
 
@@ -318,9 +266,7 @@ function ContextForm(props) {
         //Loop through all the board configs in the config file
         for (const firmwareConfigPart in firmwareConfig) {
             const firmwareConfigDataToSave = {};
-            const savedNameObject = document.getElementById(
-                firmwareConfigPart.toLowerCase() + "SavedName"
-            );
+            const savedNameObject = document.getElementById(firmwareConfigPart.toLowerCase() + "SavedName");
 
             var saveConfigData = false;
             if (savedNameObject !== null) {
@@ -329,19 +275,10 @@ function ContextForm(props) {
                 configSavedNames[firmwareConfigPart.toLowerCase()] = savedName;
 
                 //Check if the config part is custom
-                if (
-                    ConfigSelectedValue[firmwareConfigPart.toLowerCase()] ===
-                    "Custom"
-                ) {
+                if (ConfigSelectedValue[firmwareConfigPart.toLowerCase()] === "Custom") {
                     // If it is custom make sure it is not a duplicate saved name
 
-                    if (
-                        savedName === null ||
-                        CheckSavedName(
-                            savedName,
-                            firmwareConfigPart.toLowerCase()
-                        )
-                    ) {
+                    if (savedName === null || CheckSavedName(savedName, firmwareConfigPart.toLowerCase())) {
                         //Stop the data submission if it is a duplicate
                         alert("Duplicate custom name " + savedName);
                         return;
@@ -359,28 +296,20 @@ function ContextForm(props) {
                     // Save the to be passed to the backend
                     firmwareConfigDataToSave[partId] = formInputField.value;
                     if (saveConfigData) {
-                        newConfigItems[firmwareConfigPart.toLowerCase()][
-                            partId
-                        ] = formInputField.value;
+                        newConfigItems[firmwareConfigPart.toLowerCase()][partId] = formInputField.value;
                     }
                 }
             }
             // Declare the board name to be saved
-            collectedData.event.runs[0].context.bikeConfig.firmwareConfig[
-                firmwareConfigPart
-            ] = firmwareConfigDataToSave;
+            collectedData.event.run.context.bikeConfig.firmwareConfig[firmwareConfigPart] = firmwareConfigDataToSave;
         }
 
         // Save a new bike config with a name and all the needed data
         // Check that the saved name of the bike doesn't already exist
         if (ConfigSelectedValue["bike"] === "Custom") {
             // saved name already in collectedData
-            const bikeSavedName =
-                collectedData.event.runs[0].context.bikeConfig.bikeSavedName;
-            if (
-                bikeSavedName !== null &&
-                CheckSavedName(bikeSavedName, "bike")
-            ) {
+            const bikeSavedName = collectedData.event.run.context.bikeConfig.bikeSavedName;
+            if (bikeSavedName !== null && CheckSavedName(bikeSavedName, "bike")) {
                 alert("Duplicate custom name " + bikeSavedName);
                 return;
             } else {
@@ -390,14 +319,10 @@ function ContextForm(props) {
         }
         //Save this data and pass it to the next step
         //Save the data in session storage in case user loses wifi/refreshes page
-        sessionStorage.setItem("BikeData", JSON.stringify(collectedData));
+        saveItem("BikeData", collectedData);
 
         //if there is any data saved in a new config send it to the backend
-        if (
-            Object.values(newConfigItems).some(
-                (item) => Object.keys(item).length > 0
-            )
-        ) {
+        if (Object.values(newConfigItems).some((item) => Object.keys(item).length > 0)) {
             PostConfigData(JSON.stringify(newConfigItems));
         }
         navigate("/data-upload");
@@ -420,13 +345,11 @@ function ContextForm(props) {
         const offset = date.getTimezoneOffset();
         const local = new Date(date.getTime() - offset * 60 * 1000);
 
-        const configIDs = ContextJSONIdValues.event.runs[0].context;
+        const configIDs = ContextJSONIdValues.event.run.context;
         const eventIDs = ContextJSONIdValues.event;
 
         document.getElementById(eventIDs.name).value = "TEST";
-        document.getElementById(eventIDs.date).value = date
-            .toISOString()
-            .slice(0, 10);
+        document.getElementById(eventIDs.date).value = date.toISOString().slice(0, 10);
         document.getElementById(eventIDs.type).value = "TEST";
         document.getElementById(eventIDs.location).value = "TEST";
 
@@ -439,9 +362,7 @@ function ContextForm(props) {
         document.getElementById(configIDs.riderName).value = "TEST";
         document.getElementById(configIDs.riderWeight).value = 0;
         document.getElementById(configIDs.distanceCovered).value = 0;
-        document.getElementById(configIDs.startTime).value = local
-            .toISOString()
-            .slice(0, 16);
+        document.getElementById(configIDs.startTime).value = local.toISOString().slice(0, 16);
 
         document.getElementById("bikeSelect").value = "TEST_BIKE";
         HandleConfigFormChange("bike", "TEST_BIKE");
@@ -459,12 +380,7 @@ function ContextForm(props) {
     // 2️⃣ Rebuild dropdowns only when DropDownOptions change
     useEffect(() => {
         ConfigName.forEach((name) => {
-            const dropDown = SelectCreator(
-                DropDownOptions[name],
-                name,
-                HandleConfigFormChange,
-                ConfigSelectedValue
-            );
+            const dropDown = SelectCreator(DropDownOptions[name], name, HandleConfigFormChange, ConfigSelectedValue);
 
             if (name === "bike") {
                 SetBikeSelect(dropDown);
@@ -479,11 +395,7 @@ function ContextForm(props) {
      */
     useEffect(() => {
         GetConfigData.then((response) => {
-            if (
-                response &&
-                "data" in response &&
-                "config_data" in response["data"]
-            ) {
+            if (response && "data" in response && "config_data" in response["data"]) {
                 SetDropdownOptions(response.data.config_data);
             }
         });
@@ -491,27 +403,18 @@ function ContextForm(props) {
         if (location.pathname === "/new-run") {
             var eventData;
 
-            if (
-                (eventData = JSON.parse(
-                    sessionStorage.getItem("EventData")
-                )) !== null
-            ) {
+            if ((eventData = getItem("EventData")) !== null) {
                 SetEventData(eventData);
             } else {
                 console.error("Data for event was unsaved");
             }
         } else {
             //ensure no data leaks from past runs
-            sessionStorage.removeItem("EventData");
+            removeItem("EventData");
         }
     }, [location.pathname]);
     return (
-        <Form
-            className='ContextForm'
-            name='Context'
-            id='MainForm'
-            onSubmit={(e) => SubmitData(e)}
-        >
+        <Form className='ContextForm' name='Context' id='MainForm' onSubmit={(e) => SubmitData(e)}>
             <Container fluid className='main-container'>
                 {/* === MAIN + EVENT + BIKE CONTEXT === */}
                 <Row className='g-3 align-items-stretch'>
@@ -548,27 +451,18 @@ function ContextForm(props) {
                     <Container fluid className='grid-container mt-4 spacing'>
                         {ConfigName.filter((name) => name !== "bike")
                             .reduce((rows, _, i) => {
-                                if (i % 2 === 0)
-                                    rows.push(ConfigName.slice(i, i + 2));
+                                if (i % 2 === 0) rows.push(ConfigName.slice(i, i + 2));
                                 return rows;
                             }, [])
                             .map((pair, rowIndex) => (
                                 <Row key={rowIndex} className='g-3 mb-3'>
                                     {pair.map((name, colIndex) => (
-                                        <Col
-                                            md='6'
-                                            key={colIndex}
-                                            className='d-flex'
-                                        >
+                                        <Col md='6' key={colIndex} className='d-flex'>
                                             <Card className='grid-item fill flex-grow-1'>
                                                 <CardTitle className='grid-header'>
-                                                    {name.toUpperCase()}{" "}
-                                                    Configuration:{" "}
-                                                    {DropDowns[name]}
+                                                    {name.toUpperCase()} Configuration: {DropDowns[name]}
                                                 </CardTitle>
-                                                <CardBody>
-                                                    {ConfigForm[name]}
-                                                </CardBody>
+                                                <CardBody>{ConfigForm[name]}</CardBody>
                                             </Card>
                                         </Col>
                                     ))}
@@ -578,9 +472,7 @@ function ContextForm(props) {
                 )}
             </Container>
 
-            <Button className='submitButton'>
-                Submit {EventData ? "Run" : ""}
-            </Button>
+            <Button className='submitButton'>Submit {EventData ? "Run" : ""}</Button>
             <Button onClick={AutoFillData} className='autoFill'>
                 Auto Complete
             </Button>

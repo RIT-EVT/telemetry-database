@@ -1,16 +1,17 @@
 import { Route, Routes } from "react-router-dom";
 import ContextForm from "./ContextForm/ContextForm.jsx";
 import DataUpload from "./DataUpload/DataUpload.jsx";
-import { LoginPage, SignupPage } from "LoginPage/LoginPage.jsx";
+import { LoginPage, SignupPage } from "./LoginPage/LoginPage.jsx";
 import "./App.css";
 import Page404 from "./404/404.jsx";
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { CheckServerStatus } from "Utils/ServerUtils.jsx";
-import ErrorModal from "Modal/Error/Error.jsx";
+import { CheckServerStatus } from "./Utils/ServerUtils.ts";
+import DataVisualizer from "./DataVisualizer/DataVisualizer.tsx";
+import ErrorModal from "./Modal/Error/Error.jsx";
 import Header from "./Header/Header.jsx";
 import Home from "./Home/Home.jsx";
-
+import { saveItem, getItem, removeItem } from "./Utils/SessionStorageLoader.ts";
 /**
  * Render the main application and contain all the logic for what to display
  */
@@ -29,18 +30,18 @@ function App() {
 
     function HandleLogin(loginData) {
         SetToken(loginData);
-        sessionStorage.setItem("authToken", loginData);
+        saveItem("authToken", loginData);
         navigate("/");
     }
 
     function HandleSignup(signupData) {
         SetToken(signupData);
-        sessionStorage.setItem("authToken", signupData);
+        saveItem("authToken", signupData);
         navigate("/");
     }
 
     function HandleSignout() {
-        sessionStorage.removeItem("authToken");
+        removeItem("authToken");
         SetToken(null);
         navigate("/login");
     }
@@ -75,14 +76,11 @@ function App() {
     }, [ServerStatus, IgnoreError, location, navigate, CheckBackendConnection]);
 
     useEffect(() => {
-        const savedToken = sessionStorage.getItem("authToken");
+        const savedToken = getItem("authToken");
 
         if (savedToken) {
             SetToken(savedToken);
-        } else if (
-            location.pathname !== "/signup" &&
-            location.pathname !== "/login"
-        ) {
+        } else if (location.pathname !== "/signup" && location.pathname !== "/login") {
             navigate("/login");
         }
     }, [navigate, location]);
@@ -95,37 +93,18 @@ function App() {
             <main>
                 {ServerStatus ? (
                     <Routes>
-                        <Route
-                            path='/'
-                            element={<Home authToken={AuthToken} />}
-                        />
-                        <Route
-                            path='/context-upload'
-                            element={<ContextForm authToken={AuthToken} />}
-                        />
-                        <Route
-                            path='/new-run'
-                            element={<ContextForm authToken={AuthToken} />}
-                        />
+                        <Route path='/' element={<Home authToken={AuthToken} />} />
+                        <Route path='/context-upload' element={<ContextForm authToken={AuthToken} />} />
+                        <Route path='/new-run' element={<ContextForm authToken={AuthToken} />} />
                         <Route path='/data-upload' element={<DataUpload />} />
-                        <Route
-                            path='/login'
-                            element={<LoginPage onLogin={HandleLogin} />}
-                        />
-                        <Route
-                            path='/signup'
-                            element={<SignupPage onSignup={HandleSignup} />}
-                        />
+                        <Route path='/data-access' element={<DataVisualizer />} />
+                        <Route path='/login' element={<LoginPage onLogin={HandleLogin} />} />
+                        <Route path='/signup' element={<SignupPage onSignup={HandleSignup} />} />
                         <Route path='*' element={<Page404 />} />
                     </Routes>
                 ) : null}
             </main>
-            <ErrorModal
-                isOpen={IsErrorOpen}
-                toggle={toggleErrorModal}
-                ignore={ignoreErrorModal}
-                errorMessage={ErrorMsg}
-            />
+            <ErrorModal isOpen={IsErrorOpen} toggle={toggleErrorModal} ignore={ignoreErrorModal} errorMessage={ErrorMsg} />
         </div>
     );
 }

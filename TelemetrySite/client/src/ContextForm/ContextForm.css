@@ -64,6 +64,8 @@
 
 .autoFill {
   left: 10px;
+  background-color: greenyellow !important;
+  color: red !important;
 }
 
 .submitButton:hover,
