@@ -5,9 +5,11 @@ from flask_cors import CORS
 import dotenv
 import json
 import os
-import logging
 from MATLAB_access_scripts.MATLAB_access_api import MATLAB_access_api
 from http_codes import HttpResponseType
+
+from sys import argv
+
 
 from data_upload_scripts.data_upload_api import DataUploadApi
 from bike_config_scripts.bike_config_api import BikeConfigApi
@@ -15,23 +17,25 @@ from user_auth_scripts.user_auth_api import UserAuthApi
 from query_scripts.event_filter import EventFilterApi
 from query_scripts.message_filter import MessageFilterApi
 from query_scripts.confirm_query import ConfirmQueryApi
-from utils import create_db_connection  # your existing DB util
+import utils
+from development_mode import create_false_db_instance
 
 
 def create_app(db=None):
     app = Flask(__name__)
     api = Api(app)
     CORS(app)
-    log = logging.getLogger("werkzeug")
-    # Load credentials
     server_folder = os.path.dirname(__file__)
-    two_up = os.path.dirname(os.path.dirname(server_folder))
-    dotenv.load_dotenv(os.path.join(two_up, "credentials.env"))
 
-    # If no DB passed in, connect to the real one
-    # We do this so during testing we can pass in a face db connection
-    if db is None:
-        db = create_db_connection()
+    # Load credentials
+    if len(argv) < 2 or argv[1] == "production":
+        print("creating real DB instance")
+        print(len(argv))
+        two_up = os.path.dirname(os.path.dirname(server_folder))
+        dotenv.load_dotenv(os.path.join(two_up, "credentials.env"))
+        db = utils.create_db_connection()
+    else:
+        db = create_false_db_instance()
 
     # Register routes with DB injected
     api.add_resource(

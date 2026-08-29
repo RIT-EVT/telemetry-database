@@ -13,9 +13,9 @@
                     "coolantVolume": "coolantVolume",
                     "bikeSavedName": "bikeSavedName",
                     "firmwareConfig": {
-                        "BMS": [
-                            "hardwareRevisionBMS",
-                            "softwareCommitHashBMS",
+                        "bms": [
+                            "hardwareRevision",
+                            "softwareCommitHash",
                             "totalVoltageUnits",
                             "batteryVoltageUnits",
                             "currentUnits",
@@ -24,38 +24,38 @@
                             "cellVoltageUnits",
                             "bmsSavedName"
                         ],
-                        "IMU": [
-                            "hardwareRevisionIMU",
-                            "softwareCommitHashIMU",
+                        "imu": [
+                            "hardwareRevision",
+                            "softwareCommitHash",
                             "eulerUnits",
                             "gyroUnits",
                             "linearAccelerationUnits",
                             "accelerometerUnits",
                             "imuSavedName"
                         ],
-                        "TMU": [
-                            "hardwareRevisionTMU",
-                            "softwareCommitHashTMU",
+                        "tmu": [
+                            "hardwareRevision",
+                            "softwareCommitHash",
                             "thermUnits",
                             "tmuSavedName"
                         ],
-                        "TMS": [
-                            "hardwareRevisionTMS",
-                            "softwareCommitHashTMS",
+                        "tms": [
+                            "hardwareRevision",
+                            "softwareCommitHash",
                             "tempUnits",
                             "pumpSpeedUnits",
                             "fanSpeedUnits",
                             "tmsSavedName"
                         ],
-                        "PVC": [
-                            "hardwareRevisionPVC",
-                            "softwareCommitHashPVC",
+                        "pvc": [
+                            "hardwareRevision",
+                            "softwareCommitHash",
                             "pvcSavedName"
                         ],
-                        "MC": [
+                        "mc": [
                             "model",
                             "firmwareVersion",
-                            "mcSavedName"
+                            "name"
                         ]
                     },
                     "hardwareConfig": {}

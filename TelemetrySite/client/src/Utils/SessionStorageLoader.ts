@@ -1,3 +1,7 @@
+/**
+ * Save an item as a stringified object in session storage.
+ * Returns false if an error occurred
+ */
 const saveItem = (name: string, saveObject: any): boolean => {
     saveObject = JSON.stringify(saveObject);
     try {
@@ -9,6 +13,10 @@ const saveItem = (name: string, saveObject: any): boolean => {
     return true;
 };
 
+/**
+ * Get an item from session storage at an entry.
+ * Returns as parsed JSON or null if no item was found.
+ */
 const getItem = (name: string): any | null => {
     const value = sessionStorage.getItem(name);
     if (value === null) return null; // getItem returns null (not undefined) when missing
@@ -21,9 +29,11 @@ const getItem = (name: string): any | null => {
     }
 };
 
-const removeItem = (name: string): boolean => {
+/**
+ * Removes an item from storage
+ */
+const removeItem = (name: string): void => {
     sessionStorage.removeItem(name);
-    return true;
 };
 
 export { saveItem, getItem, removeItem };

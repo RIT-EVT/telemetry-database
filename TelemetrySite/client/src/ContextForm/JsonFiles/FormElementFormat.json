@@ -1,63 +1,54 @@
 {
   "mainBody": {
     "airTemp": {
-      "id": "airTemp",
       "type": "number",
       "placeHolder": "°C",
       "label": "Air Temperature",
       "required": false
     },
     "humidity": {
-      "id": "humidity",
       "type": "number",
       "placeHolder": "%",
       "label": "Humidity",
       "required": false
     },
     "windSpeed": {
-      "id": "windSpeed",
       "type": "number",
       "placeHolder": "m/s",
       "label": "Wind Speed",
       "required": false
     },
     "windAngle": {
-      "id": "windAngle",
       "type": "number",
       "placeHolder": "°",
       "label": "Wind Angle",
       "required": false
     },
     "riderName": {
-      "id": "riderName",
       "type": "text",
       "placeHolder": "Billy Bob",
       "required": true,
       "label": "Rider's Name"
     },
     "riderWeight": {
-      "id": "riderWeight",
       "type": "number",
       "placeHolder": "kg",
       "label": "Rider's Weight",
       "required": false
     },
     "driverFeedback": {
-      "id": "driverFeedback",
       "type": "text",
       "placeHolder": "It was great!",
       "label": "Driver's Feedback",
       "required": false
     },
     "distanceCovered": {
-      "id": "distanceCovered",
       "type": "number",
       "placeHolder": "km",
       "label": "Distance Covered",
       "required": true
     },
     "startTime": {
-      "id": "startTime",
       "type": "datetime-local",
       "label": "Start Time",
       "required": true
@@ -65,26 +56,22 @@
   },
   "event": {
     "eventName": {
-      "id": "eventName",
       "type": "text",
       "required": true,
       "label": "Event Name"
     },
     "eventDate": {
-      "id": "eventDate",
       "type": "date",
       "required": true,
       "label": "Event Date"
     },
     "eventType": {
-      "id": "eventType",
       "type": "text",
       "required": true,
       "placeHolder": "What happened?",
       "label": "Event Type"
     },
     "location": {
-      "id": "eventLocation",
       "type": "text",
       "required": true,
       "placeHolder": "Where?",
@@ -93,7 +80,6 @@
   },
   "bikeConfig": {
     "platformName": {
-      "id": "platformName",
       "type": "select",
       "placeHolder": "Platform name",
       "required": true,
@@ -104,205 +90,173 @@
       ]
     },
     "tirePressure": {
-      "id": "tirePressure",
       "type": "number",
       "placeHolder": "psi",
       "label": "Tire Pressure",
       "required": false
     },
     "coolantVolume": {
-      "id": "coolantVolume",
       "type": "number",
       "placeHolder": "mL",
       "label": "Coolant Volume",
       "required": false
     },
-    "bikeSavedName": {
-      "id": "bikeSavedName",
+    "name": {
       "type": "string",
       "label": "Saved Name",
       "required": true
     }
   },
   "bmsConfig": {
-    "hardwareRevisionBMS": {
-      "id": "hardwareRevisionBMS",
+    "hardwareRevision": {
       "type": "text",
       "required": true,
       "label": "Hardware Revision"
     },
-    "softwareCommitHashBMS": {
-      "id": "softwareCommitHashBMS",
+    "firmwareCommitHash": {
       "type": "text",
       "required": true,
-      "label": "Software Commit Hash"
+      "label": "Firmware Commit Hash"
     },
     "totalVoltageUnits": {
-      "id": "totalVoltageUnits",
       "type": "text",
       "required": true,
       "label": "Total Voltage Units"
     },
     "batteryVoltageUnits": {
-      "id": "batteryVoltageUnits",
       "type": "text",
       "required": true,
       "label": "Battery Voltage Units"
     },
     "currentUnits": {
-      "id": "currentUnits",
       "type": "text",
       "required": true,
       "label": "Current Units"
     },
     "packTempUnits": {
-      "id": "packTempUnits",
       "type": "text",
       "required": true,
       "label": "Pack Temp Units"
     },
     "bqTempUnits": {
-      "id": "bqTempUnits",
       "type": "text",
       "required": true,
       "label": "BQ Temp Units"
     },
     "cellVoltageUnits": {
-      "id": "cellVoltageUnits",
       "type": "text",
       "required": true,
       "label": "Cell Voltage Units"
     },
     "name": {
-      "id": "bmsSavedName",
       "type": "text",
       "required": true,
       "label": "Config saved name"
     }
   },
   "imuConfig": {
-    "hardwareRevisionIMU": {
-      "id": "hardwareRevisionIMU",
+    "hardwareRevision": {
       "type": "text",
       "required": false,
       "label": "Hardware Revision"
     },
-    "softwareCommitHashIMU": {
-      "id": "softwareCommitHashIMU",
+    "firmwareCommitHash": {
       "type": "text",
       "required": false,
-      "label": "Software Commit Hash"
+      "label": "Firmware Commit Hash"
     },
     "eulerUnits": {
-      "id": "eulerUnits",
       "type": "text",
       "required": false,
       "label": "Euler Units"
     },
     "gyroUnits": {
-      "id": "gyroUnits",
       "type": "text",
       "required": false,
       "label": "Gyro Units"
     },
     "linearAccelerationUnits": {
-      "id": "linearAccelerationUnits",
       "type": "text",
       "required": false,
       "label": "Linear Acceleration Units"
     },
     "accelerometerUnits": {
-      "id": "accelerometerUnits",
       "type": "text",
       "required": false,
       "label": "Accelerometer Units"
     },
     "name": {
-      "id": "imuSavedName",
       "type": "text",
       "required": true,
       "label": "Config saved name"
     }
   },
   "tmuConfig": {
-    "hardwareRevisionTMU": {
-      "id": "hardwareRevisionTMU",
+    "hardwareRevision": {
       "type": "text",
       "required": false,
       "label": "Hardware Revision"
     },
-    "softwareCommitHashTMU": {
-      "id": "softwareCommitHashTMU",
+    "firmwareCommitHashTMU": {
       "type": "text",
       "required": false,
-      "label": "Software Commit Hash"
+      "label": "Firmware Commit Hash"
     },
     "thermUnits": {
-      "id": "thermUnits",
       "type": "text",
       "required": false,
       "label": "Thermal units"
     },
     "name": {
-      "id": "tmuSavedName",
       "type": "text",
       "required": true,
       "label": "Config saved name"
     }
   },
   "tmsConfig": {
-    "hardwareRevisionTMS": {
-      "id": "hardwareRevisionTMS",
+    "hardwareRevision": {
       "type": "text",
       "required": true,
       "label": "Hardware Revision"
     },
-    "softwareCommitHashTMS": {
-      "id": "softwareCommitHashTMS",
+    "firmwareCommitHash": {
       "type": "text",
       "required": true,
-      "label": "Software Commit Hash"
+      "label": "Firmware Commit Hash"
     },
     "tempUnits": {
-      "id": "tempUnits",
       "type": "text",
       "required": true,
       "label": "Temp Units"
     },
     "pumpSpeedUnits": {
-      "id": "pumpSpeedUnits",
       "type": "text",
       "required": true,
       "label": "Pump Speed Units"
     },
     "fanSpeedUnits": {
-      "id": "fanSpeedUnits",
       "type": "text",
       "required": true,
       "label": "Fan Speed Units"
     },
     "name": {
-      "id": "tmsSavedName",
       "type": "text",
       "required": true,
       "label": "Config saved name"
     }
   },
   "pvcConfig": {
-    "hardwareRevisionPVC": {
-      "id": "hardwareRevisionPVC",
+    "hardwareRevision": {
       "type": "text",
       "required": true,
       "label": "Hardware Revision"
     },
-    "softwareCommitHashPVC": {
-      "id": "softwareCommitHashPVC",
+    "firmwareCommitHash": {
       "type": "text",
       "required": true,
-      "label": "Software Commit Hash"
+      "label": "Firmware Commit Hash"
     },
     "name": {
-      "id": "pvcSavedName",
       "type": "text",
       "required": true,
       "label": "Config saved name"
@@ -310,19 +264,16 @@
   },
   "mcConfig": {
     "model": {
-      "id": "model",
       "type": "text",
       "required": true,
       "label": "Model"
     },
     "firmwareVersion": {
-      "id": "firmwareVersion",
       "type": "text",
       "required": true,
       "label": "Firmware Version"
     },
     "name": {
-      "id": "mcSavedName",
       "type": "text",
       "required": true,
       "label": "Config saved name"
