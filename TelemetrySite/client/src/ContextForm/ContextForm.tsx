@@ -10,7 +10,7 @@ import { Form, Button, Card, Col, Row, CardTitle, CardBody, Container } from "re
 
 import "./ContextForm.css";
 
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState } from "react";
 
 import ContextJSONIdValues from "./JsonFiles/ContextForm.json";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -31,19 +31,8 @@ function ContextForm(props: Props) {
     const [MainContextForm, SetContextForm] = useState<React.ReactElement | null>(null);
     const [EventContextForm, SetEventForm] = useState<React.ReactElement | null>(null);
     const [BikeContextForm, SetBikeForm] = useState<React.ReactElement | null>(null);
-    const [BikeSelect, SetBikeSelect] = useState<React.ReactElement | null>(null);
 
-    const [EventData, SetEventData] = useState(null);
-
-    // Each config form object
-    const [ConfigForm, SetFormElements] = useState<Record<BoardNames, React.ReactElement | null>>({
-        bms: null,
-        imu: null,
-        tmu: null,
-        tms: null,
-        pvc: null,
-        mc: null,
-    });
+    const [BikeDropdown, SetBikeDropdown] = useState<React.ReactElement | null>(null);
     // Each dropdown object created in runtime with saved names and a field for custom
     const [DropDowns, SetDropDowns] = useState({
         bms: null,
@@ -53,7 +42,20 @@ function ContextForm(props: Props) {
         pvc: null,
         mc: null,
     });
-    // Current selected value of each dropdown
+
+    const [EventData, SetEventData] = useState(null);
+
+    // Each config form object
+    const [ConfigForms, SetFormElements] = useState<Record<BoardNames, React.ReactElement | null>>({
+        bms: null,
+        imu: null,
+        tmu: null,
+        tms: null,
+        pvc: null,
+        mc: null,
+    });
+
+    // Current selected value of each config dropdown
     const [ConfigSelectedValue, SetConfigSelectedValue] = useState<Record<ConfigTypes, string>>({
         bms: "",
         imu: "",
@@ -63,7 +65,7 @@ function ContextForm(props: Props) {
         mc: "",
         bike: "",
     });
-    // Values passed from back end
+    // Current saved configs used previously
     const [DropDownOptions, SetDropdownOptions] = useState<ConfigStorage>({
         bms: [],
         imu: [],
@@ -91,10 +93,18 @@ function ContextForm(props: Props) {
      * @param {string} configName - Name of config to update
      * @param {string} value - New value of select field
      */
-    function UpdateSavedConfigSelectedValues(configName: string, value: string) {
+    const UpdateSavedConfigSelectedValues = (configName: ConfigTypes, value: string): void => {
         // Update the state of the new conifg. Mutates the state rather than creating a new state
         SetConfigSelectedValue((prev) => ({ ...prev, [configName]: value }));
-    }
+
+        // Target config could be null here. This is handled by DynamicForm
+        const targetConfig = DropDownOptions[configName]?.find((config) => config.name === value) ?? null;
+
+        const formElement = DynamicForm(`${configName}Config`, targetConfig);
+
+        if (configName === "bike") SetBikeForm(formElement);
+        else SetFormElements((prev) => ({ ...prev, [configName]: formElement }));
+    };
 
     /**
      * Whenever the select field on a config form changes
@@ -266,56 +276,12 @@ function ContextForm(props: Props) {
             );
 
             if (name === "bike") {
-                SetBikeSelect(dropDown);
+                SetBikeDropdown(dropDown);
             } else if (BikeContextForm) {
                 SetDropDowns((prev) => ({ ...prev, [name]: dropDown }));
             }
         });
     }, [DropDownOptions, BikeContextForm]);
-
-    useEffect(() => {
-        const pairs = Object.entries(ConfigSelectedValue) as [ConfigTypes, string][];
-        pairs.forEach(([config, selectedValue]) => {
-            if (selectedValue.toLowerCase() === "custom") {
-                const formElement = DynamicForm(`${config}Config`);
-                if (config === "bike") {
-                    SetBikeForm(formElement);
-                } else {
-                    SetFormElements((prev) => ({
-                        ...prev,
-                        [config]: formElement,
-                    }));
-                }
-            } else if (selectedValue) {
-                // New configuration data selected by the user
-                const targetConfig = DropDownOptions[config].find((config) => config.name === selectedValue);
-
-                if (!targetConfig) return;
-
-                // Generate the new form and pass in values to assign
-                const formElement = DynamicForm(`${config}Config`, targetConfig);
-                // If the saved name is a bike, we also need to fill in all the board configs
-                if (config === "bike") {
-                    const bikeConfig = targetConfig as BikeConifg;
-                    const pairs = Object.entries(bikeConfig.savedConfigs);
-
-                    pairs.forEach(([key, value]) => {
-                        if (!key || !value) return;
-                        if (key in DropDowns) {
-                            UpdateSavedConfigSelectedValues(key as ConfigTypes, value);
-                        }
-                    });
-
-                    SetBikeForm(formElement);
-                } else {
-                    SetFormElements((prev) => ({
-                        ...prev,
-                        [config]: formElement,
-                    }));
-                }
-            }
-        });
-    }, [ConfigSelectedValue]);
 
     /**
      * Fetch all the saved configs on the first render
@@ -364,7 +330,7 @@ function ContextForm(props: Props) {
 
                         <Card className='panel-content fill'>
                             <CardTitle tag='h2' className='panel-header'>
-                                Bike Context: {BikeSelect}
+                                Bike Context: {BikeDropdown}
                             </CardTitle>
                             <CardBody>{BikeContextForm}</CardBody>
                         </Card>
@@ -392,7 +358,7 @@ function ContextForm(props: Props) {
                                                 <CardTitle className='grid-header'>
                                                     {name.toUpperCase()} Configuration: {DropDowns[name]}
                                                 </CardTitle>
-                                                <CardBody>{ConfigForm[name]}</CardBody>
+                                                <CardBody>{ConfigForms[name]}</CardBody>
                                             </Card>
                                         </Col>
                                     ))}

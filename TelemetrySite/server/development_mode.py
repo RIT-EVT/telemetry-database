@@ -36,7 +36,10 @@ def _setup_config_mock(mock_db):
             "config_data": {
                 "tms": [
                     {
-                        "hardwareRevisionTMS": 1,
+                        "hardwareRevision": 1,
+                        "firmwareCommitHash": 1,
+                        "data": {},
+                        "name": "test",
                     }
                 ]
             },
@@ -51,7 +54,7 @@ def _setup_config_mock(mock_db):
             {
                 "username": "test_user_valid",
                 "password": "123".encode(),
-                "auth_token": "0",
+                "auth_token": "gP98MY0suUKvOycCW2PIvzeONtm0FnO6DfkaTVNrRHQ",
                 "auth_time": datetime.now(),
             },
             {

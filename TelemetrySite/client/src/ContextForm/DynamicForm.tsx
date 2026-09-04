@@ -35,18 +35,10 @@ export default function DynamicForm(
 
                 if (optionalSetData) {
                     if (key === "name") defaultValue = optionalSetData[key];
-                    else if ("firmwareRevision" in optionalSetData) {
-                        key = key
-                            .trim()
-                            .split(/[\s_\-]+/) // split on spaces, underscores, hyphens
-                            .map((word, index) =>
-                                index === 0
-                                    ? word.toLowerCase() // first word: all lowercase
-                                    : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
-                            )
-                            .join("");
-                        console.log(key);
-                        defaultValue = (optionalSetData as BoardConfig).data[key];
+                    else if ("firmwareCommitHash" in optionalSetData) {
+                        if (key == "firmwareCommitHash" || key == "hardwareRevision")
+                            defaultValue = (optionalSetData as BoardConfig)[key];
+                        else defaultValue = (optionalSetData as BoardConfig).data[key];
                     } else {
                         const bike = optionalSetData as BikeConifg;
                     }

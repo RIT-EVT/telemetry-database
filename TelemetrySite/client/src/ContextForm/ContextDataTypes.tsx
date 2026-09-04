@@ -11,7 +11,7 @@ type ConfigNames = `${ConfigTypes}SavedName`;
  */
 interface BoardConfig {
     hardwareRevision: string;
-    softwareCommitHash: string;
+    firmwareCommitHash: string;
     name: string;
 
     data: Record<string, string>;
