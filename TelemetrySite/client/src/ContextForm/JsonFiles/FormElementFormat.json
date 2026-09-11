@@ -197,12 +197,12 @@
       "required": false,
       "label": "Hardware Revision"
     },
-    "firmwareCommitHashTMU": {
+    "firmwareCommitHash": {
       "type": "text",
       "required": false,
       "label": "Firmware Commit Hash"
     },
-    "thermUnits": {
+    "thermalUnits": {
       "type": "text",
       "required": false,
       "label": "Thermal units"

@@ -36,11 +36,18 @@ export default function DynamicForm(
                 if (optionalSetData) {
                     if (key === "name") defaultValue = optionalSetData[key];
                     else if ("firmwareCommitHash" in optionalSetData) {
-                        if (key == "firmwareCommitHash" || key == "hardwareRevision")
-                            defaultValue = (optionalSetData as BoardConfig)[key];
-                        else defaultValue = (optionalSetData as BoardConfig).data[key];
+                        switch (key) {
+                            // Abuse fall through
+                            case "firmwareCommitHash":
+                            case "hardwareRevision":
+                                defaultValue = optionalSetData[key];
+                                break;
+                            default:
+                                defaultValue = optionalSetData.data[key];
+                        }
                     } else {
                         const bike = optionalSetData as BikeConifg;
+                        if (key == "platform") if (bike) defaultValue = bike[key];
                     }
                 }
                 return (

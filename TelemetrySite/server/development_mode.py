@@ -34,14 +34,85 @@ def _setup_config_mock(mock_db):
         {
             "_id": doc_id,
             "config_data": {
+                "bike": [
+                    {
+                        "name": "test",
+                        "savedConfigs": {
+                            "bms": "test",
+                            "imu": "test",
+                            "tmu": "test",
+                            "tms": "test",
+                            "pvc": "test",
+                            "mc": "test",
+                        },
+                    }
+                ],
+                "bms": [
+                    {
+                        "hardwareRevision": 1,
+                        "firmwareCommitHash": 1,
+                        "data": {
+                            "totalVoltageUnits": "V",
+                            "batteryVoltageUnits": "V",
+                            "currentUnits": "A",
+                            "packTempUnits": "C",
+                            "bqTempUnits": "C",
+                            "cellVoltageUnits": "V",
+                        },
+                        "name": "test",
+                    }
+                ],
+                "imu": [
+                    {
+                        "hardwareRevision": 1,
+                        "firmwareCommitHash": 1,
+                        "data": {
+                            "eulerUnits": "Temp",
+                            "gyroUnits": "Temp",
+                            "linearAccelerationUnits": "jerk",
+                            "accelerometerUnits": "ms/s",
+                        },
+                        "name": "test",
+                    }
+                ],
+                "tmu": [
+                    {
+                        "hardwareRevision": 1,
+                        "firmwareCommitHash": 1,
+                        "data": {
+                            "thermalUnits": "C",
+                        },
+                        "name": "test",
+                    }
+                ],
                 "tms": [
+                    {
+                        "hardwareRevision": 1,
+                        "firmwareCommitHash": 1,
+                        "data": {
+                            "tempUnits": "C",
+                            "pumpSpeedUnits": "rpm",
+                            "fanSpeedUnits": "rpm",
+                        },
+                        "name": "test",
+                    }
+                ],
+                "pvc": [
                     {
                         "hardwareRevision": 1,
                         "firmwareCommitHash": 1,
                         "data": {},
                         "name": "test",
                     }
-                ]
+                ],
+                "mc": [
+                    {
+                        "hardwareRevision": 1,
+                        "firmwareCommitHash": 1,
+                        "data": {"model": "test", "firmwareVersion": "test"},
+                        "name": "test",
+                    }
+                ],
             },
         }
     )

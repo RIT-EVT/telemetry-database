@@ -94,7 +94,7 @@ function ContextForm(props: Props) {
      * @param {string} value - New value of select field
      */
     const UpdateSavedConfigSelectedValues = (configName: ConfigTypes, value: string): void => {
-        // Update the state of the new conifg. Mutates the state rather than creating a new state
+        // Update the state of the new conifg
         SetConfigSelectedValue((prev) => ({ ...prev, [configName]: value }));
 
         // Target config could be null here. This is handled by DynamicForm
@@ -102,57 +102,16 @@ function ContextForm(props: Props) {
 
         const formElement = DynamicForm(`${configName}Config`, targetConfig);
 
-        if (configName === "bike") SetBikeForm(formElement);
-        else SetFormElements((prev) => ({ ...prev, [configName]: formElement }));
-    };
-
-    /**
-     * Whenever the select field on a config form changes
-     * check if it is Custom. If it is, display form elements.
-     * Else, set form object to null
-     *
-     * @param {string} configName - name of config being updated
-     * @param {formElement.event} newConfigName - event that occurred to the select element
-     */
-    const HandleConfigFormChange = async (configName: ConfigTypes, newConfigName: string): Promise<void> => {
-        if (newConfigName === "Custom") {
-            const formElement = DynamicForm(`${configName}Config`);
-            if (configName === "bike") {
-                SetBikeForm(formElement);
-            } else {
-                SetFormElements((prev) => ({
-                    ...prev,
-                    [configName]: formElement,
-                }));
+        if (configName === "bike") {
+            SetBikeForm(formElement);
+            if (targetConfig) {
+                // Loop over each saved conifg and update the value
+                const savedConfigs = (targetConfig as BikeConifg).savedConfigs;
+                for (const [board, conifg] of Object.entries(savedConfigs)) {
+                    UpdateSavedConfigSelectedValues(board as ConfigTypes, conifg);
+                }
             }
-        } else if (newConfigName !== "") {
-            // New configuration data selected by the user
-            const targetConfig = DropDownOptions[configName].find((savedNames) => savedNames.name === newConfigName);
-
-            if (!targetConfig) return;
-
-            // Generate the new form and pass in values to assign
-            const formElement = DynamicForm(`${configName}Config`, targetConfig);
-            // If the saved name is a bike, we also need to fill in all the board configs
-            if (configName === "bike") {
-                const bikeConfig = targetConfig as BikeConifg;
-                const pairs = Object.entries(bikeConfig.savedConfigs);
-
-                pairs.forEach(([key, value]) => {
-                    if (!key || !value) return;
-                    if (key in DropDowns) {
-                        UpdateSavedConfigSelectedValues(key as ConfigTypes, value);
-                    }
-                });
-
-                SetBikeForm(formElement);
-            } else {
-                SetFormElements((prev) => ({
-                    ...prev,
-                    [configName]: formElement,
-                }));
-            }
-        }
+        } else SetFormElements((prev) => ({ ...prev, [configName]: formElement }));
     };
 
     /**
@@ -171,7 +130,6 @@ function ContextForm(props: Props) {
             const data = await response.json();
 
             if (data && "data" in data && "config_data" in data["data"]) {
-                console.log(data.data.config_data);
                 SetDropdownOptions(data.data.config_data as ConfigStorage);
             }
         } catch (e) {
