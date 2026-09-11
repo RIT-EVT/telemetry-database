@@ -28,11 +28,13 @@ export default function SelectCreator(
     name: ConfigTypes,
     onChange: (name: ConfigTypes, change: string) => void,
     configSelectedValue: string,
+    lockNoneBike: boolean,
 ): React.ReactElement {
     if (!displayValues) {
         displayValues = [];
     }
-    let disabled: boolean = name !== "bike" && configSelectedValue !== "Custom" && configSelectedValue !== "";
+    // Disable this select if it was assigned by the bike
+    let disabled: boolean = name !== "bike" && lockNoneBike;
     return (
         <Input
             type='select'

@@ -225,12 +225,15 @@ function ContextForm(props: Props) {
     }, [EventData]);
 
     useEffect(() => {
+        // If bike has a selected value, lock all others
+        const lockNoneBike: boolean = ConfigSelectedValue["bike"] !== "Custom";
         ConfigNames.forEach((name) => {
             const dropDown = SelectCreator(
                 DropDownOptions[name],
                 name,
                 UpdateSavedConfigSelectedValues,
                 ConfigSelectedValue[name],
+                lockNoneBike,
             );
 
             if (name === "bike") {
