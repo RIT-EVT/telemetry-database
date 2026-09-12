@@ -18,7 +18,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./LoginPage.css";
 
 import { useNavigate } from "react-router-dom";
-import { BuildURI } from "Utils/ServerUtils";
+import { BuildURI } from "../Utils/ServerUtils";
+import { getItem } from "../Utils/SessionStorageLoader";
 
 /**
  * Display a username password prompt to verify who the user is
@@ -29,8 +30,7 @@ const LoginPage = ({ onLogin }) => {
 
     const [invalidCredentialsModal, setInvalidCredModal] = useState(false);
 
-    const toggleInvalidCredentialsModal = () =>
-        setInvalidCredModal(!invalidCredentialsModal);
+    const toggleInvalidCredentialsModal = () => setInvalidCredModal(!invalidCredentialsModal);
 
     const navigate = useNavigate();
 
@@ -64,7 +64,7 @@ const LoginPage = ({ onLogin }) => {
     };
 
     useEffect(() => {
-        if (sessionStorage.getItem("authToken")) {
+        if (getItem("authToken")) {
             navigate("/");
         }
     }, [navigate]);
@@ -86,9 +86,7 @@ const LoginPage = ({ onLogin }) => {
                                         id='username'
                                         value={username}
                                         className='Input'
-                                        onChange={(e) =>
-                                            setUsername(e.target.value)
-                                        }
+                                        onChange={(e) => setUsername(e.target.value)}
                                         required
                                     />
                                 </InputGroup>
@@ -103,9 +101,7 @@ const LoginPage = ({ onLogin }) => {
                                         id='password'
                                         className='Input'
                                         value={password}
-                                        onChange={(e) =>
-                                            setPassword(e.target.value)
-                                        }
+                                        onChange={(e) => setPassword(e.target.value)}
                                         required
                                     />
                                 </InputGroup>
@@ -116,21 +112,13 @@ const LoginPage = ({ onLogin }) => {
                     <Button className='SubmitButton' type='submit'>
                         Login
                     </Button>
-                    <Button
-                        className='SwitchButton'
-                        onClick={() => navigate("/signup")}
-                    >
+                    <Button className='SwitchButton' onClick={() => navigate("/signup")}>
                         Signup
                     </Button>
                 </Form>
             </center>
-            <Modal
-                isOpen={invalidCredentialsModal}
-                toggle={toggleInvalidCredentialsModal}
-            >
-                <ModalHeader toggle={toggleInvalidCredentialsModal}>
-                    Invalid credentials
-                </ModalHeader>
+            <Modal isOpen={invalidCredentialsModal} toggle={toggleInvalidCredentialsModal}>
+                <ModalHeader toggle={toggleInvalidCredentialsModal}>Invalid credentials</ModalHeader>
                 <ModalBody>Invalid username or password</ModalBody>
             </Modal>
         </Card>
@@ -147,8 +135,7 @@ const SignupPage = ({ onSignup }) => {
     const [challengeIntModalOpen, setChallengeIntOpen] = useState(false);
 
     const passwordModalToggle = () => setPasswordModalOpen(!passwordModalOpen);
-    const challengeModalToggle = () =>
-        setChallengeIntOpen(!challengeIntModalOpen);
+    const challengeModalToggle = () => setChallengeIntOpen(!challengeIntModalOpen);
 
     const navigate = useNavigate();
 
@@ -191,7 +178,7 @@ const SignupPage = ({ onSignup }) => {
     };
 
     useEffect(() => {
-        if (sessionStorage.getItem("authToken")) {
+        if (getItem("authToken")) {
             navigate("/");
         }
     }, [navigate]);
@@ -213,9 +200,7 @@ const SignupPage = ({ onSignup }) => {
                                         className='Input'
                                         value={username}
                                         placeholder='Username'
-                                        onChange={(e) =>
-                                            setUsername(e.target.value)
-                                        }
+                                        onChange={(e) => setUsername(e.target.value)}
                                         required
                                     />
                                 </InputGroup>
@@ -229,9 +214,7 @@ const SignupPage = ({ onSignup }) => {
                                         className='Input'
                                         value={challengeInt}
                                         placeholder='Challenge Value'
-                                        onChange={(e) =>
-                                            setChallengeInt(e.target.value)
-                                        }
+                                        onChange={(e) => setChallengeInt(e.target.value)}
                                         required
                                     />
                                 </InputGroup>
@@ -246,9 +229,7 @@ const SignupPage = ({ onSignup }) => {
                                         className='Input'
                                         value={password}
                                         placeholder='Create Password'
-                                        onChange={(e) =>
-                                            setPassword(e.target.value)
-                                        }
+                                        onChange={(e) => setPassword(e.target.value)}
                                         required
                                     />
                                 </InputGroup>
@@ -261,9 +242,7 @@ const SignupPage = ({ onSignup }) => {
                                         className='Input'
                                         value={confirmPassword}
                                         placeholder='Confirm Password'
-                                        onChange={(e) =>
-                                            setConfirmPassword(e.target.value)
-                                        }
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
                                         required
                                     />
                                 </InputGroup>
@@ -276,10 +255,7 @@ const SignupPage = ({ onSignup }) => {
                         Signup
                     </Button>
 
-                    <Button
-                        className='SwitchButton'
-                        onClick={() => navigate("/login")}
-                    >
+                    <Button className='SwitchButton' onClick={() => navigate("/login")}>
                         Login
                     </Button>
                 </center>
@@ -287,21 +263,12 @@ const SignupPage = ({ onSignup }) => {
 
             {/* Modals for error handling */}
             <Modal isOpen={passwordModalOpen} toggle={passwordModalToggle}>
-                <ModalHeader toggle={passwordModalToggle}>
-                    Passwords do not match
-                </ModalHeader>
-                <ModalBody>
-                    Looks like your passwords do not match, please try again.
-                </ModalBody>
+                <ModalHeader toggle={passwordModalToggle}>Passwords do not match</ModalHeader>
+                <ModalBody>Looks like your passwords do not match, please try again.</ModalBody>
             </Modal>
             <Modal isOpen={challengeIntModalOpen} toggle={challengeModalToggle}>
-                <ModalHeader toggle={challengeModalToggle}>
-                    Invalid challenge value
-                </ModalHeader>
-                <ModalBody>
-                    Your inputted challenge value does not match the expected
-                    value
-                </ModalBody>
+                <ModalHeader toggle={challengeModalToggle}>Invalid challenge value</ModalHeader>
+                <ModalBody>Your inputted challenge value does not match the expected value</ModalBody>
             </Modal>
         </Card>
     );

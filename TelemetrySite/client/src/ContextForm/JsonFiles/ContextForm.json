@@ -4,74 +4,72 @@
         "date": "eventDate",
         "type": "eventType",
         "location": "eventLocation",
-        "runs": [
-            {
-                "orderNumber": [],
-                "context": {
-                    "bikeConfig": {
-                        "platformName": "platformName",
-                        "tirePressure": "tirePressure",
-                        "coolantVolume": "coolantVolume",
-                        "bikeSavedName": "bikeSavedName",
-                        "firmwareConfig": {
-                            "BMS": [
-                                "hardwareRevisionBMS",
-                                "softwareCommitHashBMS",
-                                "totalVoltageUnits",
-                                "batteryVoltageUnits",
-                                "currentUnits",
-                                "packTempUnits",
-                                "bqTempUnits",
-                                "cellVoltageUnits",
-                                "bmsSavedName"
-                            ],
-                            "IMU": [
-                                "hardwareRevisionIMU",
-                                "softwareCommitHashIMU",
-                                "eulerUnits",
-                                "gyroUnits",
-                                "linearAccelerationUnits",
-                                "accelerometerUnits",
-                                "imuSavedName"
-                            ],
-                            "TMU": [
-                                "hardwareRevisionTMU",
-                                "softwareCommitHashTMU",
-                                "thermUnits",
-                                "tmuSavedName"
-                            ],
-                            "TMS": [
-                                "hardwareRevisionTMS",
-                                "softwareCommitHashTMS",
-                                "tempUnits",
-                                "pumpSpeedUnits",
-                                "fanSpeedUnits",
-                                "tmsSavedName"
-                            ],
-                            "PVC": [
-                                "hardwareRevisionPVC",
-                                "softwareCommitHashPVC",
-                                "pvcSavedName"
-                            ],
-                            "MC": [
-                                "model",
-                                "firmwareVersion",
-                                "mcSavedName"
-                            ]
-                        },
-                        "hardwareConfig": {}
+        "run": {
+            "orderNumber": [],
+            "context": {
+                "bikeConfig": {
+                    "platformName": "platformName",
+                    "tirePressure": "tirePressure",
+                    "coolantVolume": "coolantVolume",
+                    "bikeSavedName": "bikeSavedName",
+                    "firmwareConfig": {
+                        "BMS": [
+                            "hardwareRevisionBMS",
+                            "softwareCommitHashBMS",
+                            "totalVoltageUnits",
+                            "batteryVoltageUnits",
+                            "currentUnits",
+                            "packTempUnits",
+                            "bqTempUnits",
+                            "cellVoltageUnits",
+                            "bmsSavedName"
+                        ],
+                        "IMU": [
+                            "hardwareRevisionIMU",
+                            "softwareCommitHashIMU",
+                            "eulerUnits",
+                            "gyroUnits",
+                            "linearAccelerationUnits",
+                            "accelerometerUnits",
+                            "imuSavedName"
+                        ],
+                        "TMU": [
+                            "hardwareRevisionTMU",
+                            "softwareCommitHashTMU",
+                            "thermUnits",
+                            "tmuSavedName"
+                        ],
+                        "TMS": [
+                            "hardwareRevisionTMS",
+                            "softwareCommitHashTMS",
+                            "tempUnits",
+                            "pumpSpeedUnits",
+                            "fanSpeedUnits",
+                            "tmsSavedName"
+                        ],
+                        "PVC": [
+                            "hardwareRevisionPVC",
+                            "softwareCommitHashPVC",
+                            "pvcSavedName"
+                        ],
+                        "MC": [
+                            "model",
+                            "firmwareVersion",
+                            "mcSavedName"
+                        ]
                     },
-                    "riderName": "riderName",
-                    "riderWeight": "riderWeight",
-                    "humidity": "humidity",
-                    "airTemp": "airTemp",
-                    "windSpeed": "windSpeed",
-                    "windDirection": "windAngle",
-                    "riderFeedback": "driverFeedback",
-                    "distanceCovered": "distanceCovered",
-                    "startTime": "startTime"
-                }
+                    "hardwareConfig": {}
+                },
+                "riderName": "riderName",
+                "riderWeight": "riderWeight",
+                "humidity": "humidity",
+                "airTemp": "airTemp",
+                "windSpeed": "windSpeed",
+                "windDirection": "windAngle",
+                "riderFeedback": "driverFeedback",
+                "distanceCovered": "distanceCovered",
+                "startTime": "startTime"
             }
-        ]
+        }
     }
 }

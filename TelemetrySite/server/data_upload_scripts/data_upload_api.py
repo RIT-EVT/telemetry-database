@@ -3,8 +3,9 @@ from flask import request
 from werkzeug.utils import secure_filename
 import os
 from data_upload_scripts.data_upload import submit_data, get_progress
-from utils import authenticate_user, check_expired_tokens
-from http_codes import HttpResponseType 
+from utils import validate_user
+from http_codes import HttpResponseType
+
 
 class DataUploadApi(MethodView):
 
@@ -28,11 +29,11 @@ class DataUploadApi(MethodView):
             tuple: Progress value
         """
 
-        if not authenticate_user(auth_token, self.db):
-            return HttpResponseType.UNAUTHORIZED.error()
-        elif check_expired_tokens(auth_token, self.db):
-            return HttpResponseType.UNAUTHORIZED.error()
-        
+        user_valid, response = validate_user(auth_token, self.db)
+
+        if not user_valid:
+            return response.error()
+
         return get_progress(), HttpResponseType.OK.value
 
     def post(self, auth_token):
@@ -46,11 +47,11 @@ class DataUploadApi(MethodView):
             tuple: success message
         """
 
-        if not authenticate_user(auth_token, self.db):
-            return HttpResponseType.UNAUTHORIZED.error()
-        elif check_expired_tokens(auth_token, self.db):
-            return HttpResponseType.UNAUTHORIZED.error()
-        
+        user_valid, response = validate_user(auth_token, self.db)
+
+        if not user_valid:
+            return response.error()
+
         # Check if the post request has all needed data needed
         if "mf4File" not in request.files:
             return HttpResponseType.BAD_REQUEST.error()
@@ -64,7 +65,7 @@ class DataUploadApi(MethodView):
         dbcFile = request.files["dbcFile"]
         context_data = request.form["contextData"]
         runOrderNumber = request.form["runOrderNumber"]
-        
+
         # ensure the file actually contains a valid file name and files
         if not mf4File or mf4File.name == "":
             return HttpResponseType.BAD_REQUEST.error()
@@ -90,14 +91,16 @@ class DataUploadApi(MethodView):
             # submit the data!
             submit_data(mf4_file, dbc_file, context_data, runOrderNumber, self.db)
 
-            # remove the file from the sever end
+            # remove the file from the server end
             os.remove(mf4_file)
             os.remove(dbc_file)
-            
-            return {"message": "Data received successfully"}, HttpResponseType.CREATED.value
+
+            return {
+                "message": "Data received successfully"
+            }, HttpResponseType.CREATED.value
         else:
             return HttpResponseType.BAD_REQUEST.error()
-        
+
     def file_type_check(self, filename):
         """
         Verify the the files are valid types

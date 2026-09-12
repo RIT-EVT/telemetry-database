@@ -18,45 +18,33 @@ export default function DynamicForm(jsonValue, optionalSetData) {
     // TODO we may want to talk later about changing the way we approach this logic, but for now this function
     return (
         <FormGroup>
-            {Object.values(ContextJSONFormElements[jsonValue]).map(
-                (formElement) => {
-                    const idValue = formElement["id"];
-                    return (
-                        <InputGroup key={idValue} className='FormGroupElement'>
-                            <InputGroupText className='form-input-label'>
-                                {formElement["label"]}
-                            </InputGroupText>
-                            <Input
-                                id={idValue}
-                                type={formElement["type"]}
-                                placeholder={formElement["placeHolder"]}
-                                required={formElement["required"]}
-                                readOnly={
-                                    formElement["readOnly"] || optionalSetData
-                                        ? true
-                                        : false
-                                }
-                                className='formInput'
-                                value={
-                                    optionalSetData
-                                        ? optionalSetData[idValue]
-                                        : undefined
-                                }
-                            >
-                                {formElement["type"] === "select"
-                                    ? formElement["selectValues"].map(
-                                          (value) => (
-                                              <option key={value} value={value}>
-                                                  {value}
-                                              </option>
-                                          )
-                                      )
-                                    : null}
-                            </Input>
-                        </InputGroup>
-                    );
-                }
-            )}
+            {Object.values(ContextJSONFormElements[jsonValue]).map((formElement) => {
+                const idValue = formElement["id"];
+                return (
+                    <InputGroup key={idValue} className='FormGroupElement'>
+                        <InputGroupText className='form-input-label'>
+                            {formElement["label"]} {formElement["required"] ? <span style={{ color: "red" }}>*</span> : null}
+                        </InputGroupText>
+                        <Input
+                            id={idValue}
+                            type={formElement["type"]}
+                            placeholder={formElement["placeHolder"]}
+                            required={formElement["required"]}
+                            readOnly={formElement["readOnly"] || optionalSetData ? true : false}
+                            className='formInput'
+                            value={optionalSetData ? optionalSetData[idValue] : undefined}
+                        >
+                            {formElement["type"] === "select"
+                                ? formElement["selectValues"].map((value) => (
+                                      <option key={value} value={value}>
+                                          {value}
+                                      </option>
+                                  ))
+                                : null}
+                        </Input>
+                    </InputGroup>
+                );
+            })}
         </FormGroup>
     );
 }

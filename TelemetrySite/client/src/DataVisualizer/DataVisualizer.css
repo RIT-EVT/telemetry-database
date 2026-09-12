@@ -1,0 +1,67 @@
+.add-button {
+    margin-left: 8px;
+    background-color: black;
+}
+
+.data-background {
+    border-color: rgb(84, 90, 93);
+    background-color: rgb(49, 53, 55);
+}
+
+.param-background {
+    background-color: rgb(44, 48, 49) !important;
+    color: white;
+}
+
+.query-mode-bar {
+    padding: 1rem;
+}
+
+.align-center {
+    align-content: center;
+    text-align: center;
+}
+
+.query-mode-button,
+.current-mode {
+    font-size: 1.5rem;
+    transition: 0.3s ease-out;
+    border-radius: 5px;
+    border-style: solid;
+    padding: 0.5rem 1rem;
+}
+
+.query-mode-button {
+    background-color: #070707;
+    color: #f76902;
+    border: solid;
+    border-color: rgb(33, 33, 33);
+}
+
+.current-mode {
+    background-color: #f76902;
+    border: solid;
+    border-color: #ca5d0f;
+
+    color: black;
+}
+
+.query-mode-button:hover,
+.current-mode:hover {
+    transform: scale(1.1);
+}
+
+.query-mode-button:hover {
+    background-color: black;
+    color: #f76902;
+}
+
+.current-mode:hover {
+    color: black;
+    background-color: #e56000;
+    border-color: #99460a;
+}
+
+.basic-query-title {
+    color: #f76902;
+}

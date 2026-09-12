@@ -2,5 +2,8 @@
     "context": "/Context",
     "data_upload": "/DataUpload",
     "config_data": "/ConfigData",
-    "user_auth": "/Login"
+    "user_auth": "/Login",
+    "event_filter": "/EventFilter",
+    "message_filter": "/MessageFilter",
+    "confirm_query": "/ConfirmQuery"
 }
