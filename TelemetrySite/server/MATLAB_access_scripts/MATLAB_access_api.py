@@ -1,13 +1,11 @@
 from json import loads
 from flask import request
 
-from flask import Flask, jsonify
-from flask_restful import Api
 from flask.views import MethodView
-from flask_cors import CORS
 
 from http_codes import HttpResponseType
 from bson import ObjectId
+
 
 class MATLAB_access_api(MethodView):
     def __init__(self, db):
@@ -24,7 +22,7 @@ class MATLAB_access_api(MethodView):
         return doc
 
     def get(self):
-        query_name = request.args.get('name')
+        query_name = request.args.get("name")
         if not query_name:
             return {"error": "Missing query name"}, HttpResponseType.BAD_REQUEST.value
 
@@ -32,7 +30,9 @@ class MATLAB_access_api(MethodView):
         config_doc = config_col.find_one({"query-name": query_name})
 
         if not config_doc:
-            return {"error": "Query definition not found"}, HttpResponseType.NOT_FOUND.value
+            return {
+                "error": "Query definition not found"
+            }, HttpResponseType.NOT_FOUND.value
 
         try:
             pipeline = loads(config_doc["query-body"])
@@ -44,8 +44,10 @@ class MATLAB_access_api(MethodView):
             return {
                 "query": query_name,
                 "data": results,
-                "count": len(results)
+                "count": len(results),
             }, HttpResponseType.OK.value
 
         except Exception as e:
-            return {"error": f"Execution failed: {str(e)}"}, HttpResponseType.INTERNAL_SERVER_ERROR.value
+            return {
+                "error": f"Execution failed: {str(e)}"
+            }, HttpResponseType.INTERNAL_SERVER_ERROR.value
