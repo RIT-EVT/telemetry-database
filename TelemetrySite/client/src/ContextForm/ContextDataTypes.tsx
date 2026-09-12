@@ -6,6 +6,11 @@ type ConfigTypes = BoardNames | "bike";
 /** Translation for the name we save configs under. ConfigTypes + "SavedName". */
 type ConfigNames = `${ConfigTypes}SavedName`;
 
+/** Get all form field names that will appear in the context field */
+type FormFields = ConfigTypes | "event" | "main";
+
+type FormDataFields = Record<FormFields, Record<string, string | Date | number | boolean>>;
+
 /**
  * Hold context for individual boards. Any board specific pieces go in "data"
  */
@@ -92,4 +97,14 @@ interface ContextData {
     };
 }
 
-export type { BoardNames, ConfigTypes, ConfigNames, ContextData, BikeConifg, BoardConfig, ConfigStorage };
+export type {
+    BoardNames,
+    FormFields,
+    FormDataFields,
+    ConfigTypes,
+    ConfigNames,
+    ContextData,
+    BikeConifg,
+    BoardConfig,
+    ConfigStorage,
+};

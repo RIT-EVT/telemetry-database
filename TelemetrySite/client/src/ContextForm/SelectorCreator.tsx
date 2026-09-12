@@ -44,6 +44,7 @@ export default function SelectCreator(
             className='ConfigDropdown'
             id={`${name}Select`}
             defaultValue={configSelectedValue ?? ""}
+            value={configSelectedValue ?? ""}
             disabled={disabled}
         >
             <option value='' disabled hidden>

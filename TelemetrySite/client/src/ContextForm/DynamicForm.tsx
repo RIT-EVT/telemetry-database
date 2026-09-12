@@ -13,11 +13,14 @@ const FormData = ContextJSONFormElements as FormConfig;
  * many input and label objects.
  *
  * @param {string} jsonValue - Key for the element in the FormElementFormat.json file
+ * @param {Record<string, string | Date | number | boolean>} outDataFormat - The data format for this DynamicForm
  * @param {json} optionalSetData - Predefined data for config inputs
  * @return {HTMLFormElement} Form group of all the input elements on the json file
  */
 export default function DynamicForm(
     jsonValue: ElementNames,
+    outDataFormat: Record<string, string | Date | number | boolean>,
+
     optionalSetData: BoardConfig | BikeConifg | null = null,
 ): React.ReactElement {
     /* Loop through every json element for the current field and
@@ -50,6 +53,9 @@ export default function DynamicForm(
                         if (key == "platform") if (bike) defaultValue = bike[key];
                     }
                 }
+                // Setup the layout for this dynamic form
+                outDataFormat[name] = defaultValue ?? "";
+
                 return (
                     <InputGroup key={name} className='FormGroupElement'>
                         <InputGroupText className='form-input-label'>

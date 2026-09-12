@@ -20,7 +20,15 @@ import SelectCreator from "./SelectorCreator";
 import { BuildURI } from "../Utils/ServerUtils.ts";
 import { saveItem, getItem, removeItem } from "Utils/SessionStorageLoader.ts";
 import { Props } from "DefaultDataTypes.ts";
-import { BoardNames, ConfigTypes, BikeConifg, BoardConfig, ConfigStorage } from "./ContextDataTypes.tsx";
+import {
+    BoardNames,
+    FormFields,
+    FormDataFields,
+    ConfigTypes,
+    BikeConifg,
+    BoardConfig,
+    ConfigStorage,
+} from "./ContextDataTypes.tsx";
 
 /**
  * Create needed context forms. Return the configured elements
@@ -76,6 +84,8 @@ function ContextForm(props: Props) {
         bike: [],
     });
 
+    const [FormData, setFormData] = useState<FormDataFields | null>(null);
+
     const BoardNames: BoardNames[] = ["bms", "imu", "tmu", "tms", "pvc", "mc"];
 
     /**
@@ -107,8 +117,8 @@ function ContextForm(props: Props) {
             if (targetConfig) {
                 // Loop over each saved conifg and update the value
                 const savedConfigs = (targetConfig as BikeConifg).savedConfigs;
-                for (const [board, conifg] of Object.entries(savedConfigs)) {
-                    UpdateSavedConfigSelectedValues(board as ConfigTypes, conifg);
+                for (const [board, config] of Object.entries(savedConfigs)) {
+                    UpdateSavedConfigSelectedValues(board as ConfigTypes, config);
                 }
             }
         } else SetFormElements((prev) => ({ ...prev, [configName]: formElement }));
@@ -242,7 +252,7 @@ function ContextForm(props: Props) {
                 SetDropDowns((prev) => ({ ...prev, [name]: dropDown }));
             }
         });
-    }, [DropDownOptions, BikeContextForm]);
+    }, [DropDownOptions, ConfigSelectedValue, BikeContextForm]);
 
     /**
      * Fetch all the saved configs on the first render
