@@ -35,7 +35,8 @@ class UserAuthApi(MethodView):
                 else:
                     auth_token = mongo_data["auth_token"]
                     # always update auth token on login
-                    auth_token = update_expired_token(mongo_data["_id"], self.db)
+                    # TODO undo when merging main
+                    # auth_token = update_expired_token(mongo_data["_id"], self.db)
                     return {"auth_token": auth_token}, HttpResponseType.OK.value
             case "signup":
 
