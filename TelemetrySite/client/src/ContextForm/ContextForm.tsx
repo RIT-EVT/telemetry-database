@@ -129,8 +129,8 @@ function ContextForm(props: Props) {
 
             const data = await response.json();
 
-            if (data && "data" in data && "config_data" in data["data"]) {
-                SetDropdownOptions(data.data.config_data as ConfigStorage);
+            if (data && "data" in data) {
+                SetDropdownOptions(data.data as ConfigStorage);
             }
         } catch (e) {
             console.error(e);

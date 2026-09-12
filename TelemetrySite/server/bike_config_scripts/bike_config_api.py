@@ -9,8 +9,6 @@ from http_codes import HttpResponseType
 
 class BikeConfigApi(MethodView):
 
-    BIKE_CONFIG_DOC = "67ae8d01097ab8ae923672f8"
-
     def __init__(self, db):
         self.db = db
 
@@ -25,20 +23,44 @@ class BikeConfigApi(MethodView):
             tuple: All configs currently saved
         """
 
+        # User Validation
         user_valid, response = validate_user(auth_token, self.db)
 
         if not user_valid:
             return response.error()
 
+        # Data Fetching & Aggrigation
         db_connection = self.db["configs"]
+        pipeline = [
+            {"$match": {"inactive": False}},
+            {"$group": {
+                "_id": "$type",
+                "data": {
+                    "$push": {
+                        "k": "$name",
+                        "v": "$$ROOT"
+                    },
+                },
+            }},
+            {"$project": {
+                "_id": 0,
+                "k": "$type",
+                "v": { "$arrayToObject": "$data" },
+            }},
+            {"$replaceRoot": { "newRoot": "$v" }},
+        ]
 
-        config_data = db_connection.find_one({"_id": ObjectId(self.BIKE_CONFIG_DOC)})
+        retreived_data = list(db_connection.aggregate(pipeline))
+        config_data = {group[next(iter(group))]["type"]: list(group.values()) for group in retreived_data}
 
-        if config_data:
-            config_data["_id"] = str(config_data["_id"])  # Convert ObjectId to string
+        # Need to remove all of the "_id" objects
+        for _, options in config_data.items():
+            for data in options:
+                del data["_id"]
 
         return {"data": config_data}, HttpResponseType.OK.value
 
+    # TODO: Update Post to use new standard!
     def post(self, auth_token):
         """
         Add new configs to the database
@@ -69,5 +91,6 @@ class BikeConfigApi(MethodView):
 
         return {"success": "Data created"}, HttpResponseType.CREATED.value
 
+    # TODO: Create delete to change the "inactive" flag to true on database entries
     def delete(self):
         return HttpResponseType.NOT_IMPLEMENTED.error()
