@@ -61,6 +61,8 @@ class BikeConfigApi(MethodView):
         return {"data": config_data}, HttpResponseType.OK.value
 
     # TODO: Update Post to use new standard!
+    # For this to be done in a way that is testable, front-end development
+    # is needed to recreate the UI to be able to create new configs.
     def post(self, auth_token):
         """
         Add new configs to the database

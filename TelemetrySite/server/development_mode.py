@@ -59,19 +59,6 @@ def _setup_config_mock(mock_db):
                 },
             },
             {
-                "type": "bike",
-                "name": "test3",
-                "inactive": False,
-                "savedConfigs": {
-                    "bms": "test",
-                    "imu": "test",
-                    "tmu": "test",
-                    "tms": "test",
-                    "pvc": "test",
-                    "mc": "test",
-                },
-            },
-            {
                 "type": "bms",
                 "name": "test",
                 "inactive": False,
