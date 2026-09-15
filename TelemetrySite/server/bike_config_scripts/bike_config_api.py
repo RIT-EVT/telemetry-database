@@ -6,11 +6,14 @@ from bson import ObjectId
 from utils import validate_user
 from http_codes import HttpResponseType
 
-
 class BikeConfigApi(MethodView):
 
     def __init__(self, db):
         self.db = db
+
+    def _hasOverlap(self, db_connection, object):
+        res = db_connection.find_one({"type": object['type'], "name": object['name']})
+        return res != None
 
     def get(self, auth_token):
         """
@@ -60,9 +63,6 @@ class BikeConfigApi(MethodView):
 
         return {"data": config_data}, HttpResponseType.OK.value
 
-    # TODO: Update Post to use new standard!
-    # For this to be done in a way that is testable, front-end development
-    # is needed to recreate the UI to be able to create new configs.
     def post(self, auth_token):
         """
         Add new configs to the database
@@ -80,16 +80,25 @@ class BikeConfigApi(MethodView):
             return response.error()
 
         db_connection = self.db["configs"]
-        config_data = request.form["configData"]
 
+        config_data = request.form["configData"]
         config_data = json.loads(config_data)
 
-        for key in config_data:
-            if len(config_data[key]) != 0:
-                db_connection.update_one(
-                    {"_id": ObjectId(self.BIKE_CONFIG_DOC)},
-                    {"$push": {f"config_data.{key}": config_data[key]}},
-                )
+        # This is going to be expecting an array of indivdual config objects.
+        for object in config_data:
+            hasOverlap = self._hasOverlap(db_connection, object)
+            if hasOverlap:
+                overlapCounter = 0
+                startName = object['name']
+
+                while hasOverlap == True:
+                    overlapCounter += 1
+
+                    object['name'] = f"{startName} ({overlapCounter})"
+                    hasOverlap = self._hasOverlap(db_connection, object)
+
+        # Add all of the objects as documents into the db.
+        db_connection.insert_many(config_data)
 
         return {"success": "Data created"}, HttpResponseType.CREATED.value
 
