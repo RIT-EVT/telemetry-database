@@ -11,6 +11,7 @@ class BikeConfigApi(MethodView):
     def __init__(self, db):
         self.db = db
 
+    # This currently makes a db request per check, unsure if theirs a more efficant way to do this. - Owen
     def _hasOverlap(self, db_connection, object):
         res = db_connection.find_one({"type": object['type'], "name": object['name']})
         return res != None
@@ -103,5 +104,33 @@ class BikeConfigApi(MethodView):
         return {"success": "Data created"}, HttpResponseType.CREATED.value
 
     # TODO: Create delete to change the "inactive" flag to true on database entries
-    def delete(self):
-        return HttpResponseType.NOT_IMPLEMENTED.error()
+    def delete(self, auth_token):
+        """
+        Sets configs in the database inactive status to true
+
+        Args:
+            auth_token (string): The user's unique authentication string
+
+        Returns:
+            tuple: success message
+        """
+
+        user_valid, response = validate_user(auth_token, self.db)
+
+        if not user_valid:
+            return response.error()
+
+        db_connection = self.db["configs"]
+
+        config_data = request.form["configData"]
+        config_data = json.loads(config_data)
+
+        # This is going to be expecting an array of an object listing name and type.
+        # Ex: { "name": "test", "type": "bike" }
+        for object in config_data:
+            if 'name' in object and 'type' in object:
+                db_connection.update_one(object, {"$set": {"inactive": True}})
+            else:
+                """Do we want some sort of msg here? What if some are found but others arnt?"""
+
+        return {"success": "Data set to 'inactive'"}, HttpResponseType.OK.value
