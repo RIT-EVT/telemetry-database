@@ -103,7 +103,6 @@ class BikeConfigApi(MethodView):
 
         return {"success": "Data created"}, HttpResponseType.CREATED.value
 
-    # TODO: Create delete to change the "inactive" flag to true on database entries
     def delete(self, auth_token):
         """
         Sets configs in the database inactive status to true
