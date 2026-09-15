@@ -84,7 +84,7 @@ function ContextForm(props: Props) {
         bike: [],
     });
 
-    const [FormData, setFormData] = useState<FormDataFields | null>(null);
+    const [FormDataUpdate, setFormData] = useState<Partial<Record<FormFields, FormDataFields>>>({});
 
     const BoardNames: BoardNames[] = ["bms", "imu", "tmu", "tms", "pvc", "mc"];
 
@@ -100,7 +100,7 @@ function ContextForm(props: Props) {
      * pass the new value here to update the useState hook
      * and rerender effected components
      *
-     * @param {string} configName - Name of config to update
+     * @param {ConfigTypes} configName - Name of config to update
      * @param {string} value - New value of select field
      */
     const UpdateSavedConfigSelectedValues = (configName: ConfigTypes, value: string): void => {
@@ -110,8 +110,7 @@ function ContextForm(props: Props) {
         // Target config could be null here. This is handled by DynamicForm
         const targetConfig = DropDownOptions[configName]?.find((config) => config.name === value) ?? null;
 
-        const formElement = DynamicForm(`${configName}Config`, targetConfig);
-
+        const formElement = CreateDynamicForm(configName, targetConfig);
         if (configName === "bike") {
             SetBikeForm(formElement);
             if (targetConfig) {
@@ -122,6 +121,24 @@ function ContextForm(props: Props) {
                 }
             }
         } else SetFormElements((prev) => ({ ...prev, [configName]: formElement }));
+    };
+
+    const UpdateSavedValue = (formName: FormFields, fieldName: string, value: string | Date | number | boolean) => {
+        let data = FormDataUpdate[formName];
+        if (data) data[fieldName] = value;
+
+        setFormData((prev) => ({ ...prev, [formName]: data }));
+    };
+
+    /**
+     * Create a new dynamic form and setup callbacks. Returns form
+     */
+    const CreateDynamicForm = (formName: FormFields, formDataSet: BoardConfig | BikeConifg | null = null) => {
+        let formDataTempSaving: FormDataFields = {};
+
+        const formElement = DynamicForm(formName, formDataSet, formDataTempSaving, UpdateSavedValue);
+        setFormData((prev) => ({ ...prev, [formName]: formDataTempSaving }));
+        return formElement;
     };
 
     /**
@@ -230,8 +247,8 @@ function ContextForm(props: Props) {
      * Hook on update to dropdown values
      */
     useEffect(() => {
-        SetContextForm(DynamicForm("mainBody"));
-        SetEventForm(DynamicForm("event", EventData ? EventData : null));
+        SetContextForm(CreateDynamicForm("main"));
+        SetEventForm(CreateDynamicForm("event", EventData ? EventData : null));
     }, [EventData]);
 
     useEffect(() => {

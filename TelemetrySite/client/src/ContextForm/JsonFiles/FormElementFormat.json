@@ -1,5 +1,5 @@
 {
-  "mainBody": {
+  "main": {
     "airTemp": {
       "type": "number",
       "placeHolder": "°C",
@@ -78,7 +78,7 @@
       "label": "Location"
     }
   },
-  "bikeConfig": {
+  "bike": {
     "platformName": {
       "type": "select",
       "placeHolder": "Platform name",
@@ -107,7 +107,7 @@
       "required": true
     }
   },
-  "bmsConfig": {
+  "bms": {
     "hardwareRevision": {
       "type": "text",
       "required": true,
@@ -154,7 +154,7 @@
       "label": "Config saved name"
     }
   },
-  "imuConfig": {
+  "imu": {
     "hardwareRevision": {
       "type": "text",
       "required": false,
@@ -191,7 +191,7 @@
       "label": "Config saved name"
     }
   },
-  "tmuConfig": {
+  "tmu": {
     "hardwareRevision": {
       "type": "text",
       "required": false,
@@ -213,7 +213,7 @@
       "label": "Config saved name"
     }
   },
-  "tmsConfig": {
+  "tms": {
     "hardwareRevision": {
       "type": "text",
       "required": true,
@@ -245,7 +245,7 @@
       "label": "Config saved name"
     }
   },
-  "pvcConfig": {
+  "pvc": {
     "hardwareRevision": {
       "type": "text",
       "required": true,
@@ -262,7 +262,7 @@
       "label": "Config saved name"
     }
   },
-  "mcConfig": {
+  "mc": {
     "model": {
       "type": "text",
       "required": true,

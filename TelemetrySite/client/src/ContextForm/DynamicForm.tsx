@@ -3,7 +3,7 @@ import "./ContextForm.css";
 import ContextJSONFormElements from "./JsonFiles/FormElementFormat.json";
 import { InputType } from "reactstrap/types/lib/Input";
 
-import { ConfigTypes, BoardConfig, BikeConifg } from "./ContextDataTypes";
+import { FormFields, BoardConfig, BikeConifg, FormDataFields } from "./ContextDataTypes";
 
 const FormData = ContextJSONFormElements as FormConfig;
 
@@ -13,15 +13,14 @@ const FormData = ContextJSONFormElements as FormConfig;
  * many input and label objects.
  *
  * @param {string} jsonValue - Key for the element in the FormElementFormat.json file
- * @param {Record<string, string | Date | number | boolean>} outDataFormat - The data format for this DynamicForm
  * @param {json} optionalSetData - Predefined data for config inputs
  * @return {HTMLFormElement} Form group of all the input elements on the json file
  */
 export default function DynamicForm(
-    jsonValue: ElementNames,
-    outDataFormat: Record<string, string | Date | number | boolean>,
-
+    jsonValue: FormFields,
     optionalSetData: BoardConfig | BikeConifg | null = null,
+    outDataFormat: FormDataFields | null = null,
+    UpdateSavedValue: Function,
 ): React.ReactElement {
     /* Loop through every json element for the current field and
      *  Create a new reactstrap input element for it
@@ -34,7 +33,7 @@ export default function DynamicForm(
                 const formElement = FormData[jsonValue][key];
                 if (!formElement) return;
                 let name = formElement.label;
-                let defaultValue: undefined | string | Date = undefined;
+                let defaultValue: undefined | string | boolean | number | Date = undefined;
 
                 if (optionalSetData) {
                     if (key === "name") defaultValue = optionalSetData[key];
@@ -53,13 +52,14 @@ export default function DynamicForm(
                         if (key == "platform") if (bike) defaultValue = bike[key];
                     }
                 }
-                // Setup the layout for this dynamic form
-                outDataFormat[name] = defaultValue ?? "";
+                if (outDataFormat)
+                    // Setup the layout for this dynamic form
+                    outDataFormat[name] = defaultValue ?? "";
 
                 return (
                     <InputGroup key={name} className='FormGroupElement'>
                         <InputGroupText className='form-input-label'>
-                            {formElement["label"]} {formElement["required"] ? <span style={{ color: "red" }}>*</span> : null}
+                            {name} {formElement["required"] ? <span style={{ color: "red" }}>*</span> : null}
                         </InputGroupText>
                         <Input
                             type={formElement["type"] as InputType}
@@ -68,6 +68,9 @@ export default function DynamicForm(
                             readOnly={formElement["readOnly"] || optionalSetData ? true : false}
                             className='formInput'
                             value={defaultValue}
+                            onChange={(e) => {
+                                UpdateSavedValue(jsonValue, name, e.target.value);
+                            }}
                         >
                             {formElement["type"] === "select"
                                 ? formElement["selectValues"].map((value) => (
@@ -87,7 +90,6 @@ export default function DynamicForm(
 //#region Form Types
 
 type FieldType = "text" | "number" | "date" | "datetime-local" | "select" | "string";
-type ElementNames = "mainBody" | "event" | `${ConfigTypes}Config`;
 
 interface BaseField {
     type: FieldType;
@@ -113,15 +115,15 @@ interface FormSection {
 }
 
 interface FormConfig {
-    mainBody: FormSection;
+    main: FormSection;
     event: FormSection;
-    bikeConfig: FormSection;
-    bmsConfig: FormSection;
-    imuConfig: FormSection;
-    tmuConfig: FormSection;
-    tmsConfig: FormSection;
-    pvcConfig: FormSection;
-    mcConfig: FormSection;
+    bike: FormSection;
+    bms: FormSection;
+    imu: FormSection;
+    tmu: FormSection;
+    tms: FormSection;
+    pvc: FormSection;
+    mc: FormSection;
 }
 
 //#endregion

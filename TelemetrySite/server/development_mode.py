@@ -125,7 +125,7 @@ def _setup_config_mock(mock_db):
             {
                 "username": "test_user_valid",
                 "password": "123".encode(),
-                "auth_token": "gP98MY0suUKvOycCW2PIvzeONtm0FnO6DfkaTVNrRHQ",
+                "auth_token": "0",
                 "auth_time": datetime.now(),
             },
             {
