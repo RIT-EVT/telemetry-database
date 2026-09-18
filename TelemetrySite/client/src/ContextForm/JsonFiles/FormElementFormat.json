@@ -36,10 +36,10 @@
       "label": "Rider's Weight",
       "required": false
     },
-    "driverFeedback": {
+    "riderFeedback": {
       "type": "text",
       "placeHolder": "It was great!",
-      "label": "Driver's Feedback",
+      "label": "Rider's Feedback",
       "required": false
     },
     "distanceCovered": {

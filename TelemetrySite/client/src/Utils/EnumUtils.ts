@@ -27,4 +27,8 @@ function getMaxEnumValue(e: object): number | undefined {
     return values[values.length - 1];
 }
 
-export { getMaxEnumValue };
+function isRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+export { getMaxEnumValue, isRecord };

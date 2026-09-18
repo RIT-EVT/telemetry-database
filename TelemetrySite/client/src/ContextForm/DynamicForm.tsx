@@ -5,52 +5,63 @@ import { InputType } from "reactstrap/types/lib/Input";
 
 import { FormFields, BoardConfig, BikeConifg, FormDataFields } from "./ContextDataTypes";
 
+import { isRecord } from "Utils/EnumUtils";
+
 const FormData = ContextJSONFormElements as FormConfig;
 
 /**
- * Create a form group based off of the json key passed in.
- * Loop through all elements in the json object and create that
- * many input and label objects.
+ * Create a form group based off of the json key passed in.  Loop through all elements in the json
+ * object and create that many input and label objects.
  *
- * @param {string} jsonValue - Key for the element in the FormElementFormat.json file
- * @param {json} optionalSetData - Predefined data for config inputs
+ * @param {FormFields} jsonValue - Key for the element in the FormElementFormat.json file
+ * @param {FormDataFields} outDataFormat - An output variable to hold data format
+ * @param {Function} UpdateSavedValue - On change call this function to update data per input
+ * @param {BoardConfig | BikeConifg | FormDataFields | null} optionalSetData - Predefined data for config inputs
  * @return {HTMLFormElement} Form group of all the input elements on the json file
  */
 export default function DynamicForm(
     jsonValue: FormFields,
-    optionalSetData: BoardConfig | BikeConifg | null = null,
-    outDataFormat: FormDataFields | null = null,
+    outDataFormat: FormDataFields,
     UpdateSavedValue: Function,
+    optionalSetData: BoardConfig | BikeConifg | FormDataFields | null = null,
 ): React.ReactElement {
     /* Loop through every json element for the current field and
      *  Create a new reactstrap input element for it
      *  TODO we may want to talk later about changing the way we approach this logic, but for now this functions
      */
+    let newOptionalSetFormat: Record<string, string> = {};
+    if (optionalSetData) {
+        let optionalSetRecord = optionalSetData as Record<string, any>;
 
+        // Loop over a record and copy value to optionalSetRecord
+        // This ensures all data is in the correct field
+        const loopRecord = (input: Record<string, any>) => {
+            const keys = Object.keys(input);
+
+            for (let index in keys) {
+                let key = keys[index] as string;
+
+                // Loop over sub records
+                if (isRecord(input[key])) {
+                    loopRecord(input[key]);
+                } else {
+                    newOptionalSetFormat[key] = input[key] as string;
+                }
+            }
+        };
+
+        loopRecord(optionalSetRecord);
+    }
     return (
         <FormGroup>
             {Object.keys(FormData[jsonValue]).map((key) => {
                 const formElement = FormData[jsonValue][key];
                 if (!formElement) return;
                 let name = formElement.label;
-                let defaultValue: undefined | string | boolean | number | Date = undefined;
+                let defaultValue: string | undefined = undefined;
 
-                if (optionalSetData) {
-                    if (key === "name") defaultValue = optionalSetData[key];
-                    else if ("firmwareCommitHash" in optionalSetData) {
-                        switch (key) {
-                            // Abuse fall through
-                            case "firmwareCommitHash":
-                            case "hardwareRevision":
-                                defaultValue = optionalSetData[key];
-                                break;
-                            default:
-                                defaultValue = optionalSetData.data[key];
-                        }
-                    } else {
-                        const bike = optionalSetData as BikeConifg;
-                        if (key == "platform") if (bike) defaultValue = bike[key];
-                    }
+                if (newOptionalSetFormat) {
+                    defaultValue = newOptionalSetFormat[key];
                 }
                 if (outDataFormat)
                     // Setup the layout for this dynamic form

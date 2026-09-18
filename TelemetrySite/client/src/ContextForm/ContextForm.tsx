@@ -12,7 +12,6 @@ import "./ContextForm.css";
 
 import { useEffect, useState } from "react";
 
-import ContextJSONIdValues from "./JsonFiles/ContextForm.json";
 import { useNavigate, useLocation } from "react-router-dom";
 import DynamicForm from "./DynamicForm";
 import SelectCreator from "./SelectorCreator";
@@ -133,10 +132,13 @@ function ContextForm(props: Props) {
     /**
      * Create a new dynamic form and setup callbacks. Returns form
      */
-    const CreateDynamicForm = (formName: FormFields, formDataSet: BoardConfig | BikeConifg | null = null) => {
+    const CreateDynamicForm = (
+        formName: FormFields,
+        formDataSet: BoardConfig | FormDataFields | BikeConifg | null = null,
+    ) => {
         let formDataTempSaving: FormDataFields = {};
 
-        const formElement = DynamicForm(formName, formDataSet, formDataTempSaving, UpdateSavedValue);
+        const formElement = DynamicForm(formName, formDataTempSaving, UpdateSavedValue, formDataSet);
         setFormData((prev) => ({ ...prev, [formName]: formDataTempSaving }));
         return formElement;
     };
@@ -202,7 +204,7 @@ function ContextForm(props: Props) {
 
         //Save this data and pass it to the next step
         //Save the data in session storage in case user loses wifi/refreshes page
-        //saveItem("BikeData", collectedData);
+        saveItem("BikeData", FormDataUpdate);
 
         //if there is any data saved in a new config send it to the backend
         //PostConfigData(newConfigItems);
@@ -218,27 +220,32 @@ function ContextForm(props: Props) {
         const offset = date.getTimezoneOffset();
         const local = new Date(date.getTime() - offset * 60 * 1000);
 
-        const configIDs = ContextJSONIdValues.event.run.context;
-        const eventIDs = ContextJSONIdValues.event;
+        const new_main_data: FormDataFields = {
+            airTemp: "0",
+            humidity: "0",
+            windSpeed: "0",
+            windAngle: "0",
+            riderFeedback: "TEST",
+            riderName: "TEST",
+            riderWeight: "0",
+            distanceCovered: "0",
+            startTime: local.toISOString().slice(0, 16),
+        };
 
-        (document.getElementById(eventIDs.name) as HTMLInputElement).value = "TEST";
-        (document.getElementById(eventIDs.date) as HTMLInputElement).value = date.toISOString().slice(0, 10);
-        (document.getElementById(eventIDs.type) as HTMLInputElement).value = "TEST";
-        (document.getElementById(eventIDs.location) as HTMLInputElement).value = "TEST";
+        const new_event_data: FormDataFields = {
+            eventName: "TEST",
+            eventDate: date.toISOString().slice(0, 10),
+            eventType: "TEST",
+            location: "TEST",
+        };
 
-        (document.getElementById(configIDs.airTemp) as HTMLInputElement).value = "0";
-        (document.getElementById(configIDs.humidity) as HTMLInputElement).value = "0";
-        (document.getElementById(configIDs.airTemp) as HTMLInputElement).value = "0";
-        (document.getElementById(configIDs.windSpeed) as HTMLInputElement).value = "0";
-        (document.getElementById(configIDs.windDirection) as HTMLInputElement).value = "0";
-        (document.getElementById(configIDs.riderFeedback) as HTMLInputElement).value = "TEST";
-        (document.getElementById(configIDs.riderName) as HTMLInputElement).value = "TEST";
-        (document.getElementById(configIDs.riderWeight) as HTMLInputElement).value = "0";
-        (document.getElementById(configIDs.distanceCovered) as HTMLInputElement).value = "0";
-        (document.getElementById(configIDs.startTime) as HTMLInputElement).value = local.toISOString().slice(0, 16);
+        setFormData((prev) => ({ ...prev, ["main"]: new_main_data }));
+        setFormData((prev) => ({ ...prev, ["event"]: new_event_data }));
 
-        (document.getElementById("bikeSelect") as HTMLInputElement).value = "TEST_BIKE";
-        UpdateSavedConfigSelectedValues("bike", "TEST_BIKE");
+        SetContextForm(CreateDynamicForm("main", new_main_data));
+        SetEventForm(CreateDynamicForm("event", new_event_data));
+
+        UpdateSavedConfigSelectedValues("bike", "test");
     }
 
     /**
@@ -247,7 +254,7 @@ function ContextForm(props: Props) {
      * Hook on update to dropdown values
      */
     useEffect(() => {
-        SetContextForm(CreateDynamicForm("main"));
+        SetContextForm(CreateDynamicForm("main", FormDataUpdate["main"] ?? null));
         SetEventForm(CreateDynamicForm("event", EventData ? EventData : null));
     }, [EventData]);
 
