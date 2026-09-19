@@ -202,9 +202,32 @@ function ContextForm(props: Props) {
         // Prevent the form from clearing data
         event.preventDefault();
 
+        const dataFormatted = {
+            event: {
+                ...FormDataUpdate["event"],
+                run: {
+                    orderNumber: 0,
+                    context: {
+                        bikeConfig: {
+                            ...FormDataUpdate["bike"],
+                            firmwareConfig: {
+                                bms: { ...FormDataUpdate["bms"] },
+                                imu: { ...FormDataUpdate["imu"] },
+                                tmu: { ...FormDataUpdate["tmu"] },
+                                tms: { ...FormDataUpdate["tms"] },
+                                pvc: { ...FormDataUpdate["pvc"] },
+                                mc: { ...FormDataUpdate["mc"] },
+                            },
+                        },
+                        ...FormDataUpdate["main"],
+                    },
+                },
+            },
+        };
+
         //Save this data and pass it to the next step
         //Save the data in session storage in case user loses wifi/refreshes page
-        saveItem("BikeData", FormDataUpdate);
+        saveItem("BikeData", dataFormatted);
 
         //if there is any data saved in a new config send it to the backend
         //PostConfigData(newConfigItems);
@@ -244,7 +267,7 @@ function ContextForm(props: Props) {
 
         SetContextForm(CreateDynamicForm("main", new_main_data));
         SetEventForm(CreateDynamicForm("event", new_event_data));
-
+        console.log(new_event_data);
         UpdateSavedConfigSelectedValues("bike", "test");
     }
 

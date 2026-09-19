@@ -30,7 +30,7 @@ def create_app(db=None):
     # Load credentials
     if len(argv) < 2 or argv[1] == "production":
         print("creating real DB instance")
-        print(len(argv))
+
         two_up = os.path.dirname(os.path.dirname(server_folder))
         dotenv.load_dotenv(os.path.join(two_up, "credentials.env"))
         db = utils.create_db_connection()
