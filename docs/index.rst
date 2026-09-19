@@ -21,7 +21,7 @@ documentation for details.
    :caption: API
    :name: sec-api
    
-   First C++ File <api/basics>
+   Bike Context API <api/bike_context>
 
 .. toctree::
    :hidden:
@@ -29,7 +29,7 @@ documentation for details.
    :caption: Data Format
    :name: sec-data_format
    
-   Bike Context <data_format/bike_context>
+   Bike Context Formatting <data_format/bike_context>
 
 .. toctree::
    :hidden:
