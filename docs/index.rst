@@ -18,11 +18,18 @@ documentation for details.
 .. toctree::
    :hidden:
    :maxdepth: 2
-   :caption: C++
-   :name: sec-cpp
+   :caption: API
+   :name: sec-api
    
-   First C++ File <cpp/basics>
-   Definitions.h <cpp/definitions>
+   First C++ File <api/basics>
+
+.. toctree::
+   :hidden:
+   :maxdepth: 2
+   :caption: Data Format
+   :name: sec-data_format
+   
+   Bike Context <data_format/bike_context>
 
 .. toctree::
    :hidden:
