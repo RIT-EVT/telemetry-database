@@ -4,7 +4,7 @@ Bike Context Format
 
 This defines what format the bike config api is expecting data to be and the format that it returns data in.
 
-JSON Schema
+Component JSON Schema
 ----------------------
 
 Bike
@@ -35,8 +35,8 @@ Battery Management System
         "name": "string",
         "type": "BMS",
         "inactive": "boolean",
-        "hardwareRevision": int,
-        "firmwareCommitHash": int,
+        "hardwareRevision": "integer",
+        "firmwareCommitHash": "integer",
         "data": {
             "totalVoltageUnits": "string",
             "batteryVoltageUnits": "string",
@@ -56,8 +56,8 @@ Inertial Measurement Unit
         "name": "string",
         "type": "IMU",
         "inactive": "boolean",
-        "hardwareRevision": int,
-        "firmwareCommitHash": int,
+        "hardwareRevision": "integer",
+        "firmwareCommitHash": "integer",
         "data": {
             "eulerUnits": "string",
             "gyroUnits": "string",
@@ -75,8 +75,8 @@ Thermal Management Unit
         "name": "string",
         "type": "TMU",
         "inactive": "boolean",
-        "hardwareRevision": int,
-        "firmwareCommitHash": int,
+        "hardwareRevision": "integer",
+        "firmwareCommitHash": "integer",
         "data": {
             "thermalUnits": "string",
         }, 
@@ -91,8 +91,8 @@ Thermal Management System
         "name": "string",
         "type": "TMS",
         "inactive": "boolean",
-        "hardwareRevision": int,
-        "firmwareCommitHash": int,
+        "hardwareRevision": "integer",
+        "firmwareCommitHash": "integer",
         "data": {
             "tempUnits": "string",
             "pumpSpeedUnits": "string",
@@ -109,8 +109,8 @@ Powertrain Voltage Controller
         "name": "string",
         "type": "PVC",
         "inactive": "boolean",
-        "hardwareRevision": int,
-        "firmwareCommitHash": int,
+        "hardwareRevision": "integer",
+        "firmwareCommitHash": "integer",
     }
 
 Motor Controller
@@ -133,6 +133,51 @@ Call Specifics
 
 get()
 ~~~~~~~~~~~~~~~~~~~~~
+
+Returns:
+
+.. code-block:: json
+
+    {
+        "data": {
+            "bike": [],
+            "bms": [],
+            "imu": [],
+            "tmu": [],
+            "tms": [],
+            "pvc": [],
+            "mc": [],
+        }
+    }
+
+post()
+~~~~~~~~~~~~~~~~~~~~~
+
+Takes:
+
+.. code-block:: json
+
+    {
+        "configData": [],
+    }
+
+``configData`` is a list of any of the component JSON Schema's.
+
+delete()
+~~~~~~~~~~~~~~~~~~~~~
+
+Takes:
+
+.. code-block:: json
+
+    {
+        "configData": [
+            {
+                "name": "string",
+                "type": "string",
+            },
+        ],
+    }
 
 Godot Type Aliases
 ------------------
