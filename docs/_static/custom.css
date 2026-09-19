@@ -1,0 +1,40 @@
+/* Godot 4 Editor Sidebar & Caption Styles */
+:root {
+    --godot-bg-sidebar: #20252b;
+    --godot-bg-panel: #0F1011;
+    --godot-caption-text: #8c919b;
+    --godot-body-text: #e0e0e0;
+    --godot-border-color: #7F7668;
+    --godot-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.wy-nav-content {
+    max-width: 85% !important;
+}
+
+.godot-sidebar {
+    background-color: var(--godot-bg-sidebar);
+    color: var(--godot-body-text);
+    font-family: var(--godot-font-family);
+    border-right: 1px solid var(--godot-border-color);
+    padding: 8px 12px;
+}
+
+.godot-caption {
+    color: var(--godot-caption-text);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 4px 0;
+    user-select: none;
+}
+
+
+.rst-content dt .descname {
+    color: #e0e0e0 !important;
+}
+
+.rst-content dt .descclassname {
+    color: #64e06c !important;
+}
