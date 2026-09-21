@@ -26,6 +26,8 @@ Returns:
         }
     }
 
+Each list in data is the JSON Schema corrolating to the component. All of them are optional.
+
 post()
 ~~~~~~~~~~~~~~~~~~~~~
 

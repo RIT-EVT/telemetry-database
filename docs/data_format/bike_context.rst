@@ -2,7 +2,8 @@
 Bike Context Format
 =============================
 
-This defines what format the bike config api is expecting data to be and the format that it returns data in.
+This defines the json schema for each component. 
+Types do not change and are in reality fully lowercase, they are in full caps to represent them being a constant.
 
 Component JSON Schema
 ----------------------
