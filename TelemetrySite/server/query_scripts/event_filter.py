@@ -45,7 +45,7 @@ class EventFilterApi(MethodView):
                 return self.save_event_query(request.get_json(), doc_id)
 
     def test_query(self, data, doc_id):
-
+        print(data)
         # Format for our data portion of the aggregate pipeline for all facets
         format = [
             {
