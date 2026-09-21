@@ -11,6 +11,9 @@ type FormFields = ConfigTypes | "event" | "main";
 
 type FormDataFields = Record<string, string | Date | number | boolean>;
 
+/** Value of the select option that lets the user fill a config out by hand instead of using a saved one. */
+const CUSTOM_OPTION = "Custom";
+
 /**
  * Hold context for individual boards. Any board specific pieces go in "data"
  */
@@ -25,13 +28,18 @@ interface BoardConfig {
 /**
  * Represent the configs for the Bike Context section.
  */
-interface BikeConifg {
+interface BikeConfig {
     name: string;
 
     /** Any board configs that are saved under this one. */
     savedConfigs: Record<BoardNames, string>;
     platform: string;
 }
+
+/**
+ * @deprecated Misspelled name, kept so existing imports keep compiling. Use {@link BikeConfig}.
+ */
+type BikeConifg = BikeConfig;
 
 /**
  * Store all configs needed for context.
@@ -43,7 +51,7 @@ interface ConfigStorage {
     tmu: BoardConfig[];
     pvc: BoardConfig[];
     mc: BoardConfig[];
-    bike: BikeConifg[];
+    bike: BikeConfig[];
 }
 
 /** Format for our data in database */
@@ -97,6 +105,8 @@ interface ContextData {
     };
 }
 
+export { CUSTOM_OPTION };
+
 export type {
     BoardNames,
     FormFields,
@@ -104,6 +114,7 @@ export type {
     ConfigTypes,
     ConfigNames,
     ContextData,
+    BikeConfig,
     BikeConifg,
     BoardConfig,
     ConfigStorage,

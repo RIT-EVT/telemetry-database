@@ -3,93 +3,135 @@ import "./ContextForm.css";
 import ContextJSONFormElements from "./JsonFiles/FormElementFormat.json";
 import { InputType } from "reactstrap/types/lib/Input";
 
-import { FormFields, BoardConfig, BikeConifg, FormDataFields } from "./ContextDataTypes";
+import { FormFields, BoardConfig, BikeConfig, FormDataFields } from "./ContextDataTypes";
 
 import { isRecord } from "Utils/EnumUtils";
 
-const FormData = ContextJSONFormElements as FormConfig;
+const FormElements = ContextJSONFormElements as FormConfig;
+
+/**
+ * Loop over a record (and any sub records) and copy every value into a single flat record.
+ * This ensures all data is in the correct field, no matter how deeply it was nested.
+ *
+ * @param {Record<string, any>} input - Record to flatten
+ * @param {Record<string, string>} output - Record the values are copied into
+ * @return {Record<string, string>} The flattened record
+ */
+function FlattenRecord(input: Record<string, any>, output: Record<string, string> = {}): Record<string, string> {
+    for (const key of Object.keys(input)) {
+        const value = input[key];
+
+        // Loop over sub records
+        if (isRecord(value)) {
+            FlattenRecord(value, output);
+        } else if (value !== null && value !== undefined) {
+            output[key] = String(value);
+        }
+    }
+
+    return output;
+}
+
+/**
+ * Build the starting values for a form. Every field in the form's json section gets an entry, keyed by the
+ * field's label (this is the format the rest of the form logic saves data in), and filled from
+ * the predefined data if there is any. Fields without predefined data start out empty.
+ *
+ * Predefined data is matched to fields by their json key, falling back to their label.
+ *
+ * @param {FormFields} formName - Key for the section in the FormElementFormat.json file
+ * @param {BoardConfig | BikeConfig | FormDataFields | null} optionalSetData - Predefined data for the inputs
+ * @return {Record<string, string>} Starting value of every field, keyed by label
+ */
+export function CreateInitialFormValues(
+    formName: FormFields,
+    optionalSetData: BoardConfig | BikeConfig | FormDataFields | null = null,
+): Record<string, string> {
+    const presetValues = optionalSetData ? FlattenRecord(optionalSetData as Record<string, any>) : {};
+    const values: Record<string, string> = {};
+
+    for (const [key, formElement] of Object.entries(FormElements[formName])) {
+        if (!formElement) continue;
+        values[formElement.label] = presetValues[key] ?? presetValues[formElement.label] ?? "";
+    }
+
+    return values;
+}
+
+interface DynamicFormProps {
+    /** Key for the element in the FormElementFormat.json file */
+    formName: FormFields;
+    /** Current value of every input, keyed by the input's label */
+    values: FormDataFields | undefined;
+    /** On change call this function to update data per input */
+    onChange: (formName: FormFields, fieldName: string, value: string) => void;
+    /** Lock every input in the form. Used when the data comes from a saved config */
+    readOnly?: boolean;
+}
 
 /**
  * Create a form group based off of the json key passed in.  Loop through all elements in the json
  * object and create that many input and label objects.
  *
- * @param {FormFields} jsonValue - Key for the element in the FormElementFormat.json file
- * @param {FormDataFields} outDataFormat - An output variable to hold data format
- * @param {Function} UpdateSavedValue - On change call this function to update data per input
- * @param {BoardConfig | BikeConifg | FormDataFields | null} optionalSetData - Predefined data for config inputs
+ * The form holds no state of its own. The parent owns the values (see CreateInitialFormValues)
+ * and this displays them.
+ *
+ * @param {DynamicFormProps} props - Form key, current values, change callback and read only flag
  * @return {HTMLFormElement} Form group of all the input elements on the json file
  */
-export default function DynamicForm(
-    jsonValue: FormFields,
-    outDataFormat: FormDataFields,
-    UpdateSavedValue: Function,
-    optionalSetData: BoardConfig | BikeConifg | FormDataFields | null = null,
-): React.ReactElement {
+export default function DynamicForm({
+    formName,
+    values,
+    onChange,
+    readOnly = false,
+}: DynamicFormProps): React.ReactElement {
     /* Loop through every json element for the current field and
      *  Create a new reactstrap input element for it
      *  TODO we may want to talk later about changing the way we approach this logic, but for now this functions
      */
-    let newOptionalSetFormat: Record<string, string> = {};
-    if (optionalSetData) {
-        let optionalSetRecord = optionalSetData as Record<string, any>;
+    const section = FormElements[formName];
 
-        // Loop over a record and copy value to optionalSetRecord
-        // This ensures all data is in the correct field
-        const loopRecord = (input: Record<string, any>) => {
-            const keys = Object.keys(input);
-
-            for (let index in keys) {
-                let key = keys[index] as string;
-
-                // Loop over sub records
-                if (isRecord(input[key])) {
-                    loopRecord(input[key]);
-                } else {
-                    newOptionalSetFormat[key] = input[key] as string;
-                }
-            }
-        };
-
-        loopRecord(optionalSetRecord);
-    }
     return (
         <FormGroup>
-            {Object.keys(FormData[jsonValue]).map((key) => {
-                const formElement = FormData[jsonValue][key];
-                if (!formElement) return;
-                let name = formElement.label;
-                let defaultValue: string | undefined = undefined;
+            {Object.keys(section).map((key) => {
+                const formElement = section[key];
+                if (!formElement) return null;
 
-                if (newOptionalSetFormat) {
-                    defaultValue = newOptionalSetFormat[key];
-                }
-                if (outDataFormat)
-                    // Setup the layout for this dynamic form
-                    outDataFormat[name] = defaultValue ?? "";
+                const name = formElement.label;
+                const isReadOnly = Boolean(formElement.readOnly || readOnly);
 
                 return (
-                    <InputGroup key={name} className='FormGroupElement'>
-                        <InputGroupText className='form-input-label'>
-                            {name} {formElement["required"] ? <span style={{ color: "red" }}>*</span> : null}
+                    <InputGroup key={name} className="FormGroupElement">
+                        <InputGroupText className="form-input-label">
+                            {name} {formElement.required ? <span style={{ color: "red" }}>*</span> : null}
                         </InputGroupText>
                         <Input
-                            type={formElement["type"] as InputType}
-                            placeholder={formElement["placeHolder"]}
-                            required={formElement["required"]}
-                            readOnly={formElement["readOnly"] || optionalSetData ? true : false}
-                            className='formInput'
-                            value={defaultValue}
+                            // "string" is not a real html input type, so it is treated as text
+                            type={(formElement.type === "string" ? "text" : formElement.type) as InputType}
+                            placeholder={formElement.placeHolder}
+                            required={formElement.required}
+                            readOnly={isReadOnly}
+                            // readOnly has no effect on a select, so lock it with disabled instead
+                            disabled={formElement.type === "select" && isReadOnly}
+                            className="formInput"
+                            value={String(values?.[name] ?? "")}
                             onChange={(e) => {
-                                UpdateSavedValue(jsonValue, name, e.target.value);
+                                onChange(formName, name, e.target.value);
                             }}
                         >
-                            {formElement["type"] === "select"
-                                ? formElement["selectValues"].map((value) => (
-                                      <option key={value} value={value}>
-                                          {value}
-                                      </option>
-                                  ))
-                                : null}
+                            {formElement.type === "select" ? (
+                                <>
+                                    {/* Empty option so the select matches the (empty) saved value until the user picks one */}
+                                    <option value="" disabled hidden>
+                                        {formElement.placeHolder ?? "Select an option"}
+                                    </option>
+                                    {formElement.selectValues.map((value) => (
+                                        <option key={value} value={value}>
+                                            {value}
+                                        </option>
+                                    ))}
+                                </>
+                            ) : null}
                         </Input>
                     </InputGroup>
                 );
