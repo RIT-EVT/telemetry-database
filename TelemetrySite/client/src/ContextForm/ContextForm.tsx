@@ -110,6 +110,8 @@ function ContextForm(props: Props) {
         event: CreateInitialFormValues("event", EventData),
     }));
 
+    const [NameCollisionError, setNameCollisionError] = useState<string | null>(null);
+
     /**
      * Find a saved config by name
      *
@@ -118,8 +120,7 @@ function ContextForm(props: Props) {
      * @return {BoardConfig | BikeConfig | null} The saved config, null if there is none (i.e. Custom)
      */
     const FindSavedConfig = (configName: ConfigTypes, savedName: string): BoardConfig | BikeConfig | null =>
-        (DropDownOptions[configName] as Array<BoardConfig | BikeConfig>).find((config) => config.name === savedName) ??
-        null;
+        (DropDownOptions[configName] as Array<BoardConfig | BikeConfig>).find((config) => config.name === savedName) ?? null;
 
     /**
      * A form is locked when its data comes from a saved config rather than being typed in
@@ -214,8 +215,25 @@ function ContextForm(props: Props) {
      *
      * @return {bool} if there is a duplicate
      */
-    function CheckSavedName(savedName: string, boardName: BoardNames) {
-        return DropDownOptions[boardName]?.some((config) => config.name === savedName) ?? false;
+    function CheckSavedName(savedName: string, configName: ConfigTypes): boolean {
+        return DropDownOptions[configName]?.some((config) => config.name === savedName) ?? false;
+    }
+
+    /**
+     * Look at every config the user is saving under a new name (i.e. currently
+     * set to Custom with a name typed in) and check it against previously saved
+     * names for that same config type.
+     *
+     * @return {ConfigTypes[]} Config types whose new name collides with an existing saved config
+     */
+    function FindNameCollisions(): ConfigTypes[] {
+        debugger;
+
+        return CONFIG_NAMES.filter((name) => {
+            const isNewConfig = ConfigSelectedValue[name] === CUSTOM_OPTION;
+            const newName = FormDataUpdate[name]?.name as string | undefined;
+            return isNewConfig && !!newName && CheckSavedName(newName, name);
+        });
     }
 
     /**
@@ -228,6 +246,19 @@ function ContextForm(props: Props) {
     function SubmitData(event: React.FormEvent<HTMLFormElement>) {
         // Prevent the form from clearing data
         event.preventDefault();
+
+        // Don't let a new config silently overwrite/collide with an existing saved one
+        const collisions = FindNameCollisions();
+        debugger;
+        if (collisions.length > 0) {
+            setNameCollisionError(
+                `The following config name(s) are already in use, please choose different names: ${collisions
+                    .map((name) => name.toUpperCase())
+                    .join(", ")}`,
+            );
+            return;
+        }
+        setNameCollisionError(null);
 
         const dataFormatted = {
             event: {
@@ -349,14 +380,14 @@ function ContextForm(props: Props) {
     );
 
     return (
-        <Form className="ContextForm" name="Context" id="MainForm" onSubmit={(e) => SubmitData(e)}>
-            <Container fluid className="main-container">
+        <Form className='ContextForm' name='Context' id='MainForm' onSubmit={(e) => SubmitData(e)}>
+            <Container fluid className='main-container'>
                 {/* === MAIN + EVENT + BIKE CONTEXT === */}
-                <Row className="g-3 align-items-stretch">
+                <Row className='g-3 align-items-stretch'>
                     {/* Left Panel */}
-                    <Col md="6" className="d-flex">
-                        <Card className="panel-content fill">
-                            <CardTitle tag="h2" className="panel-header">
+                    <Col md='6' className='d-flex'>
+                        <Card className='panel-content fill'>
+                            <CardTitle tag='h2' className='panel-header'>
                                 Main Context
                             </CardTitle>
                             <CardBody>{RenderForm("main")}</CardBody>
@@ -364,16 +395,16 @@ function ContextForm(props: Props) {
                     </Col>
 
                     {/* Right Panels */}
-                    <Col md="6" className="d-flex flex-column gap-3">
-                        <Card className="panel-content fill">
-                            <CardTitle tag="h2" className="panel-header">
+                    <Col md='6' className='d-flex flex-column gap-3'>
+                        <Card className='panel-content fill'>
+                            <CardTitle tag='h2' className='panel-header'>
                                 Event Context
                             </CardTitle>
                             <CardBody>{RenderForm("event", EventData !== null)}</CardBody>
                         </Card>
 
-                        <Card className="panel-content fill">
-                            <CardTitle tag="h2" className="panel-header">
+                        <Card className='panel-content fill'>
+                            <CardTitle tag='h2' className='panel-header'>
                                 Bike Context: {RenderSelect("bike")}
                             </CardTitle>
                             <CardBody>
@@ -385,24 +416,23 @@ function ContextForm(props: Props) {
 
                 {/* === CONFIGURATION GRID === */}
                 {ConfigSelectedValue["bike"] !== "" && (
-                    <Container fluid className="grid-container mt-4 spacing">
+                    <Container fluid className='grid-container mt-4 spacing'>
                         {/* Loop over all configs. Group them in columns of 2. Render them to screen */}
                         {ChunkItems(
                             CONFIG_NAMES.filter((name): name is BoardNames => name !== "bike"),
                             BOARDS_PER_ROW,
                         ).map((pair: BoardNames[], rowIndex) => (
                             // Loop over each board pair and create their row.
-                            <Row key={rowIndex} className="g-3 mb-3">
+                            <Row key={rowIndex} className='g-3 mb-3'>
                                 {/** Now loop over each board and create their col display*/}
                                 {pair.map((name) => (
-                                    <Col md="6" key={name} className="d-flex">
-                                        <Card className="grid-item fill flex-grow-1">
-                                            <CardTitle className="grid-header">
+                                    <Col md='6' key={name} className='d-flex'>
+                                        <Card className='grid-item fill flex-grow-1'>
+                                            <CardTitle className='grid-header'>
                                                 {name.toUpperCase()} Configuration: {RenderSelect(name)}
                                             </CardTitle>
                                             <CardBody>
-                                                {ConfigSelectedValue[name] !== "" &&
-                                                    RenderForm(name, IsSavedConfig(name))}
+                                                {ConfigSelectedValue[name] !== "" && RenderForm(name, IsSavedConfig(name))}
                                             </CardBody>
                                         </Card>
                                     </Col>
@@ -412,9 +442,10 @@ function ContextForm(props: Props) {
                     </Container>
                 )}
             </Container>
+            {NameCollisionError && <div className='text-danger mt-2 mb-2'>{NameCollisionError}</div>}
 
-            <Button className="submitButton">Submit {EventData ? "Run" : ""}</Button>
-            <Button onClick={AutoFillData} className="autoFill">
+            <Button className='submitButton'>Submit {EventData ? "Run" : ""}</Button>
+            <Button onClick={AutoFillData} className='autoFill'>
                 Auto Complete
             </Button>
         </Form>
