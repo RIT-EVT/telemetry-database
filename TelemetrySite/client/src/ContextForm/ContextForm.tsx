@@ -105,7 +105,7 @@ function ContextForm(props: Props) {
     const [DropDownOptions, SetDropdownOptions] = useState<ConfigStorage>(EMPTY_CONFIG_STORAGE);
 
     // Current value of every input in every form, keyed by form and then by input label
-    const [FormDataUpdate, setFormData] = useState<Partial<Record<FormFields, FormDataFields>>>(() => ({
+    const [FormDataUpdate, setFormData] = useState<Partial<Record<any, any>>>(() => ({
         main: CreateInitialFormValues("main"),
         event: CreateInitialFormValues("event", EventData),
     }));
@@ -183,10 +183,10 @@ function ContextForm(props: Props) {
             }
 
             const data = await response.json();
-
-            if (data && "data" in data && "config_data" in data["data"]) {
+            console.log(data);
+            if (data) {
                 // Anything the backend leaves out stays an empty list
-                SetDropdownOptions({ ...EMPTY_CONFIG_STORAGE, ...(data.data.config_data as Partial<ConfigStorage>) });
+                SetDropdownOptions({ ...EMPTY_CONFIG_STORAGE, ...(data["data"] as Partial<ConfigStorage>) });
             }
         } catch (e) {
             console.error(e);

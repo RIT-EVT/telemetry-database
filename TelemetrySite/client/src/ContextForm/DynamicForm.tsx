@@ -52,7 +52,7 @@ export function CreateInitialFormValues(
 
     for (const [key, formElement] of Object.entries(FormElements[formName])) {
         if (!formElement) continue;
-        values[formElement.label] = presetValues[key] ?? presetValues[formElement.label] ?? "";
+        values[key] = presetValues[key] ?? presetValues[key] ?? "";
     }
 
     return values;
@@ -79,18 +79,16 @@ interface DynamicFormProps {
  * @param {DynamicFormProps} props - Form key, current values, change callback and read only flag
  * @return {HTMLFormElement} Form group of all the input elements on the json file
  */
-export default function DynamicForm({
-    formName,
-    values,
-    onChange,
-    readOnly = false,
-}: DynamicFormProps): React.ReactElement {
+export default function DynamicForm({ formName, values, onChange, readOnly = false }: DynamicFormProps): React.ReactElement {
     /* Loop through every json element for the current field and
      *  Create a new reactstrap input element for it
      *  TODO we may want to talk later about changing the way we approach this logic, but for now this functions
      */
     const section = FormElements[formName];
+    console.log(values);
 
+    if (values) values = FlattenRecord(values as FormDataFields);
+    console.log(values);
     return (
         <FormGroup>
             {Object.keys(section).map((key) => {
@@ -101,8 +99,8 @@ export default function DynamicForm({
                 const isReadOnly = Boolean(formElement.readOnly || readOnly);
 
                 return (
-                    <InputGroup key={name} className="FormGroupElement">
-                        <InputGroupText className="form-input-label">
+                    <InputGroup key={name} className='FormGroupElement'>
+                        <InputGroupText className='form-input-label'>
                             {name} {formElement.required ? <span style={{ color: "red" }}>*</span> : null}
                         </InputGroupText>
                         <Input
@@ -113,16 +111,16 @@ export default function DynamicForm({
                             readOnly={isReadOnly}
                             // readOnly has no effect on a select, so lock it with disabled instead
                             disabled={formElement.type === "select" && isReadOnly}
-                            className="formInput"
-                            value={String(values?.[name] ?? "")}
+                            className='formInput'
+                            value={String(values?.[key] ?? "")}
                             onChange={(e) => {
-                                onChange(formName, name, e.target.value);
+                                onChange(formName, key, e.target.value);
                             }}
                         >
                             {formElement.type === "select" ? (
                                 <>
                                     {/* Empty option so the select matches the (empty) saved value until the user picks one */}
-                                    <option value="" disabled hidden>
+                                    <option value='' disabled hidden>
                                         {formElement.placeHolder ?? "Select an option"}
                                     </option>
                                     {formElement.selectValues.map((value) => (

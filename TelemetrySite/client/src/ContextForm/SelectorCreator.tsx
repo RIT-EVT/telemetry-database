@@ -48,16 +48,16 @@ export default function SelectCreator({
 
     return (
         <Input
-            type="select"
+            type='select'
             onChange={(e) => onChange(name, e.target.value)}
-            placeholder="Select a config"
+            placeholder='Select a config'
             required={RequiredSelects[name]}
-            className="ConfigDropdown"
+            className='ConfigDropdown'
             id={`${name}Select`}
             value={configSelectedValue ?? ""}
             disabled={disabled}
         >
-            <option value="" disabled hidden>
+            <option value='' disabled hidden>
                 Select an option
             </option>
             {/** Display each saved config name as an option. */}

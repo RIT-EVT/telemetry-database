@@ -29,92 +29,102 @@ def _setup_config_mock(mock_db):
 
     # Insert a mock config document in the mongomock DB
     configs = mock_db["configs"]
-    doc_id = ObjectId("67ae8d01097ab8ae923672f8")  # same as BIKE_CONFIG_DOC
-    configs.insert_one(
-        {
-            "_id": doc_id,
-            "config_data": {
-                "bike": [
-                    {
-                        "name": "test",
-                        "savedConfigs": {
-                            "bms": "test",
-                            "imu": "test",
-                            "tmu": "test",
-                            "tms": "test",
-                            "pvc": "test",
-                            "mc": "test",
-                        },
-                    }
-                ],
-                "bms": [
-                    {
-                        "hardwareRevision": 1,
-                        "firmwareCommitHash": 1,
-                        "data": {
-                            "totalVoltageUnits": "V",
-                            "batteryVoltageUnits": "V",
-                            "currentUnits": "A",
-                            "packTempUnits": "C",
-                            "bqTempUnits": "C",
-                            "cellVoltageUnits": "V",
-                        },
-                        "name": "test",
-                    }
-                ],
-                "imu": [
-                    {
-                        "hardwareRevision": 1,
-                        "firmwareCommitHash": 1,
-                        "data": {
-                            "eulerUnits": "Temp",
-                            "gyroUnits": "Temp",
-                            "linearAccelerationUnits": "jerk",
-                            "accelerometerUnits": "ms/s",
-                        },
-                        "name": "test",
-                    }
-                ],
-                "tmu": [
-                    {
-                        "hardwareRevision": 1,
-                        "firmwareCommitHash": 1,
-                        "data": {
-                            "thermalUnits": "C",
-                        },
-                        "name": "test",
-                    }
-                ],
-                "tms": [
-                    {
-                        "hardwareRevision": 1,
-                        "firmwareCommitHash": 1,
-                        "data": {
-                            "tempUnits": "C",
-                            "pumpSpeedUnits": "rpm",
-                            "fanSpeedUnits": "rpm",
-                        },
-                        "name": "test",
-                    }
-                ],
-                "pvc": [
-                    {
-                        "hardwareRevision": 1,
-                        "firmwareCommitHash": 1,
-                        "data": {},
-                        "name": "test",
-                    }
-                ],
-                "mc": [
-                    {
-                        "hardwareRevision": 1,
-                        "firmwareCommitHash": 1,
-                        "data": {"model": "test", "firmwareVersion": "test"},
-                        "name": "test",
-                    }
-                ],
+
+    configs.insert_many(
+        [
+            {
+                "type": "bike",
+                "name": "test",
+                "inactive": False,
+                "savedConfigs": {
+                    "bms": "test",
+                    "imu": "test",
+                    "tmu": "test",
+                    "tms": "test",
+                    "pvc": "test",
+                    "mc": "test",
+                },
             },
-        }
+            {
+                "type": "bike",
+                "name": "inactive_test",
+                "inactive": True,
+                "savedConfigs": {
+                    "bms": "test",
+                    "imu": "test",
+                    "tmu": "test",
+                    "tms": "test",
+                    "pvc": "test",
+                    "mc": "test",
+                },
+            },
+            {
+                "type": "bms",
+                "name": "test",
+                "inactive": False,
+                "hardwareRevision": 1,
+                "firmwareCommitHash": 1,
+                "data": {
+                    "totalVoltageUnits": "V",
+                    "batteryVoltageUnits": "V",
+                    "currentUnits": "A",
+                    "packTempUnits": "C",
+                    "bqTempUnits": "C",
+                    "cellVoltageUnits": "V",
+                },
+            },
+            {
+                "type": "imu",
+                "name": "test",
+                "inactive": False,
+                "hardwareRevision": 1,
+                "firmwareCommitHash": 1,
+                "data": {
+                    "eulerUnits": "Temp",
+                    "gyroUnits": "Temp",
+                    "linearAccelerationUnits": "jerk",
+                    "accelerometerUnits": "ms/s",
+                },
+            },
+            {
+                "type": "tmu",
+                "name": "test",
+                "inactive": False,
+                "hardwareRevision": 1,
+                "firmwareCommitHash": 1,
+                "data": {
+                    "thermalUnits": "C",
+                },
+            },
+            {
+                "type": "tms",
+                "name": "test",
+                "inactive": False,
+                "hardwareRevision": 1,
+                "firmwareCommitHash": 1,
+                "data": {
+                    "tempUnits": "C",
+                    "pumpSpeedUnits": "rpm",
+                    "fanSpeedUnits": "rpm",
+                },
+            },
+            {
+                "type": "pvc",
+                "name": "test",
+                "inactive": False,
+                "hardwareRevision": 1,
+                "firmwareCommitHash": 1,
+            },
+            {
+                "type": "mc",
+                "name": "test",
+                "inactive": False,
+                "data": {
+                    "model": "test", 
+                    "firmwareVersion": "test"
+                },
+            },
+        ]
     )
 
     # Insert a mock users for authentication
