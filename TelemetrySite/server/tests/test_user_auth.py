@@ -52,7 +52,7 @@ def test_user_auth_signup(client):
     }
 
     response = client.post("/Login", json=signup_payload)
-    print(response.data)
+
     assert response.status_code == 201
     json_data = response.get_json()
 

@@ -27,15 +27,16 @@ def create_app(db=None):
     CORS(app)
     server_folder = os.path.dirname(__file__)
 
-    # Load credentials
-    if len(argv) < 2 or argv[1] == "production":
-        print("creating real DB instance")
+    # Only build a DB if one wasn't injected (e.g. by tests)
+    if db is None:
+        if len(argv) < 2 or argv[1] == "production":
+            print("creating real DB instance")
 
-        two_up = os.path.dirname(os.path.dirname(server_folder))
-        dotenv.load_dotenv(os.path.join(two_up, "credentials.env"))
-        db = utils.create_db_connection()
-    else:
-        db = create_false_db_instance()
+            two_up = os.path.dirname(os.path.dirname(server_folder))
+            dotenv.load_dotenv(os.path.join(two_up, "credentials.env"))
+            db = utils.create_db_connection()
+        else:
+            db = create_false_db_instance()
 
     # Register routes with DB injected
     api.add_resource(

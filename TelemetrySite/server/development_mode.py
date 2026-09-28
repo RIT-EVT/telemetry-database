@@ -36,6 +36,7 @@ def _setup_config_mock(mock_db):
                 "type": "bike",
                 "name": "test",
                 "inactive": False,
+                "platformName": "REV3",
                 "savedConfigs": {
                     "bms": "test",
                     "imu": "test",
@@ -119,10 +120,7 @@ def _setup_config_mock(mock_db):
                 "type": "mc",
                 "name": "test",
                 "inactive": False,
-                "data": {
-                    "model": "test", 
-                    "firmwareVersion": "test"
-                },
+                "data": {"model": "test", "firmwareVersion": "test"},
             },
         ]
     )

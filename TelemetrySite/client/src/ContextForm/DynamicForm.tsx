@@ -85,10 +85,9 @@ export default function DynamicForm({ formName, values, onChange, readOnly = fal
      *  TODO we may want to talk later about changing the way we approach this logic, but for now this functions
      */
     const section = FormElements[formName];
-    console.log(values);
 
     if (values) values = FlattenRecord(values as FormDataFields);
-    console.log(values);
+
     return (
         <FormGroup>
             {Object.keys(section).map((key) => {

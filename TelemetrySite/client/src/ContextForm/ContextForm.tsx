@@ -110,8 +110,6 @@ function ContextForm(props: Props) {
         event: CreateInitialFormValues("event", EventData),
     }));
 
-    const [NameCollisionError, setNameCollisionError] = useState<string | null>(null);
-
     /**
      * Find a saved config by name
      *
@@ -194,16 +192,48 @@ function ContextForm(props: Props) {
     };
 
     /**
-     * Post the saved conifg data to the backend
+     * Post the custom configs to the backend, formatted the same way they are
+     * received from config_data (see SetConfigData).
+     *
+     * - Every config gets its `type` field
+     * - The bike config gets `savedConfigs`, mapping each board to the name of the config it uses
+     *
+     * @param {ConfigTypes[]} configData - Config types set to Custom that need saving
      */
-    async function PostConfigData(configData: Record<ConfigTypes, BoardConfig | BikeConfig>) {
+    async function PostConfigData(configData: ConfigTypes[]): Promise<void> {
         const formData = new FormData();
+
+        const changedConfigs = configData.map((name) => {
+            // Copy so the form state is never mutated
+            const config: Record<string, any> = { ...FormDataUpdate[name], type: name };
+
+            if (name === "bike") {
+                // Same shape as a received BikeConfig: board -> saved config name
+                const savedConfigs: Partial<Record<BoardNames, string>> = {};
+
+                BOARD_NAMES.forEach((board) => {
+                    const boardConfigName = FormDataUpdate[board]?.name;
+                    if (boardConfigName) {
+                        savedConfigs[board] = boardConfigName;
+                    }
+                });
+                config["savedConfigs"] = savedConfigs;
+            }
+
+            return config;
+        });
+
         // Convert object to JSON string
-        formData.append("configData", JSON.stringify(configData));
-        await fetch(BuildURI("config_data") + "/" + props.authToken, {
+        formData.append("configData", JSON.stringify(changedConfigs));
+
+        const response = await fetch(BuildURI("config_data") + "/" + props.authToken, {
             method: "POST",
             body: formData,
         });
+
+        if (!response.ok) {
+            throw new Error("Failed to save configs: " + response.statusText);
+        }
     }
 
     /**
@@ -227,8 +257,6 @@ function ContextForm(props: Props) {
      * @return {ConfigTypes[]} Config types whose new name collides with an existing saved config
      */
     function FindNameCollisions(): ConfigTypes[] {
-        debugger;
-
         return CONFIG_NAMES.filter((name) => {
             const isNewConfig = ConfigSelectedValue[name] === CUSTOM_OPTION;
             const newName = FormDataUpdate[name]?.name as string | undefined;
@@ -249,16 +277,23 @@ function ContextForm(props: Props) {
 
         // Don't let a new config silently overwrite/collide with an existing saved one
         const collisions = FindNameCollisions();
-        debugger;
+
         if (collisions.length > 0) {
-            setNameCollisionError(
+            window.alert(
                 `The following config name(s) are already in use, please choose different names: ${collisions
                     .map((name) => name.toUpperCase())
                     .join(", ")}`,
             );
             return;
         }
-        setNameCollisionError(null);
+
+        const customConfigs = CONFIG_NAMES.filter((configName) => {
+            return ConfigSelectedValue[configName] === CUSTOM_OPTION;
+        });
+
+        if (customConfigs.length > 0) {
+            PostConfigData(customConfigs);
+        }
 
         const dataFormatted = {
             event: {
@@ -442,7 +477,6 @@ function ContextForm(props: Props) {
                     </Container>
                 )}
             </Container>
-            {NameCollisionError && <div className='text-danger mt-2 mb-2'>{NameCollisionError}</div>}
 
             <Button className='submitButton'>Submit {EventData ? "Run" : ""}</Button>
             <Button onClick={AutoFillData} className='autoFill'>
