@@ -36,9 +36,6 @@ async function postDataFile(formData) {
     try {
         const authResponse = await CheckData();
         if (!authResponse) {
-            // TODO: the original called `authResponse.json()` here, which always threw
-            // on a falsy value, so the "authError -> /login" redirect never ran.
-            // Once it's clear what CheckData() returns on failure, restore that redirect.
             console.error("CheckData failed");
             return false;
         }
