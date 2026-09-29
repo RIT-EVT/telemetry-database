@@ -1,28 +1,18 @@
 import React from "react";
-import {
-    Container,
-    Row,
-    Col,
-    Card,
-    CardBody,
-    CardTitle,
-    CardText,
-    Button,
-} from "reactstrap";
+import { Container, Row, Col, Card, CardBody, CardTitle, CardText, Button } from "reactstrap";
 
 import "./Home.css";
 
 const Home = () => {
     return (
-        <Container className='mt-5'>
+        <Container className='mt-5 home-body'>
             {/* Welcome Header */}
             <Row className='mb-b'>
                 <Col>
                     <h1>EVT Telemetry Portal</h1>
-                    <p className='text-muted'>
-                        Welcome to RIT EVT’s internal telemetry management
-                        system. Upload, analyze, and document CAN data all in
-                        one place.
+                    <p className='text-muted-whites'>
+                        Welcome to RIT EVT’s internal telemetry management system. Upload, analyze, and document CAN data all
+                        in one place.
                     </p>
                 </Col>
             </Row>
@@ -62,9 +52,7 @@ const Home = () => {
             <Row className='mt-5'>
                 <Col>
                     <h3>Recent Activity</h3>
-                    <p className='text-muted'>
-                        Telemetry Database has no recent updates.
-                    </p>
+                    <p className='text-muted-white'>Telemetry Database has no recent updates.</p>
                 </Col>
             </Row>
         </Container>

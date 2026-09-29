@@ -4,13 +4,16 @@ import json
 from more_itertools import sliced
 import gridfs
 import os
+import copy
+import bson
 
 parsing_data_progress = [0]
 uploading_data_progress = [0]
 
+
 def submit_data(mf4_file, dbc_file, context_data, runOrderNumber, db):
     """
-        Parse the data from binary to a readable state and begin upload 
+        Parse the data from binary to a readable state and begin upload
 
     Args:
         mf4_file (string): path to the mf4 file
@@ -18,6 +21,10 @@ def submit_data(mf4_file, dbc_file, context_data, runOrderNumber, db):
         context_data (Dictionary): context id for the data
         runOrderNumber (int): Which run this is in a larger group of runs
     """
+    # reset progress so a previous run's "finished" state isn't reported
+    parsing_data_progress[0] = 0
+    uploading_data_progress[0] = 0
+
     fs = gridfs.GridFS(db)
 
     dbc_decoded = cantools.database.load_file(dbc_file)
@@ -27,54 +34,82 @@ def submit_data(mf4_file, dbc_file, context_data, runOrderNumber, db):
     # create an outline of how to read the data
     config_values = create_config(can_id_values, dbc_decoded)
     # turn data from CAN messages -> list
-    data_values_json = parse_data(mf4_file, config_values, can_id_values)
+    data_values_json, signal_names = parse_data(mf4_file, config_values, can_id_values)
 
     context_data = json.loads(context_data)
 
     with open(mf4_file, "rb") as f:
-        context_data["event"]["runs"][0]["mf4File"] = fs.put(f, filename=os.path.basename(mf4_file))
+        context_data["event"]["run"]["mf4File"] = fs.put(
+            f, filename=os.path.basename(mf4_file)
+        )
 
     with open(dbc_file, "rb") as f:
-        context_data["event"]["runs"][0]["dbcFile"] = fs.put(f, filename=os.path.basename(dbc_file))
-    context_data["event"]["runs"][0]["orderNumber"] = runOrderNumber
+        context_data["event"]["run"]["dbcFile"] = fs.put(
+            f, filename=os.path.basename(dbc_file)
+        )
+    context_data["event"]["run"]["orderNumber"] = runOrderNumber
+    context_data["event"]["run"]["signals"] = list(signal_names)
     upload_data_in_chunks(context_data, data_values_json, db)
-    
+
+
+# MongoDB's hard document limit is 16 MB; stay safely below it
+MAX_DOCUMENT_BYTES = 15_000_000
+# rough per-entry overhead for the array index key / element header in BSON
+ARRAY_ENTRY_OVERHEAD = 16
+
+
 def upload_data_in_chunks(new_run_data, data_values_json, db):
     """
-        Upload the data in chunks that are less than 17 mb.
-        MongoDB does not allow any files to be above this value,
-        so slice the data into chunks of 15 mb/150,000 entries.
+        Upload the data in chunks that are less than 16 mb.
+        MongoDB does not allow any document to be above this value,
+        so the data is split by its actual BSON size (~15 mb per document).
 
     Args:
         new_run_data (Dictionary): Context data
-        data_values_json (Dictionary): New bike data to upload
+        data_values_json (List): New bike data to upload
     """
-    # divide the data into chunks that are less the 16 mb
-    # 150_000 ~< 15 mb but always < 16 mb
-    sliced_data = list(sliced(data_values_json, 150_000))
-    
     collection_access_messages = db["messages"]
-    for data_index in range(0, len(sliced_data)):
-        if "_id" in new_run_data:
-            del new_run_data["_id"]
-        data_upload = new_run_data
-        data_upload ["event"]["uploadSection"] = data_index
-        data_upload ["event"]["runs"][0]["messages"] = []
-        #update progress of upload bar
-        uploading_data_progress[0]=data_index/(len(sliced_data))
-        data = sliced_data[data_index]
-        # add data until it exceeds 16 mb
-        # even at 1_000 additions per cycle the data will not get too big 
-        while len(json.dumps(data).encode('utf-8')) < 16_000_000 and data_index+1 != len(sliced_data) and  len(sliced_data[data_index+1]) !=0:
-            for _ in range(0, 1_000):
-                if len(sliced_data[data_index+1]) ==0:
-                    break
-                data.append(sliced_data[data_index+1].pop())
-        data_upload["event"]["runs"][0]["messages"] = data
-        # add data to its own document and get the reference id number 
-        collection_access_messages.insert_one(data_upload)
-        
-    uploading_data_progress[0]=1
+
+    # the context shared by every document (never carries messages or an _id)
+    base_document = copy.deepcopy(new_run_data)
+    base_document.pop("_id", None)
+    base_document["event"]["run"]["messages"] = []
+    base_size = len(bson.encode(base_document))
+
+    total_entries = len(data_values_json)
+    uploaded_entries = 0
+    upload_section = 0
+
+    def flush(chunk):
+        document = copy.deepcopy(base_document)
+        document["event"]["uploadSection"] = upload_section
+        document["event"]["run"]["messages"] = chunk
+        collection_access_messages.insert_one(document)
+
+    chunk = []
+    chunk_size = base_size
+
+    for entry in data_values_json:
+        entry_size = len(bson.encode(entry)) + ARRAY_ENTRY_OVERHEAD
+
+        # current chunk is full, upload it and start the next one
+        if chunk and chunk_size + entry_size > MAX_DOCUMENT_BYTES:
+            flush(chunk)
+            upload_section += 1
+            uploaded_entries += len(chunk)
+            uploading_data_progress[0] = uploaded_entries / total_entries
+            chunk = []
+            chunk_size = base_size
+
+        chunk.append(entry)
+        chunk_size += entry_size
+
+    # upload whatever is left over
+    if chunk:
+        flush(chunk)
+
+    uploading_data_progress[0] = 1
+
 
 def get_board_names(dbc_database):
     """
@@ -105,6 +140,7 @@ def get_board_names(dbc_database):
             config[hex(msg.frame_id)] = board_name
     return config
 
+
 def read_bits(number, starting_bit, final_bit):
     """
         Get the needed binary bits from a longer string of bits
@@ -121,17 +157,18 @@ def read_bits(number, starting_bit, final_bit):
     binary_string = binary_number[starting_bit:final_bit]
     return binary_string
 
+
 def combine_binary(*numbers):
     """
         Combine bytes of binary data
 
     Args:
         number (Tuple): binary data to combine
-        
+
     Returns:
         String: combined data
     """
-    
+
     # Convert each number to an 8-bit binary string
     binary_list = [format(num, "08b") for num in numbers]
 
@@ -142,6 +179,7 @@ def combine_binary(*numbers):
     combined_binary = "".join(binary_list)
 
     return combined_binary
+
 
 def signed_bin_convert(x, size):
     """
@@ -164,6 +202,7 @@ def signed_bin_convert(x, size):
     # Otherwise, just returns the magnitude
     return magnitude - sign
 
+
 def parse_data(mdf_path, config_values, id_to_name):
     """
         Convert .MF4 files to a list of CAN messages
@@ -176,7 +215,7 @@ def parse_data(mdf_path, config_values, id_to_name):
     Returns:
         List: CAN messages
     """
-    
+
     # Load the MDF file
     mdf = MDF(mdf_path, memory_map=False)
 
@@ -187,50 +226,56 @@ def parse_data(mdf_path, config_values, id_to_name):
     values = df.values.tolist()
     timestamps = df.index.tolist()
     json_data = []
-    
-    for index in range(0, len(df.index)):
 
-        can_id = values[index][1]
-        if hex(can_id) not in config_values:
+    # Save all unique signal names
+    signal_names_hs = set()
+
+    total_rows = len(df.index)
+
+    for index in range(0, total_rows):
+
+        parsing_data_progress[0] = index / total_rows if total_rows else 0
+
+        row = values[index]
+        can_id = int(row[1])
+        can_id_hex = hex(can_id)
+        if can_id_hex not in config_values:
             continue
 
-        config_data = config_values[hex(can_id)]
-        
-        data_array = values[index][5]
+        config_data = config_values[can_id_hex]
+
+        # data_array comes in as a ndarray with 1 dimension
+        # each entry is 1 byte / 8 bits of data
+        data_list = row[5].tolist()
+
+        board_name = id_to_name.get(can_id_hex, "null")
 
         # save the number of bytes/array indexes used by previous can messages to know where next ones begin
         # also save the number of bits used of the current byte if a message needs bits
         previous_bytes_used = 0
         previous_bits_used = 0
-        
-        config_data_length = len(config_data)
-        
-        for config_current_index in range(0, config_data_length ):
 
-            config_current = config_data[config_current_index]
+        for config_current in config_data:
 
             # get the number of bits for the current data
             data_length_bits = config_current["size"]
 
             # lets manipulate some data!
-            # each entry in the data array is 1 byte / 8  bits of data
             # if there are more than one byte of data associated with a message,
             # the second byte comes first in binary
-            # data_array comes in as a ndarray with 1 dimension
 
             if data_length_bits % 8 == 0:
 
                 # get the length in bytes of the needed data
-
                 number_of_needed_bytes = data_length_bits // 8
-                data_list = data_array.tolist()
 
-                current_data_list = []
+                # the frame is shorter than the DBC says, nothing more can be read
+                if previous_bytes_used + number_of_needed_bytes > len(data_list):
+                    break
 
-                for data_index in range(
-                    previous_bytes_used, previous_bytes_used + number_of_needed_bytes
-                ):
-                    current_data_list.append(data_list[data_index])
+                current_data_list = data_list[
+                    previous_bytes_used : previous_bytes_used + number_of_needed_bytes
+                ]
 
                 raw_binary = combine_binary(*current_data_list)
 
@@ -249,6 +294,9 @@ def parse_data(mdf_path, config_values, id_to_name):
                 # the sum always adds up to a byte
                 # if something uses 7 bits, something else will use the last bit
 
+                if previous_bytes_used >= len(data_list):
+                    break
+
                 raw_result = read_bits(
                     data_list[previous_bytes_used],
                     previous_bits_used,
@@ -257,44 +305,49 @@ def parse_data(mdf_path, config_values, id_to_name):
 
                 decimal_result = int(raw_result, 2)
 
-                # increment the previous bits for teh next time time
+                # increment the previous bits for the next time
                 # also update bytes as needed. Some messages use both bits and bytes of data
                 previous_bits_used += data_length_bits
-                if previous_bits_used == 8:
+                if previous_bits_used >= 8:
                     previous_bytes_used += 1
                     previous_bits_used = 0
 
-            table_name = config_current["table"]
-            if table_name.find("ErrorRegister") != -1 or table_name.find("Manufacturer") != -1:
+            signal_name = config_current["table"]
+            if (
+                signal_name.find("ErrorRegister") != -1
+                or signal_name.find("Manufacturer") != -1
+            ):
                 continue
-            
-            if hex(can_id) in id_to_name:
-                board_name = id_to_name[hex(can_id)]
-            else:
-                board_name = "null"
+
             json_object = {
                 "time": timestamps[index],
-                "signal": table_name,
-                "canID": hex(can_id),
+                "signal": signal_name,
+                "canID": can_id_hex,
                 "data": decimal_result,
                 "board": board_name,
             }
 
-            # if there is an axis present save it as its own field
-            if "axis" in config_current:
-                json_object["axis"] = config_current["axis"]
-            if "cellId" in config_current:
-                json_object["cellId"] = config_current["cellId"]
-            if "packId" in config_current:
-                json_object["packId"] = config_current["packId"]
-            if "thermId" in config_current:
-                json_object["thermId"] = config_current["thermId"]
-            parsing_data_progress[0] = config_current_index/config_data_length
+            signal_names_hs.add(signal_name)
+
+            # optional identifiers are saved as their own fields
+            for optional_key in (
+                "axis",
+                "cellId",
+                "packId",
+                "thermId",
+                "tempId",
+                "fanId",
+                "pumpId",
+            ):
+                if optional_key in config_current:
+                    json_object[optional_key] = config_current[optional_key]
+
             json_data.append(json_object)
 
     mdf.close()
-    parsing_data_progress[0]=1
-    return json_data
+    parsing_data_progress[0] = 1
+    return json_data, signal_names_hs
+
 
 def get_board_name(sender):
     """
@@ -312,6 +365,7 @@ def get_board_name(sender):
         return sender[:3] + "X_" + sender[len(sender) - 1 :]
     return sender
 
+
 def handle_bms(signal, sender):
     """
         Interpret BMS data
@@ -323,9 +377,11 @@ def handle_bms(signal, sender):
     Returns:
         Dictionary: Updated data
     """
-    
+
     signal_name = signal.name
     # each signal has the cell id at separate spots and needs special parts
+    cellId = None
+    tempId = None
 
     if signal_name.find("BMS_Voltage_sub") != -1:
 
@@ -383,6 +439,7 @@ def handle_bms(signal, sender):
 
     return entry
 
+
 def handle_imu(signal):
     """
         Handle IMU data
@@ -393,7 +450,7 @@ def handle_imu(signal):
     Returns:
         Dictionary: Updated data
     """
-    
+
     signal_name = signal.name
 
     # map the possible signal names to their table names in the sql db
@@ -422,6 +479,7 @@ def handle_imu(signal):
         json_object["axis"] = axis
     return json_object
 
+
 def handle_pvc(signal):
     """
         Handle PVC data
@@ -445,6 +503,7 @@ def handle_pvc(signal):
         "signage": "signed" if signal.is_signed else "unsigned",
     }
 
+
 def handle_tms(signal):
     """
         Handle TMS data
@@ -455,7 +514,7 @@ def handle_tms(signal):
     Returns:
         Dictionary: Updated data
     """
-    
+
     signal_name = signal.name
 
     if signal_name.find("Duty_Cycle") != -1:
@@ -486,6 +545,7 @@ def handle_tms(signal):
         entry["pumpId"] = 1
     return entry
 
+
 def create_config(board_names_json, dbc_file):
     """
         Create a config file to interpret data
@@ -497,44 +557,49 @@ def create_config(board_names_json, dbc_file):
     Returns:
         Dictionary: Config data
     """
-    
+
     config = {}
     # Process each message and interpret how it should be read
     for msg in dbc_file.messages:
         # make sure the message actually exists
-        if msg.senders:
-            # get the board name
-            sender = msg.senders[0]
-            board_name = get_board_name(sender)
-            # if the board doesn't exist or is VirtualNMTMaster skip over it
-            if not board_name:
-                continue
-            msg_config = []
-            for signal in msg.signals:
-                entry = None
-                # each board name needs to be handled differently
-                match board_names_json[hex(msg.frame_id)][:3]:
-                    case "BMS":
-                        # bms needs the full board name to find the packId
-                        entry = handle_bms(signal, sender)
-                    case "IMU":
-                        entry = handle_imu(signal)
-                    case "PVC":
-                        entry = handle_pvc(signal)
-                    case _:
-                        entry = {
-                            "table": signal.name,
-                            "size": signal.length,
-                            "signage": "signed" if signal.is_signed else "unsigned",
-                        }
+        if not msg.senders:
+            continue
 
-                if entry != None:
-                    msg_config.append(entry)
+        # get the board name
+        sender = msg.senders[0]
+        board_name = get_board_name(sender)
+        # if the board doesn't exist or is VirtualNMTMaster skip over it
+        if not board_name:
+            continue
+
+        msg_config = []
+        for signal in msg.signals:
+            # each board name needs to be handled differently
+            match sender[:3]:
+                case "BMS":
+                    # bms needs the full board name to find the packId
+                    entry = handle_bms(signal, sender)
+                case "IMU":
+                    entry = handle_imu(signal)
+                case "PVC":
+                    entry = handle_pvc(signal)
+                case "TMS":
+                    entry = handle_tms(signal)
+                case _:
+                    entry = {
+                        "table": signal.name,
+                        "size": signal.length,
+                        "signage": "signed" if signal.is_signed else "unsigned",
+                    }
+
+            if entry is not None:
+                msg_config.append(entry)
 
         config[hex(msg.frame_id)] = msg_config
 
     # return the config dictionary,
     return config
+
 
 ## The function that makes the progress of data upload visible to the frontend
 #
@@ -546,12 +611,12 @@ def get_progress():
     Returns:
         Int: Current progress of an upload
     """
-    if parsing_data_progress[0]!=1:
+    if parsing_data_progress[0] != 1:
         return {"Parsing Data": parsing_data_progress[0]}
-    elif uploading_data_progress[0]!=1:
+    elif uploading_data_progress[0] != 1:
         return {"uploading data": uploading_data_progress[0]}
-    
-    parsing_data_progress[0]=0
-    uploading_data_progress[0]=0
-    
+
+    parsing_data_progress[0] = 0
+    uploading_data_progress[0] = 0
+
     return {"Finished": None}

@@ -1,0 +1,160 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Bike Telemetry Event Schema",
+    "type": "object",
+    "properties": {
+        "event": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string",
+                    "format": "date"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "uploadSection": {
+                    "type": "integer"
+                },
+                "run": {
+                    "type": "object",
+                    "properties": {
+                        "orderNumber": {
+                            "type": "integer"
+                        },
+                        "context": {
+                            "type": "object",
+                            "properties": {
+                                "bikeConfig": {
+                                    "type": "object",
+                                    "properties": {
+                                        "signals": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                },
+                                "firmwareConfig": {
+                                    "type": "object",
+                                    "patternProperties": {
+                                        "^board[0-9]+Config$": {
+                                            "type": "object",
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "hardwareRevision": {
+                                                    "type": "string"
+                                                },
+                                                "softwareCommitHash": {
+                                                    "type": "integer"
+                                                },
+                                                "dataUnits": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "name",
+                                                "hardwareRevision",
+                                                "softwareCommitHash",
+                                                "dataUnits"
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": [
+                        "orderNumber",
+                        "context"
+                    ]
+                },
+                "weather": {
+                    "type": "string"
+                },
+                "riderName": {
+                    "type": "string"
+                },
+                "riderWeight": {
+                    "type": "number"
+                },
+                "airTemp": {
+                    "type": "number"
+                },
+                "windSpeed": {
+                    "type": "number"
+                },
+                "windDirection": {
+                    "type": "string"
+                },
+                "riderFeedback": {
+                    "type": "string"
+                },
+                "distanceCovered": {
+                    "type": "number"
+                },
+                "startTime": {
+                    "type": "string",
+                    "format": "time"
+                },
+                "originalDataFile": {
+                    "type": "string",
+                    "description": "MF4 binary file encoded as base64"
+                },
+                "dbcFile": {
+                    "type": "string",
+                    "description": "DBC file encoded as base64"
+                },
+                "messages": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "signalName": {
+                                "type": "string"
+                            },
+                            "receiveTime": {
+                                "type": "number"
+                            },
+                            "value": {
+                                "type": "number"
+                            },
+                            "size": {
+                                "type": "integer"
+                            }
+                        },
+                        "required": [
+                            "signalName",
+                            "receiveTime",
+                            "value",
+                            "size"
+                        ]
+                    }
+                }
+            },
+            "required": [
+                "name",
+                "location",
+                "date",
+                "type",
+                "run"
+            ]
+        },
+        "run": {}
+    },
+    "required": [
+        "event",
+        "originalDataFile",
+        "dbcFile",
+        "messages"
+    ]
+}

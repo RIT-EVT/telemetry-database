@@ -24,3 +24,11 @@
     height: 100% !important;
     width: 100% !important;
 }
+
+.home-body {
+    color: white;
+}
+
+.text-muted-white {
+    color: rgb(233, 232, 232);
+}
