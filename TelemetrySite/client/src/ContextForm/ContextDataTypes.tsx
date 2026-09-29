@@ -21,7 +21,24 @@ interface BoardConfig {
     hardwareRevision: string;
     firmwareCommitHash: string;
     name: string;
+    type: string;
+    data: Record<string, string>;
+}
 
+interface PVCBoardConfig {
+    hardwareRevision: string;
+    firmwareCommitHash: string;
+    name: string;
+    type: string;
+    data: Record<string, string>;
+}
+
+/**
+ * MC Config Board is special
+ */
+interface MCBoardConfig {
+    name: string;
+    type: string;
     data: Record<string, string>;
 }
 
@@ -30,16 +47,12 @@ interface BoardConfig {
  */
 interface BikeConfig {
     name: string;
+    type: string;
 
     /** Any board configs that are saved under this one. */
     savedConfigs: Record<BoardNames, string>;
     platform: string;
 }
-
-/**
- * @deprecated Misspelled name, kept so existing imports keep compiling. Use {@link BikeConfig}.
- */
-type BikeConifg = BikeConfig;
 
 /**
  * Store all configs needed for context.
@@ -49,8 +62,8 @@ interface ConfigStorage {
     imu: BoardConfig[];
     bms: BoardConfig[];
     tmu: BoardConfig[];
-    pvc: BoardConfig[];
-    mc: BoardConfig[];
+    pvc: PVCBoardConfig[];
+    mc: MCBoardConfig[];
     bike: BikeConfig[];
 }
 
@@ -115,7 +128,6 @@ export type {
     ConfigNames,
     ContextData,
     BikeConfig,
-    BikeConifg,
     BoardConfig,
     ConfigStorage,
 };
