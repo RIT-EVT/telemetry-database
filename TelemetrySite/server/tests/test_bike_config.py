@@ -1,16 +1,13 @@
 import json
 
-
 def test_bike_config_read(client):
     response = client.get("/ConfigData/0")
     assert response.status_code == 200, "Authorized user not allowed"
+    
     json_data = response.get_json()
     assert "data" in json_data
-    assert "config_data" in json_data["data"]
-    assert "tms" in json_data["data"]["config_data"]
-    assert "hardwareRevisionTMS" in json_data["data"]["config_data"]["tms"][0]
-    assert 1 == json_data["data"]["config_data"]["tms"][0]["hardwareRevisionTMS"]
-
+    assert "bike" in json_data["data"]
+    assert "savedConfigs" in json_data["data"]["bike"][0]
 
 def test_bike_config_read_unauthorized(client):
     response = client.get("/ConfigData/-1")
@@ -21,13 +18,25 @@ def test_bike_config_read_outdated(client):
     response = client.get("/ConfigData/1")
     assert response.status_code == 401, "Outdated user allowed access"
 
-
 def test_bike_config_write(client):
-    config_payload = {
-        "bms": {
-            "hardwareRevisionBMS": 1,
-        }
-    }
+    configName = "BIKE_CONFIG_WRITE_TEST"
+    config_payload = [
+        {
+            "type": "bms",
+            "name": configName,
+            "inactive": False,
+            "hardwareRevision": 1,
+            "firmwareCommitHash": 1,
+            "data": {
+                "totalVoltageUnits": "V",
+                "batteryVoltageUnits": "V",
+                "currentUnits": "A",
+                "packTempUnits": "C",
+                "bqTempUnits": "C",
+                "cellVoltageUnits": "V",
+            },
+        },
+    ]
 
     response = client.post(
         "/ConfigData/0",
@@ -42,11 +51,15 @@ def test_bike_config_write(client):
     json_data = response.get_json()
 
     assert "data" in json_data
-    assert "config_data" in json_data["data"]
-    assert "bms" in json_data["data"]["config_data"]
-    assert "hardwareRevisionBMS" in json_data["data"]["config_data"]["bms"][0]
-    assert 1 == json_data["data"]["config_data"]["bms"][0]["hardwareRevisionBMS"]
+    assert "bms" in json_data["data"]
 
+    hasConfigName = False
+    for config in json_data["data"]["bms"]:
+        if "name" in config and config["name"] == configName:
+            hasConfigName = True
+            break
+
+    assert hasConfigName, "Failed to find freshly written config."
 
 def test_bike_config_write_unauthorized(client):
     config_payload = {
@@ -62,7 +75,6 @@ def test_bike_config_write_unauthorized(client):
     )
 
     assert response.status_code == 401, "Unauthorized user accessed data"
-
 
 def test_bike_config_write_expired(client):
     config_payload = {

@@ -8,7 +8,7 @@ $ReactAppDir = Join-Path $RootDir "TelemetrySite\client"
 # Start Python server
 Start-Process powershell -ArgumentList `
     "-NoExit", `
-    "-Command", "cd '$PythonServerDir'; python ./server.py"
+    "-Command", "cd '$PythonServerDir'; python ./server.py development"
 
 # Start React server
 Start-Process powershell -ArgumentList `

@@ -1,137 +1,129 @@
 /* General layout */
 .ContextForm {
-  margin: 0 10px;
+    /* Theme colors */
+    --brand-orange: #f36917;
+    --brand-orange-header: #f76902;
+    --brand-orange-dark: #9d4614;
+    --card-background: #000000;
+    --card-border: #181617;
+
+    margin: 0 10px;
 }
 
-
 .main-container {
-  padding: 20px;
+    padding: 20px;
 }
 
 /* Panels */
 .left-panel,
 .right-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.panel-content {
-  flex-grow: 1;
-  padding: 15px;
-  background-color: #000000;
-  border: 1px solid #181617;
-  color: white;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 .panel-header {
-  font-size: 1.2em;
-  font-weight: bold;
-  color: #F76902 !important;
-}
-
-.grid-item {
-  padding: 15px;
-  background-color: #000000;
-  border: 1px solid #211e1f;
-  margin-bottom: 30px;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: var(--brand-orange-header) !important;
 }
 
 .grid-header {
-  margin-bottom: 10px;
-  font-weight: bold;
-  font-size: 1.2em;
-  color: #F36917 !important;
+    margin-bottom: 10px;
+    font-weight: bold;
+    font-size: 1.2em;
+    color: var(--brand-orange) !important;
+}
+
+/* Make all cards visually consistent */
+.panel-content,
+.grid-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    height: 100%;
+    padding: 15px;
+    background-color: var(--card-background);
+    border: 1px solid var(--card-border);
+    color: white;
+}
+
+.panel-content {
+    flex-grow: 1;
+}
+
+.grid-item {
+    margin-bottom: 30px;
 }
 
 /* Buttons */
 .submitButton,
 .autoFill {
-  padding: 10px 20px;
-  background-color: #F36917;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  position: fixed;
-  bottom: 10px;
-  transition: 0.1s;
+    padding: 10px 20px;
+    background-color: var(--brand-orange);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    position: fixed;
+    bottom: 10px;
+    transition: 0.1s;
 }
 
 .submitButton {
-  right: 10px;
+    right: 10px;
 }
 
 .autoFill {
-  left: 10px;
-  background-color: greenyellow !important;
-  color: red !important;
+    left: 10px;
+    background-color: greenyellow !important;
+    color: red !important;
 }
 
 .submitButton:hover,
 .autoFill:hover {
-  background-color: #9d4614;
-  transform: scale(1.05);
+    background-color: var(--brand-orange-dark);
+    transform: scale(1.05);
 }
 
 /* Form elements */
 .MainFormGroups {
-  padding: 10px;
+    padding: 10px;
 }
 
 .FormGroupElement {
-  padding: 5px;
+    padding: 5px;
 }
 
-label {
-  padding-right: 20px;
-  font-size: 1.3em;
+/* Scoped to this form so it doesn't restyle every label in the app */
+.ContextForm label {
+    padding-right: 20px;
+    font-size: 1.3em;
 }
 
 .formInput {
-  margin-left: 20px;
+    margin-left: 20px;
 }
 
 .ConfigDropdown {
-  color: #000;
-  font-size: 1em;
-  border-radius: 10px;
+    color: #000;
+    font-size: 1em;
+    border-radius: 10px;
 }
 
-
-/* Make all cards visually consistent */
-.panel-content,
-.grid-item {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  height: 100%;
-  background-color: #000;
-  border: 1px solid #181617;
-  color: white;
-}
-
-/* Ensure all cards stretch evenly */
-.row {
-  align-items: stretch;
+/* Ensure all cards stretch evenly (scoped so other rows in the app are untouched) */
+.ContextForm .row {
+    align-items: stretch;
 }
 
 /* Grid and spacing */
 .grid-container {
-  margin-top: 30px;
-  padding: 0px;
+    margin-top: 30px;
+    padding: 0px;
 }
 
 .fill {
-  width: 100%;
-  height: 100%;
-  margin: 0px;
-}
-
-
-.grid-header {
-  margin-bottom: 10px;
-  font-weight: bold;
-  font-size: 1.2em;
-  color: #F36917 !important;
+    width: 100%;
+    height: 100%;
+    margin: 0px;
 }

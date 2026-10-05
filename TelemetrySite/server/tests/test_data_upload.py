@@ -2,7 +2,6 @@ import os
 from datetime import datetime
 from json import dumps
 
-
 folder_name = os.path.dirname(__file__)
 data = {
     "mf4File": "",
@@ -47,34 +46,21 @@ def test_post_real_files(client, mock_db):
         os.path.join(folder_name, "test_data/DEV1_4_13.dbc.test"), "rb"
     ) as dbc:
         # For this data, we aren't bothering with the context data. That's the front end's job, we only care about data
-        data["mf4File"] = (mf4, "ExampleData.MF4")
+        data["mf4File"] = (mf4, "ExampleData.mf4")
         data["dbcFile"] = (dbc, "DEV1_4_13.dbc")
         response = client.post(
             "/DataUpload/0", data=data, content_type="multipart/form-data"
         )
-
+    docs = list(mock_db["messages"].find({"event.name": "test"}))
     # Assertions about return data
     assert response.status_code == 201
     assert response.get_json()["message"] == "Data received successfully"
 
-    # Assertions about mongo query result
-    pipeline = [
-        {"$match": {"event.name": "test"}},
-        {"$unwind": "$event.run.messages"},
-        {
-            "$group": {
-                "_id": None,
-                "signals": {"$addToSet": "$event.run.messages.signal"},
-            }
-        },
-    ]
+    signals = set(mock_db["messages"].distinct("event.run.messages.signal"))
 
-    result = set(
-        list(mock_db["messages"].aggregate(pipeline, allowDiskUse=True))[0]["signals"]
-    )
-    assert result.__len__() != 0
-    assert result.__contains__("BmsCurrent")
-    assert result.__contains__("Min_Pack_Temp")
+    assert len(signals) != 0
+    assert "BmsCurrent" in signals
+    assert "Min_Pack_Temp" in signals
 
 
 def test_post_missing_mf4(client):
