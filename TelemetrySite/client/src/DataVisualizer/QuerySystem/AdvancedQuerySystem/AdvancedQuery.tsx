@@ -1,12 +1,34 @@
 import { Plus, X } from "react-feather";
-import QueryEntry from "./QueryEntry.ts";
+import QueryEntry, { ParamFields } from "./QueryEntry.ts";
 import { useState } from "react";
-import { Input, Button, InputGroup, Row, Col, Form, Card } from "reactstrap";
+import {
+    Input,
+    Button,
+    InputGroup,
+    Row,
+    Col,
+    Form,
+    Card,
+    Alert,
+    Modal,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
+} from "reactstrap";
+import { BuildURI } from "Utils/ServerUtils.ts";
+import { getItem } from "Utils/SessionStorageLoader.ts";
 
-const QueryTypes = ["Match", "Group", "Sample", "Sort", "Unwind"];
+const QueryTypes = Object.keys(ParamFields);
+
+type TestResult = { count: number; sample: unknown[] };
 
 const AdvancedQuery = () => {
     const [stages, setStages] = useState([new QueryEntry(0)]);
+    const [queryName, setQueryName] = useState("");
+    const [docId, setDocId] = useState<string | null>(null);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [testResult, setTestResult] = useState<TestResult | null>(null);
 
     /**
      * Insert a new stage after a given stageIndex
@@ -93,22 +115,70 @@ const AdvancedQuery = () => {
         setStages(newStages);
     };
 
+    //#region Data Transmission
+
+    const sendQuery = async (mode: "test-query" | "save-query") => {
+        setErrorMessage(null);
+        setSuccessMessage(null);
+
+        if (stages.some((stage) => stage.type === "none")) {
+            setErrorMessage("Every stage needs a type. Select one or remove the empty stage.");
+            return;
+        }
+        if (mode === "save-query" && queryName.trim() === "") {
+            setErrorMessage("Enter a query name before saving.");
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                `${BuildURI("advanced_query")}?mode=${mode}&doc_id=${docId ?? "NULL"}&auth_token=${getItem("authToken")}`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        query_name: queryName.trim(),
+                        stages: stages.map((stage) => stage.toPayload()),
+                    }),
+                },
+            );
+            const body = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                setErrorMessage(body.error ?? body.invalid ?? `Request failed (error ${response.status}).`);
+                return;
+            }
+
+            if (mode === "test-query") {
+                setTestResult(body as TestResult);
+            } else {
+                setDocId(body.document_id);
+                setSuccessMessage(`Query "${queryName.trim()}" saved.`);
+            }
+        } catch (err) {
+            console.error("Advanced query error:", err);
+            setErrorMessage("Could not reach the server.");
+        }
+    };
+
+    //#endregion
+
     return (
-        <Form>
+        <Form onSubmit={(e) => e.preventDefault()}>
             <Card>
                 {stages.map((stage) => (
-                    <div key={stage.index} className='mb-3 p-2 border rounded data-background'>
-                        <InputGroup className='mb-2 align-items-center '>
-                            <Button color='danger' size='sm' onClick={() => removeStage(stage.index)}>
+                    <div key={stage.id} className="mb-3 p-2 border rounded data-background">
+                        <InputGroup className="mb-2 align-items-center ">
+                            <Button type="button" color="danger" size="sm" onClick={() => removeStage(stage.index)}>
                                 <X size={14} />
                             </Button>
 
                             <Input
-                                type='select'
+                                type="select"
                                 value={stage.type}
                                 onChange={(e) => handleTypeChange(stage.index, e.target.value)}
                             >
-                                <option value='none'>Select Stage</option>
+                                <option value="none">Select Stage</option>
                                 {QueryTypes.map((queryType) => (
                                     <option key={queryType} value={queryType}>
                                         {queryType}
@@ -116,43 +186,132 @@ const AdvancedQuery = () => {
                                 ))}
                             </Input>
 
-                            <Button color='success' size='sm' onClick={() => addStageAfter(stage.index)}>
+                            <Button type="button" color="success" size="sm" onClick={() => addStageAfter(stage.index)}>
                                 <Plus size={14} />
                             </Button>
                         </InputGroup>
 
                         {stage.type !== "none" && (
-                            <div className='p-2 bg-light rounded param-background'>
-                                <h6 className='mb-2'>{stage.type} Parameters</h6>
+                            <div className="p-2 bg-light rounded param-background">
+                                <h6 className="mb-2">{stage.type} Parameters</h6>
+                                {stage.type === "Group" && (
+                                    <small className="d-block mb-2 text-white-50">
+                                        Use Output Name <code>_id</code> for the group key. Leave its Field Path empty
+                                        to group everything together.
+                                    </small>
+                                )}
 
                                 {stage.params.map((param, i) => (
-                                    <Row key={i} xs='3' className='align-items-center mb-2 '>
-                                        {Object.keys(param).map((key) => (
-                                            <Col key={key} md='4'>
-                                                <Input
-                                                    placeholder={key}
-                                                    value={param.field}
-                                                    onChange={(e) => handleParamChange(stage.index, i, key, e.target.value)}
-                                                />
-                                            </Col>
-                                        ))}
+                                    <Row key={i} xs="3" className="align-items-center mb-2 ">
+                                        {Object.keys(param).map((key) => {
+                                            const options = ParamFields[stage.type]?.options[key];
+                                            return (
+                                                <Col key={key} md="4">
+                                                    {options ? (
+                                                        <Input
+                                                            type="select"
+                                                            value={param[key]}
+                                                            onChange={(e) =>
+                                                                handleParamChange(stage.index, i, key, e.target.value)
+                                                            }
+                                                        >
+                                                            {options.map((option) => (
+                                                                <option key={option} value={option}>
+                                                                    {option}
+                                                                </option>
+                                                            ))}
+                                                        </Input>
+                                                    ) : (
+                                                        <Input
+                                                            placeholder={key}
+                                                            value={param[key]}
+                                                            onChange={(e) =>
+                                                                handleParamChange(stage.index, i, key, e.target.value)
+                                                            }
+                                                        />
+                                                    )}
+                                                </Col>
+                                            );
+                                        })}
 
-                                        <Col md='1'>
-                                            <Button color='danger' size='sm' onClick={() => removeParam(stage.index, i)}>
+                                        <Col md="1">
+                                            <Button
+                                                type="button"
+                                                color="danger"
+                                                size="sm"
+                                                onClick={() => removeParam(stage.index, i)}
+                                            >
                                                 <X size={12} />
                                             </Button>
                                         </Col>
                                     </Row>
                                 ))}
 
-                                <Button color='secondary' size='sm' onClick={() => addParam(stage.index)}>
+                                <Button type="button" color="secondary" size="sm" onClick={() => addParam(stage.index)}>
                                     + Add Parameter
                                 </Button>
                             </div>
                         )}
                     </div>
                 ))}
+
+                <Row className="align-items-center p-2">
+                    <Col md="6">
+                        <Input
+                            id="advanced-query-name"
+                            placeholder="Query name"
+                            value={queryName}
+                            onChange={(e) => setQueryName(e.target.value)}
+                        />
+                    </Col>
+                    <Col md="6" className="d-flex gap-2 justify-content-end">
+                        <Button type="button" color="info" onClick={() => sendQuery("test-query")}>
+                            Test Query
+                        </Button>
+                        <Button
+                            type="button"
+                            className="nav-buttons"
+                            style={{ width: "auto" }}
+                            onClick={() => sendQuery("save-query")}
+                        >
+                            Save Query
+                        </Button>
+                    </Col>
+                </Row>
+
+                {errorMessage && (
+                    <Alert color="danger" className="m-2">
+                        {errorMessage}
+                    </Alert>
+                )}
+                {successMessage && (
+                    <Alert color="success" className="m-2">
+                        {successMessage}
+                    </Alert>
+                )}
             </Card>
+
+            <Modal isOpen={testResult !== null} toggle={() => setTestResult(null)} size="xl">
+                <ModalHeader toggle={() => setTestResult(null)}>Query Test Result</ModalHeader>
+                <ModalBody>
+                    <p>
+                        <strong>{testResult?.count ?? 0}</strong> document(s) matched.
+                    </p>
+                    {testResult && testResult.sample.length > 0 && (
+                        <>
+                            <h6>Sample (first {testResult.sample.length})</h6>
+                            <pre style={{ maxHeight: "50vh", overflow: "auto" }}>
+                                {JSON.stringify(testResult.sample, null, 2)}
+                            </pre>
+                        </>
+                    )}
+                </ModalBody>
+                <ModalFooter>
+                    <Button color="danger" onClick={() => setTestResult(null)}>
+                        Exit
+                    </Button>
+                </ModalFooter>
+            </Modal>
         </Form>
     );
 };

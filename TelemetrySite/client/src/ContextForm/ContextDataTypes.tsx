@@ -54,6 +54,8 @@ interface BikeConfig {
     platform: string;
 }
 
+type Configs = BikeConfig | MCBoardConfig | PVCBoardConfig | BoardConfig;
+
 /**
  * Store all configs needed for context.
  */
@@ -130,4 +132,5 @@ export type {
     BikeConfig,
     BoardConfig,
     ConfigStorage,
+    Configs,
 };
