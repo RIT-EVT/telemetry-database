@@ -42,6 +42,7 @@ function BasicQuery() {
         setHandleSubmit,
         currentDocId,
     };
+
     const queryBody = () => {
         switch (queryStep) {
             case QueryStep.FilterEvent:

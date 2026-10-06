@@ -24,6 +24,7 @@ h2 {
 
 .Input {
     max-width: 60%;
+    margin-right: 10px;
 }
 
 .SubmitButton {
