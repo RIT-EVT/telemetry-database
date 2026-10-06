@@ -7,6 +7,7 @@ from datetime import datetime
 
 from http_codes import HttpResponseType
 
+MIN_USER_ID = 100
 
 class UserAuthApi(MethodView):
     def __init__(self, db):
@@ -68,9 +69,11 @@ class UserAuthApi(MethodView):
                     ]))
 
                     if db_result:
-                        user_id = db_result[0]["max_value"] + 1
-                    else:
-                        user_id = 100
+                        max_id = db_result[0]["max_value"]
+                        if max_id >= MIN_USER_ID:
+                            user_id = max_id + 1
+                    if user_id == None:
+                        user_id = MIN_USER_ID
 
                     auth_token = create_auth_token(self.db)
                     user_db_connection.insert_one(
