@@ -46,7 +46,7 @@ class UserAuthApi(MethodView):
 
                 current_date_time = datetime.now()
 
-                if secure_num != 1:
+                if secure_num != "1":
                     # User value doesn't match the needed value
                     # return an error message
                     return HttpResponseType.UNAUTHORIZED.error()
