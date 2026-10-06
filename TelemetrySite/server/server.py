@@ -7,6 +7,7 @@ import json
 import os
 from MATLAB_access_scripts.MATLAB_access_api import MATLAB_access_api
 from http_codes import HttpResponseType
+import log_util
 
 from sys import argv
 
@@ -27,6 +28,8 @@ def create_app(db=None):
     CORS(app)
     server_folder = os.path.dirname(__file__)
 
+    log_util.setup_file_logging(app, server_folder)
+
     # Only build a DB if one wasn't injected (e.g. by tests)
     if db is None:
         if len(argv) < 2 or argv[1] == "production":
@@ -40,24 +43,24 @@ def create_app(db=None):
 
     # Register routes with DB injected
     api.add_resource(
-        DataUploadApi, "/DataUpload/<auth_token>", resource_class_kwargs={"db": db}
+        DataUploadApi, "/DataUpload/<auth_token>", resource_class_kwargs={"db": db, "app": app}
     )
     api.add_resource(
-        BikeConfigApi, "/ConfigData/<auth_token>", resource_class_kwargs={"db": db}
+        BikeConfigApi, "/ConfigData/<auth_token>", resource_class_kwargs={"db": db, "app": app}
     )
-    api.add_resource(UserAuthApi, "/Login", resource_class_kwargs={"db": db})
+    api.add_resource(UserAuthApi, "/Login", resource_class_kwargs={"db": db, "app": app})
     api.add_resource(
         EventFilterApi,
         "/EventFilter",
-        resource_class_kwargs={"db": db},
+        resource_class_kwargs={"db": db, "app": app},
     )
     api.add_resource(
         MessageFilterApi,
         "/MessageFilter",
-        resource_class_kwargs={"db": db},
+        resource_class_kwargs={"db": db, "app": app},
     )
-    api.add_resource(MATLAB_access_api, "/MATLAB", resource_class_kwargs={"db": db})
-    api.add_resource(ConfirmQueryApi, "/ConfirmQuery", resource_class_kwargs={"db": db})
+    api.add_resource(MATLAB_access_api, "/MATLAB", resource_class_kwargs={"db": db, "app": app})
+    api.add_resource(ConfirmQueryApi, "/ConfirmQuery", resource_class_kwargs={"db": db, "app": app})
 
     @app.route("/")
     def MainContext():

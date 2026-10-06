@@ -1,17 +1,19 @@
 from flask.views import MethodView
-from flask import request
+from flask import request, Flask
 
 from os import getenv
 from utils import create_auth_token, update_expired_token
 from datetime import datetime
 
 from http_codes import HttpResponseType
+import utils
 
 MIN_USER_ID = 100
 
 class UserAuthApi(MethodView):
-    def __init__(self, db):
+    def __init__(self, db, app: Flask):
         self.db = db
+        self.app: Flask = app
 
     def post(self):
         user_data = request.get_json()
@@ -19,7 +21,6 @@ class UserAuthApi(MethodView):
         user_db_connection = self.db["users"]
         match user_data.get("action"):
             case "login":
-
                 # Check the username and password against the db to make sure the user
                 # exists and they are who they say they are. Return auth token if the
                 # values are correct, otherwise return an invalid user error
@@ -35,6 +36,14 @@ class UserAuthApi(MethodView):
                     return HttpResponseType.UNAUTHORIZED.error()
                 else:
                     auth_token = mongo_data["auth_token"]
+                    user_id = utils.get_user_id_from_token(auth_token, self.db)
+
+                    if user_id == -1:
+                        self.app.logger.info(f"Attempted to log in \"{username}\" but got user_id of {str(user_id)}, from IP {request.remote_addr}")
+                        return HttpResponseType.UNAUTHORIZED.error()
+                    else:
+                        self.app.logger.info(f"User {str(user_id)} sucesfully logged in from {request.remote_addr}")
+
                     # always update auth token on login
                     # TODO undo when merging main
                     # auth_token = update_expired_token(mongo_data["_id"], self.db)
@@ -86,6 +95,7 @@ class UserAuthApi(MethodView):
                         }
                     )
 
+                    self.app.logger.info(f"User {str(user_id)} sucesfully created from {request.remote_addr}")
                     return {"auth_token": auth_token}, HttpResponseType.CREATED.value
             case _:
                 return HttpResponseType.NOT_FOUND.error()
