@@ -135,18 +135,21 @@ def _setup_config_mock(mock_db):
                 "password": "123".encode(),
                 "auth_token": "0",
                 "auth_time": datetime.now(),
+                "user_id": 100,
             },
             {
                 "username": "outdated_user",
                 "password": "123".encode(),
                 "auth_token": "1",
                 "auth_time": datetime.min,
+                "user_id": 101,
             },
             {
                 "username": "duplicate_user",
                 "password": "123".encode(),
                 "auth_token": "2",
                 "auth_time": datetime.now(),
+                "user_id": 102,
             },
         ]
     )

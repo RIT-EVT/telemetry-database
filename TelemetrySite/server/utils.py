@@ -133,3 +133,24 @@ def validate_user(auth_token, db):
         return False, HttpResponseType.UNAUTHORIZED
 
     return True, HttpResponseType.OK
+
+def get_user_id_from_token(auth_token, db):
+    """Fetches the user id from a token.
+
+    Args:
+        auth_token (string): User's authentication string
+        db (Database): Database connection
+
+    Returns:
+        int: The user_id connected to the token, -1 if none was found.
+    """
+
+    auth_connection = db["users"]
+    user = auth_connection.find_one({"auth_token": auth_token})
+
+    if user == None:
+        return -1
+    elif user["user_id"] == None:
+        return -1
+    else:
+        return user["user_id"]

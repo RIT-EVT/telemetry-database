@@ -57,6 +57,21 @@ class UserAuthApi(MethodView):
                 elif user_db_connection.find_one({"username": username}) != None:
                     return HttpResponseType.UNAUTHORIZED.error()
                 else:
+                    user_id = None
+                    db_result = list(user_db_connection.aggregate([
+                        {
+                            "$group": {
+                                "_id": None,
+                                "max_value": {"$max": "$user_id"}
+                            }
+                        }
+                    ]))
+
+                    if db_result:
+                        user_id = db_result[0]["max_value"] + 1
+                    else:
+                        user_id = 100
+
                     auth_token = create_auth_token(self.db)
                     user_db_connection.insert_one(
                         {
@@ -64,6 +79,7 @@ class UserAuthApi(MethodView):
                             "password": password.encode(),
                             "auth_token": auth_token,
                             "auth_time": current_date_time,
+                            "user_id": user_id,
                         }
                     )
 
