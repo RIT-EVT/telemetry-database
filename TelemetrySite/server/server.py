@@ -56,7 +56,9 @@ def create_app(db=None):
         "/MessageFilter",
         resource_class_kwargs={"db": db},
     )
-    api.add_resource(MATLAB_access_api, "/MATLAB", resource_class_kwargs={"db": db})
+    api.add_resource(
+        MATLAB_access_api, "/MATLAB/<query_name>", resource_class_kwargs={"db": db}
+    )
     api.add_resource(ConfirmQueryApi, "/ConfirmQuery", resource_class_kwargs={"db": db})
 
     @app.route("/")

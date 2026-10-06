@@ -21,8 +21,8 @@ class MATLAB_access_api(MethodView):
             return str(doc)
         return doc
 
-    def get(self):
-        query_name = request.args.get("name")
+    def get(self, query_name):
+
         if not query_name:
             return {"error": "Missing query name"}, HttpResponseType.BAD_REQUEST.value
 

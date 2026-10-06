@@ -1,5 +1,5 @@
 import { Input } from "reactstrap";
-import { ConfigTypes, BoardConfig, BikeConfig, CUSTOM_OPTION } from "./ContextDataTypes";
+import { ConfigTypes, BoardConfig, BikeConfig, Configs, ConfigStorage, CUSTOM_OPTION } from "./ContextDataTypes";
 import "./ContextForm.css";
 
 // Which config selects are optional
@@ -15,7 +15,7 @@ const RequiredSelects: Record<ConfigTypes, boolean> = {
 
 interface SelectCreatorProps {
     /** Options to display in select */
-    displayValues: BoardConfig[] | BikeConfig[];
+    displayValues: Configs[];
     /** Name of config form */
     name: ConfigTypes;
     /** Callback function for when the dropdown is updated */
@@ -41,23 +41,23 @@ export default function SelectCreator({
     configSelectedValue,
     lockNonBike,
 }: SelectCreatorProps): React.ReactElement {
-    const options: Array<BoardConfig | BikeConfig> = displayValues ?? [];
+    const options: Array<Configs> = displayValues ?? [];
 
     // Disable this select if it was assigned by the bike
     const disabled: boolean = name !== "bike" && lockNonBike;
 
     return (
         <Input
-            type='select'
+            type="select"
             onChange={(e) => onChange(name, e.target.value)}
-            placeholder='Select a config'
+            placeholder="Select a config"
             required={RequiredSelects[name]}
-            className='ConfigDropdown'
+            className="ConfigDropdown"
             id={`${name}Select`}
             value={configSelectedValue ?? ""}
             disabled={disabled}
         >
-            <option value='' disabled hidden>
+            <option value="" disabled hidden>
                 Select an option
             </option>
             {/** Display each saved config name as an option. */}

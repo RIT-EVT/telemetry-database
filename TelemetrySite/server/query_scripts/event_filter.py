@@ -22,10 +22,11 @@ class EventFilterApi(MethodView):
             return response.error()
 
         # ID isn't an ID or it doesn't correspond to a doc in the db
-        if not query_utils.validate_id(self.db, doc_id):
+        document = query_utils.get_valid_doc(self.db, doc_id)
+        if document is None:
             return HttpResponseType.BAD_REQUEST.error()
 
-        self.db["custom"]
+        return query_utils.serialize_query(document), 200
 
     def post(self):
         # Add or test a query against the DB
@@ -43,6 +44,8 @@ class EventFilterApi(MethodView):
                 return self.test_query(request.get_json(), doc_id)
             case "save-event-query":
                 return self.save_event_query(request.get_json(), doc_id)
+            case _:
+                return {"error": "Invalid mode"}, 400
 
     def test_query(self, data, doc_id):
 

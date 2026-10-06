@@ -1,7 +1,7 @@
 import { QueryFunctions, QueryDataFormat, QueryStep } from "./BasicQueryDataTypes";
 import { BuildURI } from "Utils/ServerUtils.ts";
 import React, { useEffect, useState, useRef } from "react";
-import { Input, Row, Col, Container, Label, InputGroup, CardHeader } from "reactstrap";
+import { Input, Row, Col, Container, Label, InputGroup, CardHeader, Alert } from "reactstrap";
 import { saveItem, getItem } from "Utils/SessionStorageLoader.ts";
 
 const FilterMessages = ({ updateQueryStep, updateQueryDocument, setHandleSubmit, currentDocId }: QueryFunctions) => {
@@ -16,7 +16,10 @@ const FilterMessages = ({ updateQueryStep, updateQueryDocument, setHandleSubmit,
     // The current query being built, loaded from session storage
     const [currentQueryData, setCurrentQueryData] = useState<QueryDataFormat>();
 
-    const currentQueryDataRef = useRef<QueryDataFormat>(null);
+    const currentQueryDataRef = useRef<QueryDataFormat | null>(null);
+
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [signalsLoaded, setSignalsLoaded] = useState(false);
 
     const updateSelectedCheckBox = (e: React.ChangeEvent<HTMLInputElement>): void => {
         const targetElement = e.target as HTMLInputElement;
@@ -46,6 +49,8 @@ const FilterMessages = ({ updateQueryStep, updateQueryDocument, setHandleSubmit,
     const handleMessageFilterGet = async (response: Response): Promise<void> => {
         if (!response.ok) {
             console.error(`message_filter fetch failed with status ${response.status}`);
+            setErrorMessage("Could not load CAN signals for this query.");
+            setSignalsLoaded(true);
             return;
         }
 
@@ -54,11 +59,18 @@ const FilterMessages = ({ updateQueryStep, updateQueryDocument, setHandleSubmit,
 
         // Store the raw names so the JSX below can render them reactively
         setCanNames(names);
-        // Update possible_can_names in the query data if they differ from what we have
+        setSignalsLoaded(true);
+        // Update possible_can_names in the query data if they differ from what we have.
+        // Also drop previously selected signals that no longer exist for the current event filter.
         setCurrentQueryData((prev) => {
             if (!prev) return prev;
-            if (haveSameElementsSorted(prev.query_data.possible_can_names, names)) return prev;
-            return { ...prev, query_data: { ...prev.query_data, possible_can_names: names } };
+            const pruned = prev.query_data.can_name.filter((name) => names.includes(name));
+            if (
+                haveSameElementsSorted(prev.query_data.possible_can_names, names) &&
+                pruned.length === prev.query_data.can_name.length
+            )
+                return prev;
+            return { ...prev, query_data: { ...prev.query_data, possible_can_names: names, can_name: pruned } };
         });
     };
 
@@ -69,6 +81,10 @@ const FilterMessages = ({ updateQueryStep, updateQueryDocument, setHandleSubmit,
 
         const clickedButton = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement;
         if (clickedButton.value === "next-step") {
+            if (data.query_data.can_name.length === 0) {
+                setErrorMessage("Select at least one CAN signal to continue.");
+                return;
+            }
             saveItem("QueryData", data);
             const response = await fetch(
                 `${BuildURI("message_filter")}?doc_id=${currentDocId}&auth_token=${getItem("authToken")}`,
@@ -82,8 +98,11 @@ const FilterMessages = ({ updateQueryStep, updateQueryDocument, setHandleSubmit,
             );
 
             if (!response.ok) {
-                throw new Error(`Request failed with code ${response.status} and text ${response.statusText}`);
+                const body = await response.json().catch(() => ({}));
+                setErrorMessage(body.error ?? body.invalid ?? `Request failed (error ${response.status}).`);
+                return;
             }
+            setErrorMessage(null);
             updateQueryStep(QueryStep.ConfirmQuery);
         } else if (clickedButton.value === "previous-step") {
             saveItem("QueryData", data);
@@ -104,7 +123,12 @@ const FilterMessages = ({ updateQueryStep, updateQueryDocument, setHandleSubmit,
             fetch(`${BuildURI("message_filter")}?doc_id=${currentDocId}&auth_token=${auth_token}`, {
                 method: "GET",
                 headers: { "Content-Type": "application/json" },
-            }).then(handleMessageFilterGet);
+            })
+                .then(handleMessageFilterGet)
+                .catch(() => {
+                    setErrorMessage("Could not reach the server.");
+                    setSignalsLoaded(true);
+                });
         } else {
             // No query data means the user skipped the first step — send them back
             updateQueryStep(QueryStep.FilterEvent);
@@ -126,21 +150,29 @@ const FilterMessages = ({ updateQueryStep, updateQueryDocument, setHandleSubmit,
 
     return (
         <>
-            <CardHeader className='center-align'>
-                <h1 className='query-selector'>Filter Messages</h1>
+            <CardHeader className="center-align">
+                <h1 className="query-selector">Filter Messages</h1>
             </CardHeader>
+            {errorMessage && (
+                <Alert color="danger" className="mt-3">
+                    {errorMessage}
+                </Alert>
+            )}
+            {signalsLoaded && canNames.length === 0 && !errorMessage && (
+                <p className="white text-center mt-3">No CAN signals were found for events matching this filter.</p>
+            )}
             <Container>
                 <Row xs={2}>
                     {canNames.map((element: string) => (
                         <Col key={element}>
-                            <InputGroup className='align-items-center'>
+                            <InputGroup className="align-items-center">
                                 <Input
                                     id={element}
-                                    type='checkbox'
+                                    type="checkbox"
                                     checked={selectedBoxes.get(element) ?? false}
                                     onChange={updateSelectedCheckBox}
                                 />
-                                <Label check className='mx-1 my-0 white'>
+                                <Label check className="mx-1 my-0 white">
                                     {element}
                                 </Label>
                             </InputGroup>
