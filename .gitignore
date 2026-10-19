@@ -39,3 +39,6 @@ __pycache__/
 *.pem
 *.key
 *.xml
+
+# Project Specific Files
+logs
