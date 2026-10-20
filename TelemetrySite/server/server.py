@@ -2,6 +2,7 @@
 from flask import Flask, jsonify
 from flask_restful import Api
 from flask_cors import CORS
+import logging
 import dotenv
 import json
 import os
@@ -23,12 +24,14 @@ from development_mode import create_false_db_instance
 
 
 def create_app(db=None):
+    server_folder = os.path.dirname(__file__)
+
+    print("Starting flask")
     app = Flask(__name__)
     api = Api(app)
     CORS(app)
-    server_folder = os.path.dirname(__file__)
 
-    log_util.setup_file_logging(app, server_folder)
+    log_util.setup_file_handlers(app, server_folder)
 
     # Only build a DB if one wasn't injected (e.g. by tests)
     if db is None:
@@ -81,10 +84,11 @@ def create_app(db=None):
                 HttpResponseType.INTERNAL_SERVER_ERROR.value,
             )
 
+    # log_util.setup_error_handling(app)
+
     return app
 
 
 if __name__ == "__main__":
-    print("Starting flask")
     app = create_app()  # real DB in production, don't pass in a connection
     app.run(debug=True)
