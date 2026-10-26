@@ -74,17 +74,17 @@ def create_app(db=None):
                 data = json.load(json_file)
             return jsonify(data), HttpResponseType.OK.value
         except FileNotFoundError:
+            app.logger.exception(os.path.join(server_folder, "ServerPaths.json") + " not found!")
             return (
                 jsonify({"error": "File not found"}),
                 HttpResponseType.INTERNAL_SERVER_ERROR.value,
             )
         except json.JSONDecodeError:
+            app.logger.exception("Error decoding JSON (" + os.path.join(server_folder, "ServerPaths.json") + ")")
             return (
                 jsonify({"error": "Error decoding JSON"}),
                 HttpResponseType.INTERNAL_SERVER_ERROR.value,
             )
-
-    # log_util.setup_error_handling(app)
 
     return app
 

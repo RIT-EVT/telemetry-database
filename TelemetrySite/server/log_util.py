@@ -5,7 +5,7 @@ from flask import Flask
 
 def setup_file_handlers(app: Flask, sever_folder: str):
     print("LOGGER: Setting up files!") # Debug code
-    logger = app.logger #logging.getLogger(appname)
+    logger = app.logger
 
     log_dir = os.path.join(sever_folder, 'logs')
     if not os.path.exists(log_dir):
@@ -51,30 +51,3 @@ def setup_file_handlers(app: Flask, sever_folder: str):
     logger.addHandler(time_handler)
     logger.addHandler(error_handler)
     logger.setLevel(logging.DEBUG)
-
-class AppError(Exception):
-    """Base exception for application errors."""
-    def __init__(self, message, status_code=500, payload=None):
-        super().__init__(message)
-        self.message = message
-        self.status_code = status_code
-        self.payload = payload
-
-class ValidationError(AppError):
-    """Raised when request validation fails."""
-    def __init__(self, message, payload=None):
-        super().__init__(message, status_code=400, payload=payload)
-
-class NotFoundError(AppError):
-    """Raised when a resource is not found."""
-    def __init__(self, message, payload=None):
-        super().__init__(message, status_code=404, payload=payload)
-
-def setup_error_handling(app: Flask):
-    @app.errorhandler(AppError)
-    def handle_app_error(error):
-        print("App Error:", error)
-
-    @app.errorhandler(Exception)
-    def handle_unexpected_error(error):
-        print("Unexpected Error:", error)

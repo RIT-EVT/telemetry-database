@@ -1,5 +1,5 @@
 from json import loads
-from flask import request
+from flask import request, Flask
 from flask_restful import Api
 from flask.views import MethodView
 
@@ -8,8 +8,9 @@ from bson import ObjectId
 
 
 class MATLAB_access_api(MethodView):
-    def __init__(self, db):
+    def __init__(self, db, app: Flask):
         self.db = db
+        self.app = app
 
     def serialize_doc(self, doc):
         """Recursively convert ObjectId and other non-serializable types to strings."""
@@ -48,6 +49,7 @@ class MATLAB_access_api(MethodView):
             }, HttpResponseType.OK.value
 
         except Exception as e:
+            self.app.logger.exception(f"Execution failed: {str(e)}")
             return {
                 "error": f"Execution failed: {str(e)}"
             }, HttpResponseType.INTERNAL_SERVER_ERROR.value
