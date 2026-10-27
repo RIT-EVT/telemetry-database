@@ -2,7 +2,6 @@
 from flask import Flask, jsonify
 from flask_restful import Api
 from flask_cors import CORS
-import logging
 import dotenv
 import json
 import os

@@ -1,7 +1,7 @@
 import logging
 from logging.handlers import TimedRotatingFileHandler
 import os
-from flask import Flask
+from flask import Flask, Request
 
 def setup_file_handlers(app: Flask, sever_folder: str):
     print("LOGGER: Setting up files!") # Debug code
@@ -51,3 +51,9 @@ def setup_file_handlers(app: Flask, sever_folder: str):
     logger.addHandler(time_handler)
     logger.addHandler(error_handler)
     logger.setLevel(logging.DEBUG)
+
+def log_info(app: Flask, request: Request, header: str, user_id: str, response: str):
+    app.logger.info(f"{header} | User ID: {user_id} | IP: {request.remote_addr} | Method: {request.method} | Path: {request.path} | Response: {response}")
+
+def log_warning(app: Flask, request: Request, header: str, user_id: str, reason: str, response: str):
+    app.logger.warning(f"{header} | User ID: {user_id} | IP: {request.remote_addr} | Method: {request.method} | Path: {request.path} | Reason: {reason} | Response: {response}")
