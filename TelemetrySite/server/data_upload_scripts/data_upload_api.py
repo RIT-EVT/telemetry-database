@@ -8,7 +8,7 @@ import uuid
 from data_upload_scripts.data_upload import submit_data, get_progress
 from utils import validate_user, get_user_id_from_token
 from http_codes import HttpResponseType
-from log_util import log_warning
+from log_util import log_warning, log_info
 
 
 class DataUploadApi(MethodView):
@@ -39,8 +39,9 @@ class DataUploadApi(MethodView):
         user_id = str(get_user_id_from_token(auth_token, self.db))
 
         if not user_valid:
-            self.app.logger.warning(f"Unauthorized API acess | User ID: {user_id} | IP: {request.remote_addr} | Method: {request.method} | Path: {request.path} | Reason: Invalid auth token | Response: {response.error()}")
-            return response.error()
+            error = response.error()
+            log_warning(self.app, request, "Unauthorized API acess", user_id, "Invalid auth token", error)
+            return error
 
         return get_progress(), HttpResponseType.OK.value
 
@@ -102,12 +103,12 @@ class DataUploadApi(MethodView):
         if not self.file_type_check(mf4File.filename, self.MF4_EXTENSION):
             type = self.get_file_type(mf4File.filename)
             error = HttpResponseType.BAD_REQUEST.error()
-            log_warning(self.app, request, "Bad Request", user_id, f"mf4File: expected type '{self.MF4_EXTENSION}' got '{type}'")
+            log_warning(self.app, request, "Bad Request", user_id, f"mf4File: expected type '{self.MF4_EXTENSION}' got '{type}'", error)
             return error
         if not self.file_type_check(dbcFile.filename, self.DBC_EXTENSION):
             type = self.get_file_type(mf4File.filename)
             error = HttpResponseType.BAD_REQUEST.error()
-            log_warning(self.app, request, "Bad Request", user_id, f"dbcFile: expected type '{self.DBC_EXTENSION}' got '{type}'")
+            log_warning(self.app, request, "Bad Request", user_id, f"dbcFile: expected type '{self.DBC_EXTENSION}' got '{type}'", error)
             return error
 
         # the context must be a JSON object containing event -> run
@@ -159,11 +160,12 @@ class DataUploadApi(MethodView):
 
         if result == True:
             msg = HttpResponseType.CREATED.value
-            
-
-            return {"message": "Data received successfully"}, HttpResponseType.CREATED.value
+            log_info(self.app, request, "Data received successfully", user_id, msg)
+            return {"message": "Data received successfully"}, msg
         else:
-            return {"message": "Data failed to upload"}, HttpResponseType.INTERNAL_SERVER_ERROR.value
+            msg = HttpResponseType.INTERNAL_SERVER_ERROR.value
+            log_warning(self.app, request, "Failed to upload data", user_id, err, msg)
+            return {"message": "Data failed to upload"}, msg
 
     def get_file_type(self, filename):
         if "." in filename:
