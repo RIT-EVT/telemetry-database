@@ -41,6 +41,7 @@ def create_app(db=None):
             dotenv.load_dotenv(os.path.join(two_up, "credentials.env"))
             db = utils.create_db_connection()
         else:
+            print("creating fake DB instance")
             db = create_false_db_instance()
 
     # Register routes with DB injected

@@ -1,5 +1,5 @@
 from flask.views import MethodView
-from flask import request, jsonify
+from flask import request, jsonify, Flask
 import json
 from bson import ObjectId
 
@@ -9,8 +9,9 @@ from http_codes import HttpResponseType
 
 class BikeConfigApi(MethodView):
 
-    def __init__(self, db):
+    def __init__(self, db, app: Flask):
         self.db = db
+        self.app = app
 
     # This currently makes a db request per check, unsure if theirs a more efficant way to do this. - Owen
     def _hasOverlap(self, db_connection, object):

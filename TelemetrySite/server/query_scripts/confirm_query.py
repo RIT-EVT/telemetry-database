@@ -1,15 +1,16 @@
 from flask.views import MethodView
 from utils import validate_user
 from http_codes import HttpResponseType
-from flask import request
+from flask import request, Flask
 from json import loads, dumps
 from bson import ObjectId
 import query_scripts.query_utils as query_utils
 
 
 class ConfirmQueryApi(MethodView):
-    def __init__(self, db):
+    def __init__(self, db, app: Flask):
         self.db = db
+        self.app = app
 
     def post(self):
         # Add or test a query against the DB

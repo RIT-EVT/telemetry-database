@@ -160,7 +160,7 @@ class DataUploadApi(MethodView):
 
         if result == True:
             msg = HttpResponseType.CREATED.value
-            log_info(self.app, request, "Data received successfully", user_id, msg)
+            log_info(self.app, request, f"Sucesfully uploaded {mf4FileName} and {dbcFileName}", user_id, msg)
             return {"message": "Data received successfully"}, msg
         else:
             msg = HttpResponseType.INTERNAL_SERVER_ERROR.value

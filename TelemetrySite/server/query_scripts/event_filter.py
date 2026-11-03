@@ -1,15 +1,16 @@
 from flask.views import MethodView
 from utils import validate_user
 from http_codes import HttpResponseType
-from flask import request
+from flask import request, Flask
 from json import dumps, loads
 from bson import ObjectId
 import query_scripts.query_utils as query_utils
 
 
 class EventFilterApi(MethodView):
-    def __init__(self, db):
+    def __init__(self, db, app: Flask):
         self.db = db
+        self.app = app
 
     def get(self):
         # Get the fields from a document for event filtering
