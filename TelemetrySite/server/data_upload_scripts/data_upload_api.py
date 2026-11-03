@@ -9,7 +9,8 @@ from data_upload_scripts.data_upload import submit_data, get_progress
 from utils import validate_user, get_user_id_from_token
 from http_codes import HttpResponseType
 from log_util import log_warning, log_info
-
+import random
+import string
 
 class DataUploadApi(MethodView):
 
@@ -122,18 +123,16 @@ class DataUploadApi(MethodView):
 
         # Secure file names for best practice when saving external
         # gets rid of any "/" or ".." that can change where the file is saved
+        # If a file name becomes empty, or just it extention then we generate a random one
+
         mf4FileName = secure_filename(mf4File.filename)
-        if not mf4FileName:
-            error = HttpResponseType.BAD_REQUEST.error()
-            log_warning(self.app, request, "Bad Request", user_id, f"mf4File.filename once secured is empty ('{mf4File.filename}' --> '{mf4FileName}')")
-            return error
+        if not mf4FileName or mf4FileName.lower() == "mf4":
+            mf4FileName = self.generate_random_name(20) + ".MF4"
 
         dbcFileName = secure_filename(dbcFile.filename)
-        if not dbcFileName:
-            error = HttpResponseType.BAD_REQUEST.error()
-            log_warning(self.app, request, "Bad Request", user_id, f"dbcFile.filename once secured is empty ('{dbcFile.filename}' --> '{dbcFileName}')")
-            return error
-
+        if not dbcFileName or dbcFileName.lower() == "dbc":
+            dbcFileName = self.generate_random_name(20) + ".dbc"
+        
         # each request gets its own folder so concurrent uploads
         # (or identical file names) can't overwrite or delete each other
         request_folder = os.path.join(self.UPLOAD_FOLDER, uuid.uuid4().hex)
@@ -163,7 +162,7 @@ class DataUploadApi(MethodView):
             log_info(self.app, request, f"Sucesfully uploaded {mf4FileName} and {dbcFileName}", user_id, msg)
             return {"message": "Data received successfully"}, msg
         else:
-            msg = HttpResponseType.INTERNAL_SERVER_ERROR.value
+            msg = HttpResponseType.INTERNAL_SERVER_ERROR.error()
             log_warning(self.app, request, "Failed to upload data", user_id, err, msg)
             return {"message": "Data failed to upload"}, msg
 
@@ -185,3 +184,7 @@ class DataUploadApi(MethodView):
             boolean: If the file type is valid
         """
         return self.get_file_type(filename) == extension
+
+    def generate_random_name(self, len):
+        CHARACTERS = string.ascii_letters + string.digits
+        return ''.join(random.choices(CHARACTERS, k=len))
