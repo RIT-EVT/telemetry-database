@@ -41,7 +41,7 @@ class DataUploadApi(MethodView):
 
         if not user_valid:
             error = response.error()
-            log_warning(self.app, request, "Unauthorized API acess", user_id, "Invalid auth token", error)
+            log_warning(self.app, request, "Unauthorized API access", user_id, "Invalid auth token", error)
             return error
 
         return get_progress(), HttpResponseType.OK.value
@@ -62,7 +62,7 @@ class DataUploadApi(MethodView):
 
         if not user_valid:
             error = response.error()
-            log_warning(self.app, request, "Unauthorized API acess", user_id, "Invalid auth token", error)
+            log_warning(self.app, request, "Unauthorized API access", user_id, "Invalid auth token", error)
             return error
 
         # Check if the post request has all needed data needed

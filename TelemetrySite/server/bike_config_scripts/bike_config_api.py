@@ -34,7 +34,7 @@ class BikeConfigApi(MethodView):
         user_id = get_user_id_from_token(auth_token, self.db)
 
         if not user_valid:
-            log_warning(self.app, request, "Unauthorized API acess", user_id, "Invalid auth token", response.error())
+            log_warning(self.app, request, "Unauthorized API access", user_id, "Invalid auth token", response.error())
             return response.error()
 
         # Data Fetching & Aggrigation
@@ -88,7 +88,7 @@ class BikeConfigApi(MethodView):
         user_id = get_user_id_from_token(auth_token, self.db)
 
         if not user_valid:
-            log_warning(self.app, request, "Unauthorized API acess", user_id, "Invalid auth token", response.error())
+            log_warning(self.app, request, "Unauthorized API access", user_id, "Invalid auth token", response.error())
             return response.error()
 
         db_connection = self.db["configs"]
@@ -141,7 +141,7 @@ class BikeConfigApi(MethodView):
         user_id = get_user_id_from_token(auth_token, self.db)
 
         if not user_valid:
-            log_warning(self.app, request, "Unauthorized API acess", user_id, "Invalid auth token", response.error())
+            log_warning(self.app, request, "Unauthorized API access", user_id, "Invalid auth token", response.error())
             return response.error()
 
         db_connection = self.db["configs"]

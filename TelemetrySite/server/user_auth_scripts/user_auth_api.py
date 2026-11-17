@@ -2,11 +2,11 @@ from flask.views import MethodView
 from flask import request, Flask
 
 from os import getenv
-from utils import create_auth_token, update_expired_token
 from datetime import datetime
 
+from utils import create_auth_token, update_expired_token, get_user_id_from_token
 from http_codes import HttpResponseType
-import utils
+from log_util import log_warning, log_info
 
 MIN_USER_ID = 100
 
@@ -33,16 +33,17 @@ class UserAuthApi(MethodView):
                 )
 
                 if mongo_data == None:
+                    log_warning(self.app, request, "Invalid user data", -1, f"Attempted to log into \"{username}\" but account does not exist or password was entered wrong", HttpResponseType.UNAUTHORIZED.error())
                     return HttpResponseType.UNAUTHORIZED.error()
                 else:
                     auth_token = mongo_data["auth_token"]
-                    user_id = utils.get_user_id_from_token(auth_token, self.db)
+                    user_id = get_user_id_from_token(auth_token, self.db)
 
                     if user_id == -1:
-                        self.app.logger.info(f"Attempted to log in \"{username}\" but got user_id of {str(user_id)}, from IP {request.remote_addr}")
+                        log_warning(self.app, request, "Invalid User ID", user_id, f"Attempted to log into \"{username}\" but got an invalid user_id", HttpResponseType.UNAUTHORIZED.error())
                         return HttpResponseType.UNAUTHORIZED.error()
                     else:
-                        self.app.logger.info(f"User {str(user_id)} sucesfully logged in from {request.remote_addr}")
+                        log_info(self.app, request, "Sucesfully logged in", user_id, HttpResponseType.OK.value)
 
                     # always update auth token on login
                     # TODO undo when merging main
@@ -59,13 +60,23 @@ class UserAuthApi(MethodView):
                 if secure_num != "1":
                     # User value doesn't match the needed value
                     # return an error message
-                    return HttpResponseType.UNAUTHORIZED.error()
+                    error = HttpResponseType.UNAUTHORIZED.error() # TODO: Wouldnt this be a bad request??
+                    log_warning(self.app, request, "Invalid Security Number", -1, f"Attempted to create an account, but got a security number of {secure_num}", error)
+                    return error
                 # Ensure all data submitted exists to prevent any empty users
-                elif username == "" or password == "":
-                    return HttpResponseType.UNAUTHORIZED.error()
+                elif username == "":
+                    error = HttpResponseType.UNAUTHORIZED.error() # TODO: Wouldnt this be a bad request??
+                    log_warning(self.app, request, "Invalid Username", -1, f"Attempted to create an account, but got a empty username", error)
+                    return error
+                elif password == "":
+                    error = HttpResponseType.UNAUTHORIZED.error() # TODO: Wouldnt this be a bad request??
+                    log_warning(self.app, request, "Invalid Password", -1, f"Attempted to create an account, but got a empty password", error)
+                    return error
                 # Ensure there isn't any duplicate usernames
                 elif user_db_connection.find_one({"username": username}) != None:
-                    return HttpResponseType.UNAUTHORIZED.error()
+                    error = HttpResponseType.UNAUTHORIZED.error() # TODO: Wouldnt this be a bad request??
+                    log_warning(self.app, request, "Existing User", -1, f"Attempted to create an account, but a user with the name \"{username}\" already exists", error)
+                    return error
                 else:
                     user_id = None
                     db_result = list(user_db_connection.aggregate([
@@ -95,7 +106,8 @@ class UserAuthApi(MethodView):
                         }
                     )
 
-                    self.app.logger.info(f"User {str(user_id)} sucesfully created from {request.remote_addr}")
+                    log_info(self.app, request, f"Sucesfully created user \"{username}\"", user_id, HttpResponseType.CREATED.value)
                     return {"auth_token": auth_token}, HttpResponseType.CREATED.value
             case _:
+                log_warning(self.app, request, "Action Not Found", -1, f"\"{user_data.get("action")}\" is not a valid user auth action", HttpResponseType.NOT_FOUND.error())
                 return HttpResponseType.NOT_FOUND.error()
