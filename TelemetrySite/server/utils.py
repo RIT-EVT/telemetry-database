@@ -134,7 +134,7 @@ def validate_user(auth_token, db):
 
     return True, HttpResponseType.OK
 
-def get_user_id_from_token(auth_token, db):
+def get_user_id_from_token(auth_token, db) -> int:
     """Fetches the user id from a token.
 
     Args:

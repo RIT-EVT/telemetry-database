@@ -37,7 +37,7 @@ class DataUploadApi(MethodView):
         """
 
         user_valid, response = validate_user(auth_token, self.db)
-        user_id = str(get_user_id_from_token(auth_token, self.db))
+        user_id = get_user_id_from_token(auth_token, self.db)
 
         if not user_valid:
             error = response.error()
@@ -58,7 +58,7 @@ class DataUploadApi(MethodView):
         """
 
         user_valid, response = validate_user(auth_token, self.db)
-        user_id = str(get_user_id_from_token(auth_token, self.db))
+        user_id = get_user_id_from_token(auth_token, self.db)
 
         if not user_valid:
             error = response.error()

@@ -3,9 +3,9 @@ from flask import request, jsonify, Flask
 import json
 from bson import ObjectId
 
-from utils import validate_user
+from utils import validate_user, get_user_id_from_token
 from http_codes import HttpResponseType
-
+from log_util import log_warning, log_info
 
 class BikeConfigApi(MethodView):
 
@@ -31,8 +31,10 @@ class BikeConfigApi(MethodView):
 
         # User Validation
         user_valid, response = validate_user(auth_token, self.db)
+        user_id = get_user_id_from_token(auth_token, self.db)
 
         if not user_valid:
+            log_warning(self.app, request, "Unauthorized API acess", user_id, "Invalid auth token", response.error())
             return response.error()
 
         # Data Fetching & Aggrigation
@@ -68,6 +70,7 @@ class BikeConfigApi(MethodView):
             for data in options:
                 del data["_id"]
 
+        log_info(self.app, request, "Sucesfully fetched all active bike configs", user_id, HttpResponseType.OK.value)
         return {"data": config_data}, HttpResponseType.OK.value
 
     def post(self, auth_token):
@@ -82,14 +85,19 @@ class BikeConfigApi(MethodView):
         """
 
         user_valid, response = validate_user(auth_token, self.db)
+        user_id = get_user_id_from_token(auth_token, self.db)
 
         if not user_valid:
+            log_warning(self.app, request, "Unauthorized API acess", user_id, "Invalid auth token", response.error())
             return response.error()
 
         db_connection = self.db["configs"]
 
         config_data = request.form["configData"]
         config_data = json.loads(config_data)
+
+        config_names = ""
+
         # This is going to be expecting an array of indivdual config objects.
         for object in config_data:
 
@@ -107,9 +115,15 @@ class BikeConfigApi(MethodView):
                     object["name"] = f"{startName} ({overlapCounter})"
                     hasOverlap = self._hasOverlap(db_connection, object)
 
+            config_names += f"\"{object["name"]}\", "
+
+        config_names = config_names[:-2]
+        config_names = "[" + config_names + "]"
+
         # Add all of the objects as documents into the db.
         db_connection.insert_many(config_data)
 
+        log_info(self.app, request, f"Sucesfully created {str(len(config_data))} config objects: {config_names}", user_id, HttpResponseType.CREATED.value)
         return {"success": "Data created"}, HttpResponseType.CREATED.value
 
     def delete(self, auth_token):
@@ -124,8 +138,10 @@ class BikeConfigApi(MethodView):
         """
 
         user_valid, response = validate_user(auth_token, self.db)
+        user_id = get_user_id_from_token(auth_token, self.db)
 
         if not user_valid:
+            log_warning(self.app, request, "Unauthorized API acess", user_id, "Invalid auth token", response.error())
             return response.error()
 
         db_connection = self.db["configs"]
@@ -138,6 +154,7 @@ class BikeConfigApi(MethodView):
         for object in config_data:
             if "name" in object and "type" in object:
                 db_connection.update_one(object, {"$set": {"inactive": True}})
+                log_info(self.app, request, f"Sucesfully marked {object["type"]}'s \"{object["name"]}\" as inactive", user_id, HttpResponseType.OK.value)
             else:
                 """Do we want some sort of msg here? What if some are found but others arnt?"""
 
